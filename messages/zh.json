@@ -1,0 +1,75 @@
+{
+  "sidebar": {
+    "heading": {
+      "overview": "概览",
+      "management": "管理",
+      "account": "账户"
+    },
+    "menu": {
+      "dashboard": "仪表盘",
+      "customers": "客户",
+      "allCustomers": "全部客户",
+      "highValue": "高价值客户",
+      "atRisk": "流失风险",
+      "tickets": "工单",
+      "profile": "个人资料",
+      "settings": "设置",
+      "version": "v1.0.0",
+      "viewSource": "查看源码"
+    }
+  },
+  "header": {
+    "search": {
+      "placeholder": "搜索页面…",
+      "noResults": "未找到相关页面"
+    },
+    "notifications": {
+      "title": "通知",
+      "newBadge": "{count} 条未读",
+      "seeAll": "查看全部通知"
+    },
+    "profile": {
+      "home": "首页",
+      "profile": "个人资料",
+      "tickets": "工单",
+      "settings": "设置",
+      "logOut": "退出登录"
+    }
+  },
+  "pages": {
+    "comingSoon": "即将上线",
+    "dashboard": {
+      "title": "仪表盘",
+      "description": "KPI 卡片、图表与核心业务指标的快速概览。"
+    },
+    "customers": {
+      "title": "客户",
+      "description": "由 URL 查询参数驱动的数据表格，支持搜索、筛选、排序与分页。",
+      "segments": {
+        "highValue": {
+          "title": "高价值客户",
+          "description": "按生命周期价值排名的重点客户，展示收入与留存信号。"
+        },
+        "atRisk": {
+          "title": "流失风险客户",
+          "description": "活跃度下降或续约逾期、需要重点跟进的客户。"
+        }
+      }
+    },
+    "tickets": {
+      "title": "工单",
+      "description": "完整的 CRUD 流程：创建、分派与更新支持工单。"
+    },
+    "profile": {
+      "title": "个人资料",
+      "description": "包含头像、标签页与账户信息的个人资料页。"
+    },
+    "settings": {
+      "title": "设置",
+      "description": "基于 react-hook-form 与 zod 校验的设置表单。"
+    }
+  },
+  "common": {
+    "pro": "专业版"
+  }
+}

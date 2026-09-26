@@ -1,0 +1,75 @@
+{
+  "sidebar": {
+    "heading": {
+      "overview": "Overview",
+      "management": "Management",
+      "account": "Account"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "customers": "Customers",
+      "allCustomers": "All Customers",
+      "highValue": "High Value",
+      "atRisk": "At Risk",
+      "tickets": "Tickets",
+      "profile": "Profile",
+      "settings": "Settings",
+      "version": "v1.0.0",
+      "viewSource": "View Source"
+    }
+  },
+  "header": {
+    "search": {
+      "placeholder": "Search pages...",
+      "noResults": "No pages found"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "newBadge": "{count} new",
+      "seeAll": "See all notifications"
+    },
+    "profile": {
+      "home": "Home",
+      "profile": "Profile",
+      "tickets": "Tickets",
+      "settings": "Settings",
+      "logOut": "Log Out"
+    }
+  },
+  "pages": {
+    "comingSoon": "Coming soon",
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "KPI cards, charts and a quick overview of key business metrics."
+    },
+    "customers": {
+      "title": "Customers",
+      "description": "A data table with search, filtering, sorting and pagination driven by URL search params.",
+      "segments": {
+        "highValue": {
+          "title": "High-Value Customers",
+          "description": "Top accounts ranked by lifetime value, with revenue and retention signals."
+        },
+        "atRisk": {
+          "title": "At-Risk Customers",
+          "description": "Accounts with declining engagement or overdue renewals that need attention."
+        }
+      }
+    },
+    "tickets": {
+      "title": "Tickets",
+      "description": "A CRUD workflow to create, triage and update support tickets."
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "User profile with avatar, tabs and account details."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Settings form built with react-hook-form and zod validation."
+    }
+  },
+  "common": {
+    "pro": "Pro"
+  }
+}

@@ -1,0 +1,5 @@
+<svg width="120" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="8" fill="#F8FAFC"/>
+  <path d="M10 22V10h3.5l5 8.2V10H22v12h-3.5l-5-8.2V22H10z" fill="#0F172A"/>
+  <text x="40" y="21" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#F8FAFC">Dashboard</text>
+</svg>
