@@ -1,0 +1,74 @@
+{
+  "sidebar": {
+    "heading": {
+      "overview": "Übersicht",
+      "management": "Verwaltung",
+      "account": "Konto"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "customers": "Kunden",
+      "allCustomers": "Alle Kunden",
+      "highValue": "Top-Kunden",
+      "atRisk": "Gefährdet",
+      "tickets": "Tickets",
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "viewSource": "Quellcode ansehen"
+    }
+  },
+  "header": {
+    "search": {
+      "placeholder": "Seiten suchen...",
+      "noResults": "Keine Seiten gefunden"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "newBadge": "{count} neu",
+      "seeAll": "Alle Benachrichtigungen ansehen"
+    },
+    "profile": {
+      "home": "Startseite",
+      "profile": "Profil",
+      "tickets": "Tickets",
+      "settings": "Einstellungen",
+      "logOut": "Abmelden"
+    }
+  },
+  "pages": {
+    "comingSoon": "In Kürze",
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "KPI-Karten, Diagramme und ein schneller Überblick über die wichtigsten Geschäftskennzahlen."
+    },
+    "customers": {
+      "title": "Kunden",
+      "description": "Eine Datentabelle mit Suche, Filterung, Sortierung und Paginierung – gesteuert über URL-Parameter.",
+      "segments": {
+        "highValue": {
+          "title": "Top-Kunden",
+          "description": "Wichtigste Konten nach Lebenszeitwert sortiert, mit Umsatz- und Bindungssignalen."
+        },
+        "atRisk": {
+          "title": "Gefährdete Kunden",
+          "description": "Konten mit nachlassender Aktivität oder überfälligen Verlängerungen, die Aufmerksamkeit brauchen."
+        }
+      }
+    },
+    "tickets": {
+      "title": "Tickets",
+      "description": "Ein CRUD-Workflow zum Erstellen, Priorisieren und Aktualisieren von Support-Tickets."
+    },
+    "profile": {
+      "title": "Profil",
+      "description": "Benutzerprofil mit Avatar, Tabs und Kontodetails."
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "description": "Einstellungsformular mit react-hook-form und zod-Validierung."
+    }
+  },
+  "common": {
+    "pro": "Pro"
+  }
+}

@@ -1,9 +1,17 @@
 import type { ComponentType } from "react";
 import { UsFlag } from "./us-flag";
 import { CnFlag } from "./cn-flag";
+import { DeFlag } from "./de-flag";
+import { EsFlag } from "./es-flag";
+import { ArFlag } from "./ar-flag";
 
 /** All registered icon names. Add a new entry when introducing an icon file. */
-export type IconName = "us-flag" | "cn-flag";
+export type IconName =
+  | "us-flag"
+  | "cn-flag"
+  | "de-flag"
+  | "es-flag"
+  | "ar-flag";
 
 /** Contract every icon component must fulfill so <Icon /> can render it. */
 interface IconComponentProps {
@@ -14,6 +22,9 @@ interface IconComponentProps {
 const REGISTRY: Record<IconName, ComponentType<IconComponentProps>> = {
   "us-flag": UsFlag,
   "cn-flag": CnFlag,
+  "de-flag": DeFlag,
+  "es-flag": EsFlag,
+  "ar-flag": ArFlag,
 };
 
 interface IconProps {

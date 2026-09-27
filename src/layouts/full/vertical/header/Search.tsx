@@ -56,11 +56,11 @@ function Search() {
     <div className="relative w-full">
       <div className="relative w-48 sm:w-56 lg:w-72">
         <SearchIcon size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+          className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
         />
         <Input
           placeholder={tHeader("placeholder")}
-          className="rounded-lg pl-10!"
+          className="rounded-lg ps-10!"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

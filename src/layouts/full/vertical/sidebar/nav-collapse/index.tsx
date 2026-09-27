@@ -98,7 +98,7 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
                   />
                 </summary>
 
-                <div className="pl-3 ml-5 border-l border-border group-data-[state=collapsed]:hidden">
+                <div className="ps-3 ms-5 border-s border-border group-data-[state=collapsed]:hidden">
                   {item.items?.map((sub: ChildItem, index) =>
                     sub.items ? (
                       <NavCollapse

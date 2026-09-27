@@ -26,7 +26,7 @@ export function NavUser() {
                                 <SidebarMenuButton size="lg" className="h-full cursor-pointer w-full">
                                     <div className="flex items-center gap-3 w-full">
                                         <item.icon className="shadow-none size-5 shrink-0" />
-                                        <div className="flex flex-col flex-1 text-left text-sm leading-tight hide-menu whitespace-nowrap">
+                                        <div className="flex flex-col flex-1 text-start text-sm leading-tight hide-menu whitespace-nowrap">
                                             <span className="truncate font-medium">{t(item.titleKey)}</span>
                                         </div>
                                     </div>

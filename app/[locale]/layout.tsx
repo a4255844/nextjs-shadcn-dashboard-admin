@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, getDirection } from "@/i18n/routing";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -40,6 +40,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
+      dir={getDirection(locale)}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

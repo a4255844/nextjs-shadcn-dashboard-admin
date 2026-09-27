@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { PanelLeft } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import NavCollapse from './nav-collapse';
 import SimpleBar from 'simplebar-react';
 import FullLogo from '../../shared/logo/FullLogo';
@@ -16,10 +17,12 @@ import {
 } from "@/components/ui/sidebar";
 import { NavUser } from './NavUser';
 import { Button } from "@/components/ui/button";
+import { getDirection } from "@/i18n/routing";
 import sidebaritems from './sidebaritems';
 
 const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { toggleSidebar } = useSidebar();
+  const locale = useLocale();
 
   return (
     <Sidebar
@@ -27,7 +30,7 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
       collapsible="icon"
       {...props}
       className="sidebar-box **:data-[slot=sidebar-inner]:bg-background **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-border group-data-[state=collapsed]:hover:shadow-xl"
-      side="left"
+      side={getDirection(locale) === "rtl" ? "right" : "left"}
     >
       <SidebarHeader className="flex flex-row items-center justify-between border-b border-border p-3 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:px-2.5">
         <div className="group-data-[state=collapsed]:hidden">

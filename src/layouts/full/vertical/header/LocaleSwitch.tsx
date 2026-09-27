@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { useLocale } from "next-intl";
 import { Check } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { getDirection } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +18,9 @@ import { cn } from "cn";
 const LOCALES = [
   { code: "en", label: "English", icon: "us-flag" },
   { code: "zh", label: "中文", icon: "cn-flag" },
+  { code: "de", label: "Deutsch", icon: "de-flag" },
+  { code: "es", label: "Español", icon: "es-flag" },
+  { code: "ar", label: "العربية", icon: "ar-flag" },
 ] as const satisfies ReadonlyArray<{ code: string; label: string; icon: IconName }>;
 
 type LocaleCode = (typeof LOCALES)[number]["code"];
@@ -36,7 +40,7 @@ export default function LocaleSwitch() {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu dir={getDirection(locale)}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -59,7 +63,7 @@ export default function LocaleSwitch() {
           >
             <Icon name={item.icon} />
             {item.label}
-            {item.code === locale && <Check className="ml-auto size-4" />}
+            {item.code === locale && <Check className="ms-auto size-4" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

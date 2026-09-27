@@ -1,0 +1,74 @@
+{
+  "sidebar": {
+    "heading": {
+      "overview": "Resumen",
+      "management": "Gestión",
+      "account": "Cuenta"
+    },
+    "menu": {
+      "dashboard": "Panel",
+      "customers": "Clientes",
+      "allCustomers": "Todos los clientes",
+      "highValue": "Alto valor",
+      "atRisk": "En riesgo",
+      "tickets": "Tickets",
+      "profile": "Perfil",
+      "settings": "Ajustes",
+      "viewSource": "Ver código fuente"
+    }
+  },
+  "header": {
+    "search": {
+      "placeholder": "Buscar páginas...",
+      "noResults": "No se encontraron páginas"
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "newBadge": "{count} nuevas",
+      "seeAll": "Ver todas las notificaciones"
+    },
+    "profile": {
+      "home": "Inicio",
+      "profile": "Perfil",
+      "tickets": "Tickets",
+      "settings": "Ajustes",
+      "logOut": "Cerrar sesión"
+    }
+  },
+  "pages": {
+    "comingSoon": "Próximamente",
+    "dashboard": {
+      "title": "Panel",
+      "description": "Tarjetas KPI, gráficos y una visión general de las métricas clave del negocio."
+    },
+    "customers": {
+      "title": "Clientes",
+      "description": "Tabla de datos con búsqueda, filtrado, ordenación y paginación gestionados por parámetros URL.",
+      "segments": {
+        "highValue": {
+          "title": "Clientes de alto valor",
+          "description": "Cuentas principales ordenadas por valor de vida, con señales de ingresos y retención."
+        },
+        "atRisk": {
+          "title": "Clientes en riesgo",
+          "description": "Cuentas con participación decreciente o renovaciones vencidas que requieren atención."
+        }
+      }
+    },
+    "tickets": {
+      "title": "Tickets",
+      "description": "Flujo CRUD para crear, priorizar y actualizar tickets de soporte."
+    },
+    "profile": {
+      "title": "Perfil",
+      "description": "Perfil de usuario con avatar, pestañas y detalles de la cuenta."
+    },
+    "settings": {
+      "title": "Ajustes",
+      "description": "Formulario de ajustes creado con react-hook-form y validación con zod."
+    }
+  },
+  "common": {
+    "pro": "Pro"
+  }
+}
