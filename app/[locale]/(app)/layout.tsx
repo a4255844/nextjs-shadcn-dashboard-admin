@@ -11,9 +11,9 @@ export default function AppLayout({
   return (
     <SidebarProvider>
       <SidebarLayout />
-      <SidebarInset>
+      <SidebarInset className="bg-muted/30">
         <Header />
-        <div className="flex flex-1 flex-col p-4 sm:p-6">{children}</div>
+        <div className="flex flex-1 flex-col p-4 md:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

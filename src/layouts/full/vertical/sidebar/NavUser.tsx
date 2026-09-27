@@ -3,8 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroupContent, SidebarGroup } from "@/components/ui/sidebar"
 
-// TODO: 部署前替换为你的公开仓库地址
-const GITHUB_REPO_URL = "https://github.com/your-username/dashboard-next";
+const GITHUB_REPO_URL = "https://github.com/a4255844/nextjs-shadcn-dashboard-admin";
 
 export function NavUser() {
     const t = useTranslations("sidebar.menu");

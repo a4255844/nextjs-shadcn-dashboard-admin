@@ -1,7 +1,11 @@
 {
-  "name": "dashboard-next",
+  "name": "nextjs-shadcn-dashboard-admin",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a4255844/nextjs-shadcn-dashboard-admin.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

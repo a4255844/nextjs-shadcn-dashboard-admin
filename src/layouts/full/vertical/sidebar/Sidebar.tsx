@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { PanelLeft } from 'lucide-react';
 import NavCollapse from './nav-collapse';
 import SimpleBar from 'simplebar-react';
 import FullLogo from '../../shared/logo/FullLogo';
@@ -11,14 +12,14 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarHeader,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { NavUser } from './NavUser';
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import sidebaritems from './sidebaritems';
-import { useTranslations } from "next-intl";
 
 const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
-  const t = useTranslations("sidebar.menu");
+  const { toggleSidebar } = useSidebar();
 
   return (
     <Sidebar
@@ -28,9 +29,19 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
       className="sidebar-box **:data-[slot=sidebar-inner]:bg-background **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-border group-data-[state=collapsed]:hover:shadow-xl"
       side="left"
     >
-      <SidebarHeader className="p-3 group-data-[state=collapsed]:px-2.5 flex flex-row items-center justify-between border-b border-border">
-        <FullLogo />
-        <Badge className="group-data-[state=collapsed]:hidden" variant={"secondary"}>{t("version")}</Badge>
+      <SidebarHeader className="flex flex-row items-center justify-between border-b border-border p-3 group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:px-2.5">
+        <div className="group-data-[state=collapsed]:hidden">
+          <FullLogo />
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 cursor-pointer text-muted-foreground hover:bg-primary/5 hover:text-foreground"
+          onClick={toggleSidebar}
+          aria-label="Toggle sidebar"
+        >
+          <PanelLeft size={18} />
+        </Button>
       </SidebarHeader>
 
       <SidebarContent>
