@@ -39,7 +39,7 @@ export default function LocaleSwitch() {
       // 切换语言后布局方向必须跟随新语言（ar=rtl，其余=ltr），清除显式覆盖。
       // setDirection 会同步写入 localStorage，保证随后的跨 locale 整页导航也能恢复正确方向。
       setDirection(null);
-      router.replace(pathname, { locale: next });
+        router.replace(pathname, { locale: next });
     });
   }
 
@@ -63,7 +63,12 @@ export default function LocaleSwitch() {
           <DropdownMenuItem
             key={item.code}
             className="cursor-pointer"
-            onClick={() => switchLocale(item.code)}
+            onSelect={() => {
+              // 延迟到当前点击手势派发完、菜单关闭落定后再导航。
+              // 立即 router.replace 会在 transition 中同步重渲染 header（语言文案/方向变化），
+              // 打断 Radix 菜单的关闭流程，导致 open 被翻回 true（菜单关闭后又弹回）。
+              window.setTimeout(() => switchLocale(item.code), 50);
+            }}
           >
             <Icon name={item.icon} />
             {item.label}
