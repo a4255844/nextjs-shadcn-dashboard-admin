@@ -73,7 +73,12 @@
     "subtitle": "在此调整你的外观与布局偏好。",
     "close": "关闭",
     "sections": {
-      "style": "主题风格"
+      "style": "主题风格",
+      "mode": "主题模式"
+    },
+    "modes": {
+      "light": "浅色",
+      "dark": "深色"
     },
     "styles": {
       "vega": "Vega",

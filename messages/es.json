@@ -73,7 +73,12 @@
     "subtitle": "Realiza los cambios de personalización aquí.",
     "close": "Cerrar",
     "sections": {
-      "style": "Estilo del tema"
+      "style": "Estilo del tema",
+      "mode": "Opción del tema"
+    },
+    "modes": {
+      "light": "Claro",
+      "dark": "Oscuro"
     },
     "styles": {
       "vega": "Vega",

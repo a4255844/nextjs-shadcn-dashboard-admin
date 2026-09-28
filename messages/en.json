@@ -73,7 +73,12 @@
     "subtitle": "Make changes to your customizer here.",
     "close": "Close",
     "sections": {
-      "style": "Theme Style"
+      "style": "Theme Style",
+      "mode": "Theme Option"
+    },
+    "modes": {
+      "light": "Light",
+      "dark": "Dark"
     },
     "styles": {
       "vega": "Vega",

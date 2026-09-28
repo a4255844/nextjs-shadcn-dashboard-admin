@@ -12,14 +12,14 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import OptionCard from "./option-card";
-import { STYLE_OPTIONS } from "./types";
+import { MODE_OPTIONS, STYLE_OPTIONS } from "./types";
 import { useCustomizer } from "./customizer-context";
 
 // Customizer 抽屉：Header 齿轮触发，右侧滑出。
-// 本期仅包含 Theme Style 分区，后续模块在此追加 section。
+// 后续模块（方向/主题色/布局/容器）在各 section 之后继续追加。
 export default function Customizer() {
   const t = useTranslations("customizer");
-  const { settings, setStyle } = useCustomizer();
+  const { settings, setStyle, setMode } = useCustomizer();
 
   return (
     <Sheet>
@@ -72,6 +72,24 @@ export default function Customizer() {
                   label={t(`styles.${key}`)}
                   active={settings.style === key}
                   onSelect={() => setStyle(key)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-8 flex flex-col gap-4">
+            <h3 className="text-base font-semibold text-foreground">
+              {t("sections.mode")}
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {MODE_OPTIONS.map(({ key, icon }) => (
+                <OptionCard
+                  key={key}
+                  icon={icon}
+                  label={t(`modes.${key}`)}
+                  layout="horizontal"
+                  active={settings.mode === key}
+                  onSelect={() => setMode(key)}
                 />
               ))}
             </div>

@@ -1,39 +1,37 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import { useCustomizer } from "@/components/customizer/customizer-context";
+
+type DocumentWithViewTransition = Document & {
+  startViewTransition?: (callback: () => void) => {
+    ready: Promise<void>;
+  };
+};
 
 const LightDark = () => {
-  const [isMounted, setIsMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-    const isDarkMode = document.documentElement.classList.contains("dark");
-    setIsDark(isDarkMode);
-  }, []);
+  const { settings, mounted, setMode } = useCustomizer();
+  const isDark = settings.mode === "dark";
 
   const toggleTheme = async () => {
-    const newMode = !isDark;
-    setIsDark(newMode);
+    const newMode = isDark ? "light" : "dark";
 
+    // 立即改 class，保证 View Transition 捕获到新主题快照；
+    // React 状态与 localStorage 由 CustomizerProvider 统一接管（class 切换幂等）。
     const applyTheme = () => {
-      if (newMode) {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      }
+      document.documentElement.classList.toggle("dark", newMode === "dark");
+      setMode(newMode);
     };
 
-    if (!(document as Document & { startViewTransition?: (callback: () => void) => { ready: Promise<void> } }).startViewTransition) {
+    if (!(document as DocumentWithViewTransition).startViewTransition) {
       applyTheme();
       return;
     }
 
-    const transition = (document as Document & { startViewTransition: (callback: () => void) => { ready: Promise<void> } }).startViewTransition(applyTheme);
+    const transition = (
+      document as DocumentWithViewTransition
+    ).startViewTransition!(applyTheme);
     await transition.ready;
 
     document.documentElement.animate(
@@ -48,7 +46,7 @@ const LightDark = () => {
     );
   };
 
-  if (!isMounted) {
+  if (!mounted) {
     return null;
   }
 
@@ -58,6 +56,7 @@ const LightDark = () => {
         variant="ghost"
         className="h-10 w-10 hover:bg-primary/5 rounded-full cursor-pointer"
         onClick={toggleTheme}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       >
         {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
       </Button>

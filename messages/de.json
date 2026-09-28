@@ -73,7 +73,12 @@
     "subtitle": "Nimm hier deine Anpassungen vor.",
     "close": "Schließen",
     "sections": {
-      "style": "Designstil"
+      "style": "Designstil",
+      "mode": "Designoption"
+    },
+    "modes": {
+      "light": "Hell",
+      "dark": "Dunkel"
     },
     "styles": {
       "vega": "Vega",
