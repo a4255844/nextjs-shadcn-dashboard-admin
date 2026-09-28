@@ -118,10 +118,15 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle("dark", settings.mode === "dark");
   }, [settings.mode]);
 
-  // 同步到 <html dir>（覆盖服务端按 locale 写入的初始值）
+  // 同步到 <html dir>（根 layout 是静态的，初始 dir 由 head 脚本按 URL 校正，这里负责后续更新）
   useEffect(() => {
     document.documentElement.dir = resolvedDirection;
   }, [resolvedDirection]);
+
+  // 同步到 <html lang>（locale 变化时更新；初始值同样由 head 脚本在绘制前设置）
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   // 所有变更经 update 一次性"改 state + 落盘"。
   // 必须同步写 localStorage——跨语言切换走的是整页硬导航（proxy 参与），
