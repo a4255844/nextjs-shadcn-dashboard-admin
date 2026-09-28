@@ -68,6 +68,23 @@
       "description": "Settings form built with react-hook-form and zod validation."
     }
   },
+  "customizer": {
+    "title": "Customizer",
+    "subtitle": "Make changes to your customizer here.",
+    "close": "Close",
+    "sections": {
+      "style": "Theme Style"
+    },
+    "styles": {
+      "vega": "Vega",
+      "nova": "Nova",
+      "maia": "Maia",
+      "lyra": "Lyra",
+      "mira": "Mira",
+      "luma": "Luma",
+      "rhea": "Rhea"
+    }
+  },
   "common": {
     "pro": "Pro"
   }

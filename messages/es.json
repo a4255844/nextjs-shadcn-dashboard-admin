@@ -68,6 +68,23 @@
       "description": "Formulario de ajustes creado con react-hook-form y validación con zod."
     }
   },
+  "customizer": {
+    "title": "Personalizador",
+    "subtitle": "Realiza los cambios de personalización aquí.",
+    "close": "Cerrar",
+    "sections": {
+      "style": "Estilo del tema"
+    },
+    "styles": {
+      "vega": "Vega",
+      "nova": "Nova",
+      "maia": "Maia",
+      "lyra": "Lyra",
+      "mira": "Mira",
+      "luma": "Luma",
+      "rhea": "Rhea"
+    }
+  },
   "common": {
     "pro": "Pro"
   }

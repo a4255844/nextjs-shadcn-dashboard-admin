@@ -16,17 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SearchIcon } from "lucide-react";
 import { DashboardCard } from "@/components/shared/dashboard-card";
-
-type ProductRow = {
-  id: string;
-  project: string;
-  productImg: string;
-  name: string;
-  role: string;
-  timeline: string;
-  budget: string;
-  statustext: 'On track' | 'Delayed' | 'Submitted';
-};
+import type { ProductRow } from "./types";
 
 const ProductTableData: ProductRow[] = [
   {

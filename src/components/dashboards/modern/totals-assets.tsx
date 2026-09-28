@@ -1,9 +1,10 @@
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardCard } from "@/components/shared/dashboard-card";
 import { Bookmark, BriefcaseBusiness, Box, Users, File } from 'lucide-react';
+import type { AssetItem } from "./types";
 
 
-const assetsData = [
+const assetsData: AssetItem[] = [
   {
     id: 'Employees',
     title: 'Employees',

@@ -7,8 +7,7 @@ import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/comp
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import SimpleBar from "simplebar-react";
 import { Button } from "@/components/ui/button";
-
-type StatusKey = "Processing" | "Delayed" | "Delivered" | "Cancelled";
+import type { OrderRow, StatusKey } from "./types";
 
 const statusConfig: Record<StatusKey, { bg: string; text: string }> = {
   Processing: { bg: "bg-[#f54900]/10", text: "text-[#f54900]" },
@@ -17,16 +16,7 @@ const statusConfig: Record<StatusKey, { bg: string; text: string }> = {
   Cancelled: { bg: "bg-[#ec003f]/10", text: "text-[#ec003f]" },
 };
 
-const orders: {
-  id: string;
-  project: string;
-  avatar: string;
-  name: string;
-  role: string;
-  status: StatusKey;
-  price: string;
-  deadline: string;
-}[] = [
+const orders: OrderRow[] = [
     {
       id: "SD-2026-001",
       project: "Modernize",

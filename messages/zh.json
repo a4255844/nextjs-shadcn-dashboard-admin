@@ -68,6 +68,23 @@
       "description": "基于 react-hook-form 与 zod 校验的设置表单。"
     }
   },
+  "customizer": {
+    "title": "自定义设置",
+    "subtitle": "在此调整你的外观与布局偏好。",
+    "close": "关闭",
+    "sections": {
+      "style": "主题风格"
+    },
+    "styles": {
+      "vega": "Vega",
+      "nova": "Nova",
+      "maia": "Maia",
+      "lyra": "Lyra",
+      "mira": "Mira",
+      "luma": "Luma",
+      "rhea": "Rhea"
+    }
+  },
   "common": {
     "pro": "专业版"
   }

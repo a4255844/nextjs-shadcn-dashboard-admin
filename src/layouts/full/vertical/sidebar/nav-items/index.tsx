@@ -2,7 +2,7 @@
 
 import { cn } from "cn";
 import { ChevronRight } from "lucide-react";
-import { ChildItem } from "../sidebaritems";
+import type { ChildItem } from "../types";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";

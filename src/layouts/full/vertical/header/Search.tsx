@@ -3,16 +3,11 @@
 import { useState, useMemo } from "react";
 import { FileText, Search as SearchIcon } from 'lucide-react';
 import { useTranslations } from "next-intl";
-import SidebarContent, { ChildItem } from "../../vertical/sidebar/sidebaritems";
+import SidebarContent from "../../vertical/sidebar/sidebaritems";
+import type { ChildItem } from "../../vertical/sidebar/types";
+import type { SearchResult } from "./types";
 import { Input } from "@/components/ui/input";
 import { Link } from "@/i18n/navigation";
-
-interface SearchResult {
-  key: string;
-  label: string;
-  url: string;
-  external?: boolean;
-}
 
 function Search() {
   const [query, setQuery] = useState("");

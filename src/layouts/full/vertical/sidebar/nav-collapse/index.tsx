@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import NavItem from "../nav-items/index";
 import { cn } from "cn";
 import { useSidebar } from "@/components/ui/sidebar";
-import { MenuItem, ChildItem } from "../sidebaritems";
+import type { MenuItem, ChildItem } from "../types";
 
 interface NavCollapseProps {
   menu: MenuItem[];

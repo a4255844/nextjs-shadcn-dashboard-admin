@@ -68,6 +68,23 @@
       "description": "نموذج إعدادات مبني باستخدام react-hook-form والتحقق من الصحة باستخدام zod."
     }
   },
+  "customizer": {
+    "title": "المخصّص",
+    "subtitle": "أجرِ تغييراتك على المخصّص هنا.",
+    "close": "إغلاق",
+    "sections": {
+      "style": "نمط القالب"
+    },
+    "styles": {
+      "vega": "Vega",
+      "nova": "Nova",
+      "maia": "Maia",
+      "lyra": "Lyra",
+      "mira": "Mira",
+      "luma": "Luma",
+      "rhea": "Rhea"
+    }
+  },
   "common": {
     "pro": "Pro"
   }

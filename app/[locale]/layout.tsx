@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing, getDirection } from "@/i18n/routing";
+import { CustomizerProvider } from "@/components/customizer/customizer-context";
+import { CUSTOMIZER_INIT_SCRIPT } from "@/components/customizer/customizer-init";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -41,10 +43,18 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       dir={getDirection(locale)}
+      data-style="vega"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* 在首屏绘制前恢复 customizer 设置，防止主题闪烁 */}
+        <script dangerouslySetInnerHTML={{ __html: CUSTOMIZER_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          <CustomizerProvider>{children}</CustomizerProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -1,15 +1,7 @@
 //   Notification Data
-import { Calendar, Settings, LucideIcon, Command, LayoutPanelLeft } from 'lucide-react';
-
-interface NotificationType {
-  title: string;
-  icon: LucideIcon;
-  subtitle: string;
-  bgcolor: string;
-  color: string;
-  time: string;
-  isRead?: boolean;
-}
+import { Calendar, Settings, Command, LayoutPanelLeft } from 'lucide-react';
+import { Home, User, Ticket, Settings as SettingsIcon } from 'lucide-react';
+import type { NotificationType, ProfileType } from "./types";
 
 const Notification: NotificationType[] = [
   {
@@ -68,15 +60,7 @@ const Notification: NotificationType[] = [
   },
 ];
 
-interface profileType {
-  avatar: LucideIcon;
-  titleKey: string;
-  href: string;
-}
-
-import { Home, User, Ticket, Settings as SettingsIcon } from 'lucide-react';
-
-const profileDD: profileType[] = [
+const profileDD: ProfileType[] = [
   {
     avatar: Home,
     titleKey: 'home',

@@ -6,6 +6,7 @@ import Profile from "./Profile";
 import LightDark from "./Light-Dark";
 import Notifications from "./Notifications";
 import LocaleSwitch from "./LocaleSwitch";
+import Customizer from "@/components/customizer/customizer-panel";
 
 const Header = () => {
   return (
@@ -25,6 +26,7 @@ const Header = () => {
 
             <div className="flex items-center gap-0 sm:gap-1">
               <LocaleSwitch />
+              <Customizer />
               <LightDark />
               <Notifications className="hidden sm:block" />
               <Profile />

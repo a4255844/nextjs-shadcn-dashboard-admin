@@ -17,8 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type {
+  AnimatedTooltipContentProps,
+  SalesDataPoint,
+} from "./types";
 
-const allChartData: Record<string, { date: string; newUser: number; existingUser: number }[]> = {
+const allChartData: Record<string, SalesDataPoint[]> = {
   "Last 30 Days": [
     { date: "Mar 30", newUser: 12, existingUser: 20 },
     { date: "Apr 1", newUser: 18, existingUser: 25 },
@@ -109,13 +113,7 @@ function AnimatedValue({ value }: { value: number }) {
   return <>{animated.toLocaleString()}</>;
 }
 
-type TooltipItem = { name?: string; value?: number; color?: string; dataKey?: string; type?: string };
-type ConfigEntry = { label?: string; color?: string };
-
-function AnimatedTooltipContent({ active, payload, label, hideLabel = false, config }: {
-  active?: boolean; payload?: TooltipItem[]; label?: string;
-  hideLabel?: boolean; config?: Record<string, ConfigEntry>;
-}) {
+function AnimatedTooltipContent({ active, payload, label, hideLabel = false, config }: AnimatedTooltipContentProps) {
   if (!active || !payload?.length) return null;
   const items = payload.filter((item) => item.type !== "none" && item.value !== undefined);
   if (!items.length) return null;

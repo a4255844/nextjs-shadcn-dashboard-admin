@@ -68,6 +68,23 @@
       "description": "Einstellungsformular mit react-hook-form und zod-Validierung."
     }
   },
+  "customizer": {
+    "title": "Anpassung",
+    "subtitle": "Nimm hier deine Anpassungen vor.",
+    "close": "Schließen",
+    "sections": {
+      "style": "Designstil"
+    },
+    "styles": {
+      "vega": "Vega",
+      "nova": "Nova",
+      "maia": "Maia",
+      "lyra": "Lyra",
+      "mira": "Mira",
+      "luma": "Luma",
+      "rhea": "Rhea"
+    }
+  },
   "common": {
     "pro": "Pro"
   }
