@@ -74,11 +74,16 @@
     "close": "Schließen",
     "sections": {
       "style": "Designstil",
-      "mode": "Designoption"
+      "mode": "Designoption",
+      "direction": "Designrichtung"
     },
     "modes": {
       "light": "Hell",
       "dark": "Dunkel"
+    },
+    "directions": {
+      "ltr": "LTR",
+      "rtl": "RTL"
     },
     "styles": {
       "vega": "Vega",

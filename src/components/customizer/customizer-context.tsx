@@ -6,16 +6,21 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
+import { useLocale } from "next-intl";
+import { getDirection } from "@/i18n/routing";
 import {
   DEFAULT_SETTINGS,
   LEGACY_THEME_KEY,
   STORAGE_KEY,
+  THEME_DIRECTIONS,
   THEME_MODES,
   THEME_STYLES,
   type CustomizerSettings,
+  type ThemeDirection,
   type ThemeMode,
   type ThemeStyle,
 } from "./types";
@@ -24,9 +29,13 @@ interface CustomizerContextValue {
   settings: CustomizerSettings;
   /** 是否已从 localStorage 完成恢复（首帧为 false） */
   mounted: boolean;
+  /** 实际生效的文本方向：显式设置优先，否则回退当前 locale 推导 */
+  resolvedDirection: ThemeDirection;
   setStyle: (style: ThemeStyle) => void;
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
+  /** 设置显式方向；传 null 清除覆盖、回到跟随当前 locale */
+  setDirection: (direction: ThemeDirection | null) => void;
   reset: () => void;
 }
 
@@ -40,6 +49,11 @@ function isStyle(v?: ThemeStyle): v is ThemeStyle {
 
 function isMode(v?: ThemeMode): v is ThemeMode {
   return v !== undefined && THEME_MODES.includes(v);
+}
+
+// direction 允许 null（跟随 locale），仅在为显式 ltr/rtl 时收窄
+function isDirection(v?: ThemeDirection | null): v is ThemeDirection {
+  return v !== null && v !== undefined && THEME_DIRECTIONS.includes(v);
 }
 // 解析 localStorage 取出的任意字符串：合法则收窄为 ThemeMode，否则 null
 function parseMode(v: string | null): ThemeMode | null {
@@ -67,6 +81,7 @@ function loadSettings(): CustomizerSettings {
     return {
       style: isStyle(parsed.style) ? parsed.style : DEFAULT_SETTINGS.style,
       mode,
+      direction: isDirection(parsed.direction) ? parsed.direction : null,
     };
   } catch {
     return DEFAULT_SETTINGS;
@@ -77,10 +92,19 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
   // 始终以默认值启动，保证 SSR 与首帧一致，避免 hydration mismatch
   const [settings, setSettings] = useState<CustomizerSettings>(DEFAULT_SETTINGS);
   const [mounted, setMounted] = useState(false);
+  // 最新设置的同步引用，供 update 在事件中同步读取/落盘
+  const settingsRef = useRef(settings);
+  const locale = useLocale();
 
-  // hydration 后读取持久化设置（首屏的 data-style/.dark 已由内联脚本提前写入）
+  // 显式方向优先；为 null 时回退 locale 推导。首帧默认值即 locale 方向，与 SSR 一致
+  const resolvedDirection: ThemeDirection =
+    settings.direction ?? getDirection(locale);
+
+  // hydration 后读取持久化设置（首屏的 data-style/.dark/dir 已由内联脚本提前写入）
   useEffect(() => {
-    setSettings(loadSettings());
+    const loaded = loadSettings();
+    settingsRef.current = loaded;
+    setSettings(loaded);
     setMounted(true);
   }, []);
 
@@ -94,34 +118,68 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle("dark", settings.mode === "dark");
   }, [settings.mode]);
 
-  // 持久化
+  // 同步到 <html dir>（覆盖服务端按 locale 写入的初始值）
   useEffect(() => {
-    if (!mounted) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-  }, [settings, mounted]);
+    document.documentElement.dir = resolvedDirection;
+  }, [resolvedDirection]);
 
-  const setStyle = useCallback((style: ThemeStyle) => {
-    setSettings((prev) => ({ ...prev, style }));
+  // 所有变更经 update 一次性"改 state + 落盘"。
+  // 必须同步写 localStorage——跨语言切换走的是整页硬导航（proxy 参与），
+  // 若靠异步 effect 持久化，旧页面卸载时写入会丢失，新页面又恢复成旧覆盖。
+  const update = useCallback((patch: Partial<CustomizerSettings>) => {
+    const next = { ...settingsRef.current, ...patch };
+    settingsRef.current = next;
+    setSettings(next);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // 存储不可用（隐私模式等）时仅内存生效
+    }
   }, []);
 
-  const setMode = useCallback((mode: ThemeMode) => {
-    setSettings((prev) => ({ ...prev, mode }));
-  }, []);
+  const setStyle = useCallback(
+    (style: ThemeStyle) => update({ style }),
+    [update]
+  );
 
-  const toggleMode = useCallback(() => {
-    setSettings((prev) => ({
-      ...prev,
-      mode: prev.mode === "dark" ? "light" : "dark",
-    }));
-  }, []);
+  const setMode = useCallback((mode: ThemeMode) => update({ mode }), [update]);
 
-  const reset = useCallback(() => {
-    setSettings(DEFAULT_SETTINGS);
-  }, []);
+  const toggleMode = useCallback(
+    () =>
+      update({
+        mode: settingsRef.current.mode === "dark" ? "light" : "dark",
+      }),
+    [update]
+  );
+
+  const setDirection = useCallback(
+    (direction: ThemeDirection | null) => update({ direction }),
+    [update]
+  );
+
+  const reset = useCallback(() => update(DEFAULT_SETTINGS), [update]);
 
   const value = useMemo(
-    () => ({ settings, mounted, setStyle, setMode, toggleMode, reset }),
-    [settings, mounted, setStyle, setMode, toggleMode, reset]
+    () => ({
+      settings,
+      mounted,
+      resolvedDirection,
+      setStyle,
+      setMode,
+      toggleMode,
+      setDirection,
+      reset,
+    }),
+    [
+      settings,
+      mounted,
+      resolvedDirection,
+      setStyle,
+      setMode,
+      toggleMode,
+      setDirection,
+      reset,
+    ]
   );
 
   return (

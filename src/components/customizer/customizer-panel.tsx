@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import OptionCard from "./option-card";
-import { MODE_OPTIONS, STYLE_OPTIONS } from "./types";
+import { DIRECTION_OPTIONS, MODE_OPTIONS, STYLE_OPTIONS } from "./types";
 import { useCustomizer } from "./customizer-context";
 
 // Customizer 抽屉：Header 齿轮触发，右侧滑出。
-// 后续模块（方向/主题色/布局/容器）在各 section 之后继续追加。
+// 后续模块（主题色/布局/容器）在各 section 之后继续追加。
 export default function Customizer() {
   const t = useTranslations("customizer");
-  const { settings, setStyle, setMode } = useCustomizer();
+  const { settings, resolvedDirection, setStyle, setMode, setDirection } =
+    useCustomizer();
 
   return (
     <Sheet>
@@ -90,6 +91,24 @@ export default function Customizer() {
                   layout="horizontal"
                   active={settings.mode === key}
                   onSelect={() => setMode(key)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-8 flex flex-col gap-4">
+            <h3 className="text-base font-semibold text-foreground">
+              {t("sections.direction")}
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {DIRECTION_OPTIONS.map(({ key, icon }) => (
+                <OptionCard
+                  key={key}
+                  icon={icon}
+                  label={t(`directions.${key}`)}
+                  layout="horizontal"
+                  active={resolvedDirection === key}
+                  onSelect={() => setDirection(key)}
                 />
               ))}
             </div>

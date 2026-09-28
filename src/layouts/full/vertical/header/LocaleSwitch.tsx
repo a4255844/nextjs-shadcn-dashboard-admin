@@ -4,8 +4,8 @@ import { useTransition } from "react";
 import { useLocale } from "next-intl";
 import { Check } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { getDirection } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
+import { useCustomizer } from "@/components/customizer/customizer-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,17 +30,21 @@ export default function LocaleSwitch() {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const { resolvedDirection, setDirection } = useCustomizer();
   const current = LOCALES.find((item) => item.code === locale) ?? LOCALES[0];
 
   function switchLocale(next: LocaleCode) {
     if (next === locale) return;
     startTransition(() => {
+      // 切换语言后布局方向必须跟随新语言（ar=rtl，其余=ltr），清除显式覆盖。
+      // setDirection 会同步写入 localStorage，保证随后的跨 locale 整页导航也能恢复正确方向。
+      setDirection(null);
       router.replace(pathname, { locale: next });
     });
   }
 
   return (
-    <DropdownMenu dir={getDirection(locale)}>
+    <DropdownMenu dir={resolvedDirection}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"

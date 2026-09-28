@@ -74,11 +74,16 @@
     "close": "Cerrar",
     "sections": {
       "style": "Estilo del tema",
-      "mode": "Opción del tema"
+      "mode": "Opción del tema",
+      "direction": "Dirección del tema"
     },
     "modes": {
       "light": "Claro",
       "dark": "Oscuro"
+    },
+    "directions": {
+      "ltr": "LTR",
+      "rtl": "RTL"
     },
     "styles": {
       "vega": "Vega",
