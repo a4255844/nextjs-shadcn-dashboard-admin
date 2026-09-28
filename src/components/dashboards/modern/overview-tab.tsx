@@ -49,27 +49,28 @@ export default function OverviewTab() {
           <p className='text-sm font-normal text-muted-foreground'>Stay informed with today’s analytics</p>
         </div>
         <div className="flex items-center lg:flex-nowrap flex-wrap gap-2">
-          <Button variant="outline" className={"p-2.5 h-auto outline rounded-lg cursor-pointer"}>
+          <Button variant="outline" size="icon" aria-label="Refresh">
             <RefreshCcw size={16} />
           </Button>
-          <div>
-            <Select value={selectedYear} onValueChange={(value) => value && setSelectedYear(value)}>
-              <SelectTrigger className="w-fit h-auto! text-foreground cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <CalendarDays size={16} />
-                  <SelectValue />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {dropdownItems.map((item, index) => (
-                  <SelectItem className={"cursor-pointer"} key={index} value={item}>
-                    {item}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <Button className="flex items-center gap-1.5 h-auto px-4 py-2 rounded-lg cursor-pointer">
+          <Select value={selectedYear} onValueChange={(value) => value && setSelectedYear(value)}>
+            <SelectTrigger className="w-fit gap-2">
+              <CalendarDays size={16} className="text-muted-foreground" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent
+              position="popper"
+              align="start"
+              sideOffset={4}
+              className="rounded-md shadow-md"
+            >
+              {dropdownItems.map((item) => (
+                <SelectItem key={item} value={item}>
+                  {item}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button className="gap-2 px-4">
             <Download size={16} />
             <span className="text-sm font-medium">Export</span>
           </Button>

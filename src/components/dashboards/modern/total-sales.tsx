@@ -171,7 +171,12 @@ export default function TotalSales() {
             <SelectTrigger className="h-auto! w-fit text-sm font-medium text-foreground border-border shadow-[0px_1px_2px_rgba(0,0,0,0.05)] cursor-pointer gap-1.5 px-3">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+              position="popper"
+              align="start"
+              sideOffset={4}
+              className="rounded-md shadow-md"
+            >
               {periodOptions.map((opt) => (
                 <SelectItem key={opt} value={opt} className="cursor-pointer">
                   {opt}
