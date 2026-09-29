@@ -61,9 +61,12 @@ export type OrderRow = {
 };
 
 // totals-assets 资产卡片数据项
+// id/title 即 dashboard.assets 下的 i18n key，二者保持一致
+export type AssetKey = "employees" | "projects" | "clients" | "events";
+
 export type AssetItem = {
-  id: string;
-  title: string;
+  id: AssetKey;
+  title: AssetKey;
   href: string;
   value: string;
   icon: LucideIcon;

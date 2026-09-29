@@ -109,6 +109,70 @@
       "teal": "青色"
     }
   },
+  "dashboard": {
+    "greeting": {
+      "morning": "早上好",
+      "afternoon": "下午好",
+      "evening": "晚上好",
+      "night": "夜深了"
+    },
+    "subtitle": "随时掌握今日的数据分析",
+    "refresh": "刷新",
+    "export": "导出",
+    "periods": {
+      "monthly": "按月",
+      "yearly": "按年"
+    },
+    "banner": {
+      "update": "更新",
+      "text": "销售额在一周内增长了 <highlight>40%</highlight>",
+      "cta": "查看统计"
+    },
+    "stats": {
+      "weeklySales": "每周销售额",
+      "newUsers": "新用户",
+      "purchaseOrders": "采购订单",
+      "cta": "查看统计"
+    },
+    "sales": {
+      "title": "销售概览",
+      "totalLabel": "总销售额",
+      "vsLastMonth": "较上月",
+      "periods": {
+        "d30": "近 30 天",
+        "d7": "近 7 天",
+        "d90": "近 90 天"
+      },
+      "series": {
+        "newUser": "新用户",
+        "existingUser": "老用户"
+      }
+    },
+    "assets": {
+      "title": "总资产",
+      "employees": "员工",
+      "projects": "项目",
+      "clients": "客户",
+      "events": "活动"
+    },
+    "orders": {
+      "title": "项目与订单",
+      "moreOptions": "更多操作",
+      "columns": {
+        "project": "项目",
+        "item": "成员",
+        "status": "状态",
+        "price": "价格",
+        "deadline": "截止日期"
+      },
+      "status": {
+        "processing": "进行中",
+        "delayed": "已延迟",
+        "delivered": "已交付",
+        "cancelled": "已取消"
+      }
+    }
+  },
   "common": {
     "pro": "专业版"
   }

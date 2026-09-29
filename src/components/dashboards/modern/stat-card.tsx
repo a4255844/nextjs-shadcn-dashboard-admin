@@ -11,6 +11,8 @@ interface StatCardProps {
   badgeValue: string;
   badgeVariant?: "positive" | "negative";
   icon: LucideIcon;
+  /** "See Statistics" 按钮文案（由服务端页面注入翻译，保持本组件为 RSC） */
+  actionLabel: string;
 }
 
 export default function StatCard({
@@ -19,6 +21,7 @@ export default function StatCard({
   badgeValue,
   badgeVariant = "positive",
   icon: Icon,
+  actionLabel,
 }: StatCardProps) {
   return (
     <DashboardCard className="py-6">
@@ -41,7 +44,7 @@ export default function StatCard({
             </div>
           </div>
           <Button variant="outline" className="flex gap-1.5 px-4 py-2 h-auto rounded-md cursor-pointer">
-            See Statistics
+            {actionLabel}
             <span>
               <ArrowRight width={18} height={18} />
             </span>

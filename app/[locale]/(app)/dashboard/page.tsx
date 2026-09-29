@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import OverviewTab from "@/components/dashboards/modern/overview-tab";
 import StatCard from "@/components/dashboards/modern/stat-card";
 import TotalSales from "@/components/dashboards/modern/total-sales";
@@ -8,7 +9,9 @@ import StyleAwareWrapper from "@/components/shared/StyleAwareWrapper";
 import StyleDivider from "@/components/shared/StyleDivider";
 import { Handbag, Users, Box } from "lucide-react";
 
-const page = () => {
+const page = async () => {
+  const t = await getTranslations("dashboard");
+
   return (
     <>
       <div className="pb-4">
@@ -30,13 +33,13 @@ const page = () => {
         </div>
         <StyleDivider wrapperClassName="col-span-12" />
         <div className="lg:col-span-4 col-span-12">
-          <StatCard title="Weekly sales" value="714k" badgeValue="40%" icon={Handbag} />
+          <StatCard title={t("stats.weeklySales")} value="714k" badgeValue="40%" icon={Handbag} actionLabel={t("stats.cta")} />
         </div>
         <div className="lg:col-span-4 col-span-12">
-          <StatCard title="New users" value="1.35m" badgeValue="20%" badgeVariant="negative" icon={Users} />
+          <StatCard title={t("stats.newUsers")} value="1.35m" badgeValue="20%" badgeVariant="negative" icon={Users} actionLabel={t("stats.cta")} />
         </div>
         <div className="lg:col-span-4 col-span-12">
-          <StatCard title="Purchase Orders" value="1.72m" badgeValue="40%" icon={Box} />
+          <StatCard title={t("stats.purchaseOrders")} value="1.72m" badgeValue="40%" icon={Box} actionLabel={t("stats.cta")} />
         </div>
         <StyleDivider wrapperClassName="col-span-12" />
         <div className="col-span-12">

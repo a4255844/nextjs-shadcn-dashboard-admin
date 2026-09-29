@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from "next-intl";
 import { BriefcaseBusiness, ArrowDownUp, Ellipsis } from "lucide-react";
 import { CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { DashboardCard } from "@/components/shared/dashboard-card";
@@ -98,6 +99,8 @@ const getInitials = (name: string) =>
     .toUpperCase();
 
 export default function ProjectsOrders() {
+  const t = useTranslations("dashboard.orders");
+
   return (
     <DashboardCard className="flex flex-col gap-0!">
       {/* Header */}
@@ -105,7 +108,7 @@ export default function ProjectsOrders() {
         <CardTitle className="flex items-center gap-2">
           <BriefcaseBusiness size={16} className="text-foreground" />
           <span>
-            Projects & Orders
+            {t("title")}
           </span>
         </CardTitle>
       </CardHeader>
@@ -120,31 +123,31 @@ export default function ProjectsOrders() {
                   <TableRow className="hover:bg-transparent border-border">
                     <TableHead className="pl-4! px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[160px]">
                       <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        Project
+                        {t("columns.project")}
                         <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
                       </div>
                     </TableHead>
                     <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground">
                       <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        Item
+                        {t("columns.item")}
                         <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
                       </div>
                     </TableHead>
                     <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[130px]">
                       <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        Status
+                        {t("columns.status")}
                         <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
                       </div>
                     </TableHead>
                     <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[120px]">
                       <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        Price
+                        {t("columns.price")}
                         <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
                       </div>
                     </TableHead>
                     <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[130px]">
                       <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        Deadline
+                        {t("columns.deadline")}
                         <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
                       </div>
                     </TableHead>
@@ -195,7 +198,7 @@ export default function ProjectsOrders() {
                           <span
                             className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-normal whitespace-nowrap ${bg} ${text}`}
                           >
-                            {order.status}
+                            {t(`status.${order.status.toLowerCase() as Lowercase<StatusKey>}`)}
                           </span>
                         </TableCell>
 
@@ -218,7 +221,7 @@ export default function ProjectsOrders() {
                           <Button
                             variant="ghost"
                             className="p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                            aria-label="More options"
+                            aria-label={t("moreOptions")}
                           >
                             <Ellipsis size={16} className="text-foreground" />
                           </Button>

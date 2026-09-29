@@ -109,6 +109,70 @@
       "teal": "Verde azulado"
     }
   },
+  "dashboard": {
+    "greeting": {
+      "morning": "Buenos días",
+      "afternoon": "Buenas tardes",
+      "evening": "Buenas noches",
+      "night": "Buenas noches"
+    },
+    "subtitle": "Mantente al día con los análisis de hoy",
+    "refresh": "Actualizar",
+    "export": "Exportar",
+    "periods": {
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
+    "banner": {
+      "update": "Actualización",
+      "text": "Los ingresos por ventas aumentaron un <highlight>40%</highlight> en 1 semana",
+      "cta": "Ver estadísticas"
+    },
+    "stats": {
+      "weeklySales": "Ventas semanales",
+      "newUsers": "Nuevos usuarios",
+      "purchaseOrders": "Órdenes de compra",
+      "cta": "Ver estadísticas"
+    },
+    "sales": {
+      "title": "Resumen de ventas",
+      "totalLabel": "Ventas totales",
+      "vsLastMonth": "vs. el mes pasado",
+      "periods": {
+        "d30": "Últimos 30 días",
+        "d7": "Últimos 7 días",
+        "d90": "Últimos 90 días"
+      },
+      "series": {
+        "newUser": "Usuario nuevo",
+        "existingUser": "Usuario existente"
+      }
+    },
+    "assets": {
+      "title": "Activos totales",
+      "employees": "Empleados",
+      "projects": "Proyectos",
+      "clients": "Clientes",
+      "events": "Eventos"
+    },
+    "orders": {
+      "title": "Proyectos y pedidos",
+      "moreOptions": "Más opciones",
+      "columns": {
+        "project": "Proyecto",
+        "item": "Elemento",
+        "status": "Estado",
+        "price": "Precio",
+        "deadline": "Fecha límite"
+      },
+      "status": {
+        "processing": "Procesando",
+        "delayed": "Retrasado",
+        "delivered": "Entregado",
+        "cancelled": "Cancelado"
+      }
+    }
+  },
   "common": {
     "pro": "Pro"
   }

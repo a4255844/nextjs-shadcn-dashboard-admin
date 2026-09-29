@@ -1,35 +1,37 @@
+'use client'
+
+import { useTranslations } from 'next-intl';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardCard } from "@/components/shared/dashboard-card";
 import { Bookmark, BriefcaseBusiness, Box, Users, File } from 'lucide-react';
 import type { AssetItem } from "./types";
 
-
+// title 存 i18n key，展示时再翻译；数据将来接后端后同样只返回 key
 const assetsData: AssetItem[] = [
   {
-    id: 'Employees',
-    title: 'Employees',
+    id: 'employees',
+    title: 'employees',
     href: '/apps/kanban',
     value: '96',
     icon: Users
   },
-
   {
-    id: 'Projects',
-    title: 'Projects',
+    id: 'projects',
+    title: 'projects',
     href: '/apps/calendar',
     value: '356',
     icon: File
   },
   {
-    id: 'Clients',
-    title: 'Clients',
+    id: 'clients',
+    title: 'clients',
     href: '/',
     value: '3,650',
     icon: BriefcaseBusiness
   },
   {
-    id: 'Events',
-    title: 'Events',
+    id: 'events',
+    title: 'events',
     href: '/',
     value: '86',
     icon: Bookmark
@@ -58,19 +60,21 @@ function AssetCard({ title, value, icon: Icon }: AssetCardProps) {
 }
 
 export default function TotalAssets() {
+  const t = useTranslations('dashboard.assets');
+
   return (
     <DashboardCard className="flex flex-col gap-0! pb-0!">
       <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2">
           <Box size={16} className="text-muted-foreground" />
-          Total Assets
+          {t('title')}
         </CardTitle>
       </CardHeader>
       <CardContent className='h-full! px-0!'>
         <div className='h-full!'>
           <div className='grid grid-cols-2 h-full! gap-px bg-border'>
             {assetsData.map((item) => (
-              <AssetCard key={item.id} {...item} />
+              <AssetCard key={item.id} {...item} title={t(item.title)} />
             ))}
           </div>
         </div>

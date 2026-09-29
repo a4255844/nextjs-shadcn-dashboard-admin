@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { TrendingUp } from "lucide-react";
 import { Line, LineChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import {
@@ -22,8 +23,11 @@ import type {
   SalesDataPoint,
 } from "./types";
 
-const allChartData: Record<string, SalesDataPoint[]> = {
-  "Last 30 Days": [
+// 数据 key 与展示文案解耦：周期用稳定 key，展示时再翻译
+type PeriodKey = "d30" | "d7" | "d90";
+
+const allChartData: Record<PeriodKey, SalesDataPoint[]> = {
+  d30: [
     { date: "Mar 30", newUser: 12, existingUser: 20 },
     { date: "Apr 1", newUser: 18, existingUser: 25 },
     { date: "Apr 2", newUser: 14, existingUser: 22 },
@@ -47,7 +51,7 @@ const allChartData: Record<string, SalesDataPoint[]> = {
     { date: "May 1", newUser: 20, existingUser: 18 },
     { date: "May 4", newUser: 24, existingUser: 22 },
   ],
-  "Last 7 Days": [
+  d7: [
     { date: "Apr 28", newUser: 18, existingUser: 22 },
     { date: "Apr 29", newUser: 22, existingUser: 20 },
     { date: "Apr 30", newUser: 20, existingUser: 28 },
@@ -56,7 +60,7 @@ const allChartData: Record<string, SalesDataPoint[]> = {
     { date: "May 3", newUser: 32, existingUser: 20 },
     { date: "May 4", newUser: 22, existingUser: 28 },
   ],
-  "Last 90 Days": [
+  d90: [
     { date: "Feb 1", newUser: 14, existingUser: 22 },
     { date: "Feb 15", newUser: 20, existingUser: 28 },
     { date: "Mar 1", newUser: 18, existingUser: 24 },
@@ -69,10 +73,10 @@ const allChartData: Record<string, SalesDataPoint[]> = {
   ],
 };
 
-const xAxisLabels: Record<string, Set<string>> = {
-  "Last 30 Days": new Set(["Mar 30", "Apr 4", "Apr 9", "Apr 14", "Apr 19", "Apr 24", "Apr 29", "May 4"]),
-  "Last 7 Days": new Set(["Apr 28", "Apr 29", "Apr 30", "May 1", "May 2", "May 3", "May 4"]),
-  "Last 90 Days": new Set(["Feb 1", "Feb 15", "Mar 1", "Mar 15", "Mar 30", "Apr 14", "Apr 29", "May 4"]),
+const xAxisLabels: Record<PeriodKey, Set<string>> = {
+  d30: new Set(["Mar 30", "Apr 4", "Apr 9", "Apr 14", "Apr 19", "Apr 24", "Apr 29", "May 4"]),
+  d7: new Set(["Apr 28", "Apr 29", "Apr 30", "May 1", "May 2", "May 3", "May 4"]),
+  d90: new Set(["Feb 1", "Feb 15", "Mar 1", "Mar 15", "Mar 30", "Apr 14", "Apr 29", "May 4"]),
 };
 
 const chartConfig = {
@@ -80,7 +84,7 @@ const chartConfig = {
   existingUser: { label: "Existing User", color: "color-mix(in srgb, var(--primary) 60%, transparent)" },
 } satisfies ChartConfig;
 
-const periodOptions = ["Last 30 Days", "Last 7 Days", "Last 90 Days"];
+const periodOptions: PeriodKey[] = ["d30", "d7", "d90"];
 
 function useAnimatedNumber(target: number, duration = 450) {
   const [display, setDisplay] = useState(0);
@@ -136,7 +140,14 @@ function AnimatedTooltipContent({ active, payload, label, hideLabel = false, con
 }
 
 export default function TotalSales() {
-  const [period, setPeriod] = useState(periodOptions[0]);
+  const t = useTranslations("dashboard.sales");
+  const [period, setPeriod] = useState<PeriodKey>(periodOptions[0]);
+
+  // chartConfig 的 label 需要翻译，挂在组件内随 locale 重建
+  const localizedConfig = {
+    newUser: { ...chartConfig.newUser, label: t("series.newUser") },
+    existingUser: { ...chartConfig.existingUser, label: t("series.existingUser") },
+  } satisfies ChartConfig;
 
   const chartData = allChartData[period];
   const visibleLabels = xAxisLabels[period];
@@ -147,7 +158,7 @@ export default function TotalSales() {
       <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2">
           <TrendingUp size={16} className="text-muted-foreground" />
-          Sales Overview
+          {t("title")}
         </CardTitle>
       </CardHeader>
 
@@ -155,17 +166,17 @@ export default function TotalSales() {
         {/* Stats row + period selector */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex flex-col gap-1">
-            <span className="text-base font-normal text-foreground leading-6">Total Sales</span>
+            <span className="text-base font-normal text-foreground leading-6">{t("totalLabel")}</span>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-2xl font-semibold tracking-[-0.3px] text-foreground leading-8">
                 $12,450.00
               </span>
               <span className="text-sm font-medium text-chart-2">+22%</span>
-              <span className="text-sm font-normal text-muted-foreground">vs last month</span>
+              <span className="text-sm font-normal text-muted-foreground">{t("vsLastMonth")}</span>
             </div>
           </div>
 
-          <Select value={period} onValueChange={(v) => v && setPeriod(v)}>
+          <Select value={period} onValueChange={(v) => v && setPeriod(v as PeriodKey)}>
             <SelectTrigger className="h-auto! w-fit text-sm font-medium text-foreground border-border shadow-[0px_1px_2px_rgba(0,0,0,0.05)] cursor-pointer gap-1.5 px-3">
               <SelectValue />
             </SelectTrigger>
@@ -177,7 +188,7 @@ export default function TotalSales() {
             >
               {periodOptions.map((opt) => (
                 <SelectItem key={opt} value={opt} className="cursor-pointer">
-                  {opt}
+                  {t(`periods.${opt}`)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -185,7 +196,7 @@ export default function TotalSales() {
         </div>
 
         {/* Chart */}
-        <ChartContainer config={chartConfig} className="h-[215px]! w-full">
+        <ChartContainer config={localizedConfig} className="h-[215px]! w-full">
           <LineChart
             data={chartData}
             margin={{ top: 8, right: 4, bottom: 0, left: -10 }}
@@ -219,7 +230,7 @@ export default function TotalSales() {
                 strokeWidth: 1,
                 strokeDasharray: "4 4",
               }}
-              content={<AnimatedTooltipContent config={chartConfig} />}
+              content={<AnimatedTooltipContent config={localizedConfig} />}
             />
             <ReferenceLine
               x="Apr 22"
