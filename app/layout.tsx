@@ -35,6 +35,7 @@ export default function RootLayout({
       lang="en"
       dir="ltr"
       data-style="vega"
+      data-color="indigo"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >

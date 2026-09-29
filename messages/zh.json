@@ -75,7 +75,8 @@
     "sections": {
       "style": "主题风格",
       "mode": "主题模式",
-      "direction": "主题方向"
+      "direction": "主题方向",
+      "color": "选择主题色"
     },
     "modes": {
       "light": "浅色",
@@ -93,6 +94,19 @@
       "mira": "Mira",
       "luma": "Luma",
       "rhea": "Rhea"
+    },
+    "colors": {
+      "default": "默认",
+      "blue": "蓝色",
+      "indigo": "靛蓝",
+      "violet": "紫罗兰",
+      "purple": "紫色",
+      "pink": "粉色",
+      "red": "红色",
+      "orange": "橙色",
+      "amber": "琥珀色",
+      "green": "绿色",
+      "teal": "青色"
     }
   },
   "common": {

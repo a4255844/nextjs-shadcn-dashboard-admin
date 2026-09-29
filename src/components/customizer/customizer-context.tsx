@@ -16,10 +16,12 @@ import {
   DEFAULT_SETTINGS,
   LEGACY_THEME_KEY,
   STORAGE_KEY,
+  THEME_COLORS,
   THEME_DIRECTIONS,
   THEME_MODES,
   THEME_STYLES,
   type CustomizerSettings,
+  type ThemeColor,
   type ThemeDirection,
   type ThemeMode,
   type ThemeStyle,
@@ -36,6 +38,7 @@ interface CustomizerContextValue {
   toggleMode: () => void;
   /** 设置显式方向；传 null 清除覆盖、回到跟随当前 locale */
   setDirection: (direction: ThemeDirection | null) => void;
+  setColor: (color: ThemeColor) => void;
   reset: () => void;
 }
 
@@ -54,6 +57,10 @@ function isMode(v?: ThemeMode): v is ThemeMode {
 // direction 允许 null（跟随 locale），仅在为显式 ltr/rtl 时收窄
 function isDirection(v?: ThemeDirection | null): v is ThemeDirection {
   return v !== null && v !== undefined && THEME_DIRECTIONS.includes(v);
+}
+
+function isColor(v?: ThemeColor): v is ThemeColor {
+  return v !== undefined && THEME_COLORS.includes(v);
 }
 // 解析 localStorage 取出的任意字符串：合法则收窄为 ThemeMode，否则 null
 function parseMode(v: string | null): ThemeMode | null {
@@ -82,6 +89,7 @@ function loadSettings(): CustomizerSettings {
       style: isStyle(parsed.style) ? parsed.style : DEFAULT_SETTINGS.style,
       mode,
       direction: isDirection(parsed.direction) ? parsed.direction : null,
+      color: isColor(parsed.color) ? parsed.color : DEFAULT_SETTINGS.color,
     };
   } catch {
     return DEFAULT_SETTINGS;
@@ -112,6 +120,11 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.style = settings.style;
   }, [settings.style]);
+
+  // 同步到 <html data-color>
+  useEffect(() => {
+    document.documentElement.dataset.color = settings.color;
+  }, [settings.color]);
 
   // 同步到 <html class="dark">
   useEffect(() => {
@@ -162,6 +175,11 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
     [update]
   );
 
+  const setColor = useCallback(
+    (color: ThemeColor) => update({ color }),
+    [update]
+  );
+
   const reset = useCallback(() => update(DEFAULT_SETTINGS), [update]);
 
   const value = useMemo(
@@ -173,6 +191,7 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
       setMode,
       toggleMode,
       setDirection,
+      setColor,
       reset,
     }),
     [
@@ -183,6 +202,7 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
       setMode,
       toggleMode,
       setDirection,
+      setColor,
       reset,
     ]
   );

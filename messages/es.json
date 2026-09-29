@@ -75,7 +75,8 @@
     "sections": {
       "style": "Estilo del tema",
       "mode": "Opción del tema",
-      "direction": "Dirección del tema"
+      "direction": "Dirección del tema",
+      "color": "Elige los colores del tema"
     },
     "modes": {
       "light": "Claro",
@@ -93,6 +94,19 @@
       "mira": "Mira",
       "luma": "Luma",
       "rhea": "Rhea"
+    },
+    "colors": {
+      "default": "Predeterminado",
+      "blue": "Azul",
+      "indigo": "Índigo",
+      "violet": "Violeta",
+      "purple": "Púrpura",
+      "pink": "Rosa",
+      "red": "Rojo",
+      "orange": "Naranja",
+      "amber": "Ámbar",
+      "green": "Verde",
+      "teal": "Verde azulado"
     }
   },
   "common": {

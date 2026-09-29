@@ -36,18 +36,37 @@ export const THEME_DIRECTIONS = ["ltr", "rtl"] as const;
 
 export type ThemeDirection = (typeof THEME_DIRECTIONS)[number];
 
-// Customizer 的全部设置；后续模块（主题色/布局/容器）在此扩展
+// 主题色板（对应 globals.css 中的 [data-color="..."] 变量块）；default 沿用基础灰
+export const THEME_COLORS = [
+  "default",
+  "blue",
+  "indigo",
+  "violet",
+  "purple",
+  "pink",
+  "red",
+  "orange",
+  "amber",
+  "green",
+  "teal",
+] as const;
+
+export type ThemeColor = (typeof THEME_COLORS)[number];
+
+// Customizer 的全部设置；后续模块（布局/容器）在此扩展
 export interface CustomizerSettings {
   style: ThemeStyle;
   mode: ThemeMode;
   /** null = 跟随 locale；显式值覆盖 locale 推导 */
   direction: ThemeDirection | null;
+  color: ThemeColor;
 }
 
 export const DEFAULT_SETTINGS: CustomizerSettings = {
   style: "vega",
   mode: "light",
   direction: null,
+  color: "indigo",
 };
 
 // localStorage 持久化 key
@@ -92,4 +111,27 @@ export const MODE_OPTIONS: ModeOption[] = [
 export const DIRECTION_OPTIONS: DirectionOption[] = [
   { key: "ltr", icon: AlignLeft },
   { key: "rtl", icon: AlignRight },
+];
+
+export interface ColorOption {
+  key: ThemeColor;
+  /** 抽屉中圆点的展示色（与 light 模式主色一致） */
+  swatch: string;
+  /** 选中勾的颜色：浅底色（如琥珀）用深色勾，其余用白勾 */
+  darkCheck: boolean;
+}
+
+// Choose Your Theme Colors 选项；每个色板对应的 light/dark CSS 变量在 globals.css
+export const COLOR_OPTIONS: ColorOption[] = [
+  { key: "default", swatch: "oklch(0.205 0 0)", darkCheck: false },
+  { key: "blue", swatch: "oklch(0.55 0.22 258)", darkCheck: false },
+  { key: "indigo", swatch: "oklch(0.52 0.21 275)", darkCheck: false },
+  { key: "violet", swatch: "oklch(0.53 0.23 295)", darkCheck: false },
+  { key: "purple", swatch: "oklch(0.52 0.22 315)", darkCheck: false },
+  { key: "pink", swatch: "oklch(0.57 0.21 350)", darkCheck: false },
+  { key: "red", swatch: "oklch(0.56 0.21 25)", darkCheck: false },
+  { key: "orange", swatch: "oklch(0.63 0.19 48)", darkCheck: false },
+  { key: "amber", swatch: "oklch(0.76 0.16 78)", darkCheck: true },
+  { key: "green", swatch: "oklch(0.56 0.17 150)", darkCheck: false },
+  { key: "teal", swatch: "oklch(0.55 0.12 195)", darkCheck: false },
 ];

@@ -75,7 +75,8 @@
     "sections": {
       "style": "نمط القالب",
       "mode": "خيار القالب",
-      "direction": "اتجاه القالب"
+      "direction": "اتجاه القالب",
+      "color": "اختر ألوان القالب"
     },
     "modes": {
       "light": "فاتح",
@@ -93,6 +94,19 @@
       "mira": "Mira",
       "luma": "Luma",
       "rhea": "Rhea"
+    },
+    "colors": {
+      "default": "الافتراضي",
+      "blue": "أزرق",
+      "indigo": "نيلي",
+      "violet": "بنفسجي",
+      "purple": "أرجواني",
+      "pink": "وردي",
+      "red": "أحمر",
+      "orange": "برتقالي",
+      "amber": "كهرماني",
+      "green": "أخضر",
+      "teal": "تركوازي"
     }
   },
   "common": {

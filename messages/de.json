@@ -75,7 +75,8 @@
     "sections": {
       "style": "Designstil",
       "mode": "Designoption",
-      "direction": "Designrichtung"
+      "direction": "Designrichtung",
+      "color": "Designfarbe wählen"
     },
     "modes": {
       "light": "Hell",
@@ -93,6 +94,19 @@
       "mira": "Mira",
       "luma": "Luma",
       "rhea": "Rhea"
+    },
+    "colors": {
+      "default": "Standard",
+      "blue": "Blau",
+      "indigo": "Indigo",
+      "violet": "Violett",
+      "purple": "Lila",
+      "pink": "Pink",
+      "red": "Rot",
+      "orange": "Orange",
+      "amber": "Bernstein",
+      "green": "Grün",
+      "teal": "Türkis"
     }
   },
   "common": {

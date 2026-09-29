@@ -75,7 +75,8 @@
     "sections": {
       "style": "Theme Style",
       "mode": "Theme Option",
-      "direction": "Theme Direction"
+      "direction": "Theme Direction",
+      "color": "Choose Your Theme Colors"
     },
     "modes": {
       "light": "Light",
@@ -93,6 +94,19 @@
       "mira": "Mira",
       "luma": "Luma",
       "rhea": "Rhea"
+    },
+    "colors": {
+      "default": "Default",
+      "blue": "Blue",
+      "indigo": "Indigo",
+      "violet": "Violet",
+      "purple": "Purple",
+      "pink": "Pink",
+      "red": "Red",
+      "orange": "Orange",
+      "amber": "Amber",
+      "green": "Green",
+      "teal": "Teal"
     }
   },
   "common": {
