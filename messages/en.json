@@ -7,6 +7,7 @@
     },
     "menu": {
       "dashboard": "Dashboard",
+      "ecommerce": "Ecommerce",
       "customers": "Customers",
       "allCustomers": "All Customers",
       "highValue": "High Value",
@@ -171,6 +172,55 @@
         "delivered": "Delivered",
         "cancelled": "Cancelled"
       }
+    }
+  },
+  "ecommerce": {
+    "greeting": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Evening",
+      "night": "Good Night"
+    },
+    "subtitle": "Stay informed with today's analytics. Get a quick snapshot of your key business metrics.",
+    "viewReport": "View Full Report",
+    "keyInsights": {
+      "title": "Key Insights",
+      "vsLastMonth": "vs last month",
+      "regions": {
+        "asia": "Asia",
+        "usa": "USA",
+        "europe": "Europe"
+      }
+    },
+    "salesOverview": {
+      "title": "Sales Overview",
+      "revenueLabel": "Revenue Overview",
+      "vsLastMonth": "vs last month",
+      "periods": {
+        "d30": "Last 30 Days",
+        "d7": "Last 7 Days",
+        "d90": "Last 90 Days"
+      },
+      "series": {
+        "teamA": "Team A",
+        "teamB": "Team B",
+        "teamC": "Team C"
+      }
+    },
+    "salesDistribution": {
+      "title": "Sales Distribution",
+      "totalRevenue": "Total Revenue",
+      "channels": {
+        "website": "Website",
+        "marketplace": "Marketplace",
+        "affiliate": "Affiliate"
+      }
+    },
+    "stats": {
+      "weeklySales": "Weekly sales",
+      "newUsers": "New users",
+      "purchaseOrders": "Purchase Orders",
+      "cta": "See Statistics"
     }
   },
   "common": {

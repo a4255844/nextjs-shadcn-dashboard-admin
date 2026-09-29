@@ -1,6 +1,7 @@
 import { uniqueId } from "lodash";
 import {
   LayoutDashboard,
+  ShoppingBag,
   Users,
   UsersRound,
   Gem,
@@ -20,6 +21,12 @@ const SidebarContent: MenuItem[] = [
         name: "dashboard",
         icon: LayoutDashboard,
         url: "/dashboard",
+      },
+      {
+        id: uniqueId(),
+        name: "ecommerce",
+        icon: ShoppingBag,
+        url: "/dashboard/ecommerce",
       },
     ],
   },

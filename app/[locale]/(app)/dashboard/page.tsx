@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import OverviewTab from "@/components/dashboards/modern/overview-tab";
-import StatCard from "@/components/dashboards/modern/stat-card";
+import StatCard from "@/components/shared/stat-card";
 import TotalSales from "@/components/dashboards/modern/total-sales";
 import UpdateBanner from "@/components/dashboards/modern/update-banner"
 import TotalAssets from "@/components/dashboards/modern/totals-assets";

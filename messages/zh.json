@@ -7,6 +7,7 @@
     },
     "menu": {
       "dashboard": "仪表盘",
+      "ecommerce": "电商",
       "customers": "客户",
       "allCustomers": "全部客户",
       "highValue": "高价值客户",
@@ -171,6 +172,55 @@
         "delivered": "已交付",
         "cancelled": "已取消"
       }
+    }
+  },
+  "ecommerce": {
+    "greeting": {
+      "morning": "早上好",
+      "afternoon": "下午好",
+      "evening": "晚上好",
+      "night": "夜深了"
+    },
+    "subtitle": "随时掌握今日的数据分析，快速了解核心业务指标。",
+    "viewReport": "查看完整报告",
+    "keyInsights": {
+      "title": "关键洞察",
+      "vsLastMonth": "较上月",
+      "regions": {
+        "asia": "亚洲",
+        "usa": "美国",
+        "europe": "欧洲"
+      }
+    },
+    "salesOverview": {
+      "title": "销售总览",
+      "revenueLabel": "收入概览",
+      "vsLastMonth": "较上月",
+      "periods": {
+        "d30": "近 30 天",
+        "d7": "近 7 天",
+        "d90": "近 90 天"
+      },
+      "series": {
+        "teamA": "团队 A",
+        "teamB": "团队 B",
+        "teamC": "团队 C"
+      }
+    },
+    "salesDistribution": {
+      "title": "销售分布",
+      "totalRevenue": "总收入",
+      "channels": {
+        "website": "网站",
+        "marketplace": "市场",
+        "affiliate": "联盟"
+      }
+    },
+    "stats": {
+      "weeklySales": "每周销售额",
+      "newUsers": "新用户",
+      "purchaseOrders": "采购订单",
+      "cta": "查看统计"
     }
   },
   "common": {

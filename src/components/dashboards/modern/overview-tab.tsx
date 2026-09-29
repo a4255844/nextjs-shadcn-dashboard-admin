@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,27 +10,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { CalendarDays, RefreshCcw, Download, Sun, Moon } from 'lucide-react';
-
-// 问候语只存 key，展示时再翻译，避免用英文文案做逻辑判断
-type GreetingKey = 'morning' | 'afternoon' | 'evening' | 'night';
+import { useGreetingKey } from '@/hooks/use-greeting-key';
 
 export default function OverviewTab() {
   const t = useTranslations('dashboard');
-  const [greeting, setGreeting] = useState<GreetingKey | null>(null);
-
-  useEffect(() => {
-    const hour = new Date().getHours();
-
-    if (hour >= 5 && hour < 12) {
-      setGreeting('morning');
-    } else if (hour >= 12 && hour < 17) {
-      setGreeting('afternoon');
-    } else if (hour >= 17 && hour < 21) {
-      setGreeting('evening');
-    } else {
-      setGreeting('night');
-    }
-  }, []);
+  const greeting = useGreetingKey();
 
   const getGreetingIcon = () => {
     if (greeting === 'morning' || greeting === 'afternoon') {

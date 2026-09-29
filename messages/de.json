@@ -7,6 +7,7 @@
     },
     "menu": {
       "dashboard": "Dashboard",
+      "ecommerce": "E-Commerce",
       "customers": "Kunden",
       "allCustomers": "Alle Kunden",
       "highValue": "Top-Kunden",
@@ -171,6 +172,55 @@
         "delivered": "Geliefert",
         "cancelled": "Storniert"
       }
+    }
+  },
+  "ecommerce": {
+    "greeting": {
+      "morning": "Guten Morgen",
+      "afternoon": "Guten Tag",
+      "evening": "Guten Abend",
+      "night": "Gute Nacht"
+    },
+    "subtitle": "Bleiben Sie mit den heutigen Analysen auf dem Laufenden und behalten Sie Ihre wichtigsten Geschäftskennzahlen im Blick.",
+    "viewReport": "Vollständigen Bericht ansehen",
+    "keyInsights": {
+      "title": "Wichtige Einblicke",
+      "vsLastMonth": "ggü. Vormonat",
+      "regions": {
+        "asia": "Asien",
+        "usa": "USA",
+        "europe": "Europa"
+      }
+    },
+    "salesOverview": {
+      "title": "Verkaufsübersicht",
+      "revenueLabel": "Umsatzübersicht",
+      "vsLastMonth": "ggü. Vormonat",
+      "periods": {
+        "d30": "Letzte 30 Tage",
+        "d7": "Letzte 7 Tage",
+        "d90": "Letzte 90 Tage"
+      },
+      "series": {
+        "teamA": "Team A",
+        "teamB": "Team B",
+        "teamC": "Team C"
+      }
+    },
+    "salesDistribution": {
+      "title": "Vertriebsverteilung",
+      "totalRevenue": "Gesamtumsatz",
+      "channels": {
+        "website": "Website",
+        "marketplace": "Marktplatz",
+        "affiliate": "Affiliate"
+      }
+    },
+    "stats": {
+      "weeklySales": "Wochenverkäufe",
+      "newUsers": "Neue Benutzer",
+      "purchaseOrders": "Bestellungen",
+      "cta": "Statistiken ansehen"
     }
   },
   "common": {
