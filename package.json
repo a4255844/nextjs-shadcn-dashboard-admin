@@ -10,7 +10,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen-types": "node -e \"const{execSync}=require('child_process');require('fs').writeFileSync('src/lib/supabase/database.types.ts',execSync('npx --yes supabase@latest gen types typescript --project-id jiyuoeplmdwjrczpycws --schema public',{encoding:'utf8',maxBuffer:5e7}))\""
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

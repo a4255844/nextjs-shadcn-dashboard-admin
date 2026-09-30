@@ -6,15 +6,10 @@ import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
   flexRender,
+  useTable,
   type PaginationState,
   type SortingState,
 } from "@tanstack/react-table";
-import {
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useLegacyTable as useReactTable,
-} from "@tanstack/react-table/legacy";
 import {
   Search,
   ChevronsLeft,
@@ -40,8 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { customerData } from "./customer-data";
-import { useColumns } from "./columns";
+import { features, useColumns } from "./columns";
 import {
   PAGE_SIZE_OPTIONS,
   parsePageSize,
@@ -63,7 +57,12 @@ const STATUS_FILTER_OPTIONS: readonly StatusFilter[] = [
   "inactive",
 ] as const;
 
-export default function CustomersTable() {
+// 表格数据由服务端页面（RSC）从 DB 查询后传入
+interface CustomersTableProps {
+  rows: CustomerRow[];
+}
+
+export default function CustomersTable({ rows }: CustomersTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -81,6 +80,10 @@ export default function CustomersTable() {
   const size = parsePageSize(searchParams.get("size")) ?? PAGE_SIZE_OPTIONS[0];
 
   // ---- 写回 URL 的辅助函数 ----
+  // server-driven：URL 变化 -> RSC 重新渲染 -> 服务端重查 DB，
+  // 每次交互都拿到数据库最新数据（多用户协同时不出现脏读）。
+  // dev 下因国际延迟每次 ~600ms；生产环境（Vercel 与 Supabase 同区域）
+  // 为几十 ms。数据量大后的演进方向：筛选/分页下推到 DB 查询，只回传一页。
   const setParams = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(searchParams.toString());
     for (const [k, v] of Object.entries(updates)) {
@@ -91,7 +94,7 @@ export default function CustomersTable() {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
-  // ---- 搜索输入：local state + 防抖同步到 URL，避免每次按键触发 router.replace ----
+  // ---- 搜索输入：local state + 防抖同步到 URL（每次提交都向服务端取最新数据）----
   const [inputQ, setInputQ] = useState(q);
   const firstRun = useRef(true);
 
@@ -112,10 +115,10 @@ export default function CustomersTable() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputQ]);
 
-  // ---- 搜索 + 状态筛选：在数据层手动过滤（15 条数据，无需 react-table filter）----
+  // ---- 搜索 + 状态筛选：在数据层手动过滤（当前数据量，无需 react-table filter）----
   const filteredData = useMemo<CustomerRow[]>(() => {
     const term = q.toLowerCase().trim();
-    return customerData.filter((c) => {
+    return rows.filter((c) => {
       if (statusFilter !== "all" && c.status !== statusFilter) return false;
       if (
         term &&
@@ -129,7 +132,7 @@ export default function CustomersTable() {
       }
       return true;
     });
-  }, [q, statusFilter]);
+  }, [rows, q, statusFilter]);
 
   // ---- react-table 状态：从 URL 派生，controlled ----
   const sorting: SortingState = useMemo(
@@ -145,7 +148,10 @@ export default function CustomersTable() {
     [page, size],
   );
 
-  const table = useReactTable({
+  // v9：feature 已在 columns 模块的 features 单例中注册（排序/分页 + 对应行模型），
+  // core 行模型自动内置，无需再传 getCoreRowModel
+  const table = useTable({
+    features,
     data: filteredData,
     columns,
     state: { sorting, pagination },
@@ -168,9 +174,6 @@ export default function CustomersTable() {
         size: String(next.pageSize),
       });
     },
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   });
 
   const pageCount = table.getPageCount();
@@ -268,7 +271,8 @@ export default function CustomersTable() {
           ) : (
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
+                {/* v9：getVisibleCells 归 columnVisibilityFeature；未注册隐藏列能力时 getAllCells 等价 */}
+                {row.getAllCells().map((cell) => (
                   <TableCell key={cell.id} className="py-2">
                     {flexRender(
                       cell.column.columnDef.cell,

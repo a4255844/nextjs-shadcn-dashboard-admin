@@ -65,11 +65,12 @@ export default async function proxy(request: NextRequest) {
     },
   );
 
-  // 2. 校验会话。getUser() 会向 Supabase Auth 服务端验证 token，
-  //    过期时自动刷新并在 setAll 里重写 cookie（会话续期就在这里发生）。
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // 2. 校验会话。getClaims() 在本地用 JWKS 公钥验证 JWT 签名（首次拉取后
+  //    缓存公钥），与 getUser() 同样能防伪造 cookie，但不产生每次导航的
+  //    服务端网络往返；token 过期时同样会自动刷新并在 setAll 里重写
+  //    cookie（会话续期就在这里发生）。
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   // 3. 路由保护（按去掉 locale 前缀后的路径判断）。
   const { locale, path } = splitLocalePrefix(request.nextUrl.pathname);

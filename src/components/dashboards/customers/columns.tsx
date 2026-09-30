@@ -2,7 +2,14 @@
 
 import { useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import type { LegacyColumnDef as ColumnDef } from "@tanstack/react-table/legacy";
+import {
+  type ColumnDef,
+  createPaginatedRowModel,
+  createSortedRowModel,
+  rowPaginationFeature,
+  rowSortingFeature,
+  tableFeatures,
+} from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +22,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "cn";
 import type { CustomerRow, StatusKey } from "./types";
+
+// TanStack Table v9：按需显式注册 feature（v8 是全量内置）。
+// 模块级单例，columns 类型与 useTable 共用同一份 features，保证 TFeatures 推断一致。
+export const features = tableFeatures({
+  rowSortingFeature,
+  rowPaginationFeature,
+  sortedRowModel: createSortedRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+});
 
 // 状态徽章配色：与 stat-card 的 badge 体系协调
 const statusBadgeClass: Record<StatusKey, string> = {
@@ -38,11 +54,11 @@ function initials(name: string): string {
 }
 
 // 列定义 hook：i18n + locale 感知，返回 memoized 的 ColumnDef 数组
-export function useColumns(): ColumnDef<CustomerRow>[] {
+export function useColumns(): ColumnDef<typeof features, CustomerRow>[] {
   const t = useTranslations("customers.table");
   const locale = useLocale();
 
-  return useMemo<ColumnDef<CustomerRow>[]>(
+  return useMemo<ColumnDef<typeof features, CustomerRow>[]>(
     () => {
       const moneyFmt = new Intl.NumberFormat(locale, {
         style: "currency",
