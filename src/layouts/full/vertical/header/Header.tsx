@@ -7,8 +7,9 @@ import LightDark from "./Light-Dark";
 import Notifications from "./Notifications";
 import LocaleSwitch from "./LocaleSwitch";
 import Customizer from "@/components/customizer/customizer-panel";
+import type { CurrentUser } from "@/lib/api/auth";
 
-const Header = () => {
+const Header = ({ user }: { user: CurrentUser | null }) => {
   return (
     <header className="sticky top-0 z-30 shrink-0">
       <div className="border-b border-border bg-card/85 backdrop-blur supports-[backdrop-filter]:bg-card/70 md:rounded-t-xl">
@@ -29,7 +30,7 @@ const Header = () => {
               <Customizer />
               <LightDark />
               <Notifications className="hidden sm:block" />
-              <Profile />
+              <Profile user={user} />
             </div>
           </div>
         </nav>

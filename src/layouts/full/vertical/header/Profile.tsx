@@ -11,21 +11,55 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { X, Mailbox, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 import { cn } from "cn";
 import { profileDD } from "./data";
 import { Link } from "@/i18n/navigation";
+import type { CurrentUser } from "@/lib/api/auth";
 
-export default function ProfileSheet() {
+/** 取用于头像/展示的名字：优先 first + last，其次 email @ 前段 */
+function getDisplayName(user: CurrentUser): string {
+  const parts = [user.firstName?.trim(), user.lastName?.trim()].filter(
+    (p): p is string => p !== undefined && p !== "",
+  );
+  if (parts.length > 0) return parts.join(" ");
+  return user.email.split("@")[0] ?? user.email;
+}
+
+/** 头像缩写：first + last 的首字母，无名字时取 email 首字母 */
+function getInitials(user: CurrentUser): string {
+  const first = user.firstName?.trim()[0] ?? "";
+  const last = user.lastName?.trim()[0] ?? "";
+  const initials = `${first}${last}`.toUpperCase();
+  if (initials !== "") return initials;
+  return (user.email[0] ?? "?").toUpperCase();
+}
+
+export default function ProfileSheet({ user }: { user: CurrentUser | null }) {
   const t = useTranslations("header.profile");
+  const router = useRouter();
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
+  const displayName = user !== null ? getDisplayName(user) : "";
+  const initials = user !== null ? getInitials(user) : "?";
 
   return (
     <Sheet>
       {/* Trigger Button */}
       <SheetTrigger className="cursor-pointer hover:bg-primary/5 flex items-center justify-center rounded-full h-10 w-10">
         <Avatar className="h-8 w-8">
-          <AvatarImage src="/images/profile/avtar.webp" alt="profile" />
-          <AvatarFallback>CM</AvatarFallback>
+          {user?.avatarUrl !== null && user?.avatarUrl !== undefined && (
+            <AvatarImage src={user.avatarUrl} alt="profile" />
+          )}
+          <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
       </SheetTrigger>
 
@@ -42,21 +76,25 @@ export default function ProfileSheet() {
         <div className="p-6 py-6">
           <div className="flex flex-col gap-4 justify-center items-center pt-10">
             <Avatar className="h-16 w-16">
-              <AvatarImage
-                src="/images/profile/avtar.webp"
-                alt="Profile"
-              />
-              <AvatarFallback>CM</AvatarFallback>
+              {user?.avatarUrl !== null && user?.avatarUrl !== undefined && (
+                <AvatarImage src={user.avatarUrl} alt="Profile" />
+              )}
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
 
             <div className="text-center">
-              <h6 className="text-lg font-semibold">Cameron</h6>
-              <div className="flex items-center gap-2 justify-center">
-                <Mailbox size={18} className="text-muted-foreground" />
-                <span className="text-sm font-normal text-muted-foreground">
-                  cameron@demo.dev
-                </span>
-              </div>
+              <h6 className="text-lg font-semibold">{displayName || "?"}</h6>
+              {user !== null && (
+                <div className="flex items-center gap-2 justify-center">
+                  <Mailbox size={18} className="text-muted-foreground" />
+                  <span
+                    className="text-sm font-normal text-muted-foreground"
+                    dir="ltr"
+                  >
+                    {user.email}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -89,12 +127,16 @@ export default function ProfileSheet() {
         {/* Footer */}
         <SheetFooter className="px-0 pb-6">
           <div className="border-t border-border w-full pt-6 px-6">
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/">
+            <SheetClose asChild>
+              <Button
+                variant="outline"
+                className="w-full cursor-pointer"
+                onClick={handleSignOut}
+              >
                 <LogOut className="size-4" />
                 {t("logOut")}
-              </Link>
-            </Button>
+              </Button>
+            </SheetClose>
           </div>
         </SheetFooter>
       </SheetContent>

@@ -270,6 +270,22 @@
       }
     }
   },
+  "login": {
+    "title": "Willkommen zurück",
+    "subtitle": "Melde dich bei deinem Konto an, um fortzufahren",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "passwordTooShort": "Das Passwort muss mindestens {count} Zeichen lang sein",
+    "checkEmail": "Registrierung erfolgreich! Wir haben einen Bestätigungslink an {email} gesendet. Bitte bestätige deine E-Mail-Adresse und melde dich dann an.",
+    "signIn": "Anmelden",
+    "signUp": "Konto erstellen",
+    "noAccount": "Noch kein Konto?",
+    "switchToSignUp": "Registrieren",
+    "hasAccount": "Bereits ein Konto?",
+    "switchToSignIn": "Anmelden"
+  },
   "common": {
     "pro": "Pro"
   }

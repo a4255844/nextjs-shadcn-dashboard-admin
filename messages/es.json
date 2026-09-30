@@ -270,6 +270,22 @@
       }
     }
   },
+  "login": {
+    "title": "Bienvenido de nuevo",
+    "subtitle": "Inicia sesión en tu cuenta para continuar",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "passwordTooShort": "La contraseña debe tener al menos {count} caracteres",
+    "checkEmail": "¡Registro exitoso! Enviamos un enlace de confirmación a {email}. Verifica tu correo y luego inicia sesión.",
+    "signIn": "Iniciar sesión",
+    "signUp": "Crear cuenta",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "switchToSignUp": "Registrarse",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "switchToSignIn": "Iniciar sesión"
+  },
   "common": {
     "pro": "Pro"
   }

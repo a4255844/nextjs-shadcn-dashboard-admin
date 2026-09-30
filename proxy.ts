@@ -1,8 +1,108 @@
-import createMiddleware from 'next-intl/middleware';
-import { routing } from './src/i18n/routing';
+import createIntlMiddleware from "next-intl/middleware";
+import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { routing } from "./src/i18n/routing";
+import { getSupabaseAnonKey, getSupabaseUrl } from "./src/lib/supabase/env";
 
-export default createMiddleware(routing);
+const handleI18nRouting = createIntlMiddleware(routing);
+
+/** 受保护路径（不含 locale 前缀）：未登录一律重定向到登录页 */
+const PROTECTED_PREFIXES = [
+  "/dashboard",
+  "/customers",
+  "/tickets",
+  "/profile",
+  "/settings",
+];
+
+/** 仅未登录可访问的页面：已登录访问时跳转 dashboard */
+const AUTH_PAGES = ["/login"];
+
+/**
+ * 去掉 pathname 里的 locale 前缀。
+ * /en/dashboard -> { locale: "en", path: "/dashboard" }
+ * /dashboard    -> { locale: null, path: "/dashboard" }
+ */
+function splitLocalePrefix(pathname: string): {
+  locale: string | null;
+  path: string;
+} {
+  const first = pathname.split("/")[1] ?? "";
+  if ((routing.locales as readonly string[]).includes(first)) {
+    const rest = pathname.slice(1 + first.length);
+    return { locale: first, path: rest === "" ? "/" : rest };
+  }
+  return { locale: null, path: pathname };
+}
+
+function matchesAny(path: string, prefixes: string[]): boolean {
+  return prefixes.some((p) => path === p || path.startsWith(`${p}/`));
+}
+
+export default async function proxy(request: NextRequest) {
+  // 1. 创建绑定到"请求-响应"cookie 对的 Supabase 客户端。
+  //    官方警告：createServerClient 与 getUser() 之间不得插入其他 await。
+  let supabaseResponse = NextResponse.next({ request });
+
+  const supabase = createServerClient(
+    getSupabaseUrl(),
+    getSupabaseAnonKey(),
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value),
+          );
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options),
+          );
+        },
+      },
+    },
+  );
+
+  // 2. 校验会话。getUser() 会向 Supabase Auth 服务端验证 token，
+  //    过期时自动刷新并在 setAll 里重写 cookie（会话续期就在这里发生）。
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // 3. 路由保护（按去掉 locale 前缀后的路径判断）。
+  const { locale, path } = splitLocalePrefix(request.nextUrl.pathname);
+  const effectiveLocale = locale ?? routing.defaultLocale;
+  const redirectTo = (pathname: string) => {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname;
+    const response = NextResponse.redirect(url);
+    // 重定向响应也要带上可能已刷新的会话 cookie
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((c) => response.cookies.set({ ...c }));
+    return response;
+  };
+
+  if (matchesAny(path, PROTECTED_PREFIXES) && !user) {
+    const loginPath = `/${effectiveLocale}/login`;
+    return redirectTo(
+      `${loginPath}?redirect=${encodeURIComponent(path)}`,
+    );
+  }
+  if (matchesAny(path, AUTH_PAGES) && user) {
+    return redirectTo(`/${effectiveLocale}/dashboard`);
+  }
+
+  // 4. 交给 next-intl 处理 locale 路由，并把 Supabase 刷新的 cookie 合并进最终响应。
+  const intlResponse = handleI18nRouting(request);
+  supabaseResponse.cookies
+    .getAll()
+    .forEach((c) => intlResponse.cookies.set({ ...c }));
+  return intlResponse;
+}
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)']
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };

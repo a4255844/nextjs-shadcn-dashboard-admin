@@ -270,6 +270,22 @@
       }
     }
   },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to your account to continue",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "password": "Password",
+    "passwordTooShort": "Password must be at least {count} characters",
+    "checkEmail": "Registration successful! We sent a confirmation link to {email}. Please verify your email, then sign in.",
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "noAccount": "No account yet?",
+    "switchToSignUp": "Sign up",
+    "hasAccount": "Already have an account?",
+    "switchToSignIn": "Sign in"
+  },
   "common": {
     "pro": "Pro"
   }
