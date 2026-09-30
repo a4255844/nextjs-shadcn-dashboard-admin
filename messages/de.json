@@ -223,6 +223,53 @@
       "cta": "Statistiken ansehen"
     }
   },
+  "customers": {
+    "stats": {
+      "total": "Kunden gesamt",
+      "active": "Aktiv",
+      "vip": "VIP",
+      "atRisk": "Risiko",
+      "cta": "Statistiken anzeigen"
+    },
+    "table": {
+      "search": "Kunden suchen...",
+      "loading": "Wird geladen...",
+      "filter": {
+        "all": "Alle Status"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv",
+        "vip": "VIP",
+        "atRisk": "Risiko"
+      },
+      "columns": {
+        "customer": "Kunde",
+        "company": "Unternehmen",
+        "status": "Status",
+        "spent": "Ausgaben",
+        "createdAt": "Beigetreten",
+        "actions": "Aktionen"
+      },
+      "actions": {
+        "label": "Zeilenaktionen öffnen",
+        "view": "Anzeigen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      },
+      "pagination": {
+        "showing": "Zeige {from}-{to} von {total}",
+        "pageAria": "Seite {current} von {total}",
+        "first": "Erste Seite",
+        "prev": "Vorherige Seite",
+        "next": "Nächste Seite",
+        "last": "Letzte Seite",
+        "rows": "Zeilen",
+        "rowsPerPage": "Zeilen pro Seite",
+        "noData": "Keine Kunden gefunden"
+      }
+    }
+  },
   "common": {
     "pro": "Pro"
   }

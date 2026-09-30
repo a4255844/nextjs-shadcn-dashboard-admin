@@ -223,6 +223,53 @@
       "cta": "عرض الإحصائيات"
     }
   },
+  "customers": {
+    "stats": {
+      "total": "إجمالي العملاء",
+      "active": "نشط",
+      "vip": "VIP",
+      "atRisk": "معرض للخطر",
+      "cta": "عرض الإحصائيات"
+    },
+    "table": {
+      "search": "ابحث عن العملاء...",
+      "loading": "جارٍ التحميل...",
+      "filter": {
+        "all": "كل الحالات"
+      },
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "vip": "VIP",
+        "atRisk": "معرض للخطر"
+      },
+      "columns": {
+        "customer": "العميل",
+        "company": "الشركة",
+        "status": "الحالة",
+        "spent": "الإنفاق",
+        "createdAt": "تاريخ الانضمام",
+        "actions": "إجراءات"
+      },
+      "actions": {
+        "label": "فتح إجراءات الصف",
+        "view": "عرض",
+        "edit": "تحرير",
+        "delete": "حذف"
+      },
+      "pagination": {
+        "showing": "عرض {from}-{to} من {total}",
+        "pageAria": "صفحة {current} من {total}",
+        "first": "الصفحة الأولى",
+        "prev": "الصفحة السابقة",
+        "next": "الصفحة التالية",
+        "last": "الصفحة الأخيرة",
+        "rows": "صفوف",
+        "rowsPerPage": "الصفوف لكل صفحة",
+        "noData": "لم يتم العثور على عملاء"
+      }
+    }
+  },
   "common": {
     "pro": "Pro"
   }

@@ -223,6 +223,53 @@
       "cta": "See Statistics"
     }
   },
+  "customers": {
+    "stats": {
+      "total": "Total Customers",
+      "active": "Active",
+      "vip": "VIP",
+      "atRisk": "At Risk",
+      "cta": "See Statistics"
+    },
+    "table": {
+      "search": "Search customers...",
+      "loading": "Loading...",
+      "filter": {
+        "all": "All statuses"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "vip": "VIP",
+        "atRisk": "At Risk"
+      },
+      "columns": {
+        "customer": "Customer",
+        "company": "Company",
+        "status": "Status",
+        "spent": "Spent",
+        "createdAt": "Joined",
+        "actions": "Actions"
+      },
+      "actions": {
+        "label": "Open row actions",
+        "view": "View",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "pagination": {
+        "showing": "Showing {from}-{to} of {total}",
+        "pageAria": "Page {current} of {total}",
+        "first": "First page",
+        "prev": "Previous page",
+        "next": "Next page",
+        "last": "Last page",
+        "rows": "rows",
+        "rowsPerPage": "Rows per page",
+        "noData": "No customers found"
+      }
+    }
+  },
   "common": {
     "pro": "Pro"
   }
