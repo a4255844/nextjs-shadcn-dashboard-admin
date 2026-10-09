@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { Check } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ export default function LocaleSwitch() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const { resolvedDirection, setDirection } = useCustomizer();
   const current = LOCALES.find((item) => item.code === locale) ?? LOCALES[0];
@@ -39,7 +41,10 @@ export default function LocaleSwitch() {
       // 切换语言后布局方向必须跟随新语言（ar=rtl，其余=ltr），清除显式覆盖。
       // setDirection 会同步写入 localStorage，保证随后的跨 locale 整页导航也能恢复正确方向。
       setDirection(null);
-        router.replace(pathname, { locale: next });
+      // 保留当前查询参数（如登录页的 ?redirect=...、表格页的筛选状态），
+      // 与 customers-table 相同的 pathname?qs 传参方式。
+      const qs = searchParams.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { locale: next });
     });
   }
 

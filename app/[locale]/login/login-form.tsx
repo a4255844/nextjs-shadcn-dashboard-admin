@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DashboardCard } from "@/components/shared/dashboard-card";
+import LocaleSwitch from "@/layouts/full/vertical/header/LocaleSwitch";
 import { Loader2 } from "lucide-react";
 
 type Mode = "signIn" | "signUp";
@@ -186,6 +187,11 @@ export default function LoginForm() {
             {mode === "signIn" ? t("switchToSignUp") : t("switchToSignIn")}
           </button>
         </p>
+
+        {/* 语言切换（水平居中；切换时保留 ?redirect= 查询参数） */}
+        <div className="flex justify-center">
+          <LocaleSwitch />
+        </div>
       </form>
     </DashboardCard>
   );

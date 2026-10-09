@@ -75,9 +75,11 @@ export default async function proxy(request: NextRequest) {
   // 3. 路由保护（按去掉 locale 前缀后的路径判断）。
   const { locale, path } = splitLocalePrefix(request.nextUrl.pathname);
   const effectiveLocale = locale ?? routing.defaultLocale;
-  const redirectTo = (pathname: string) => {
+  const redirectTo = (pathname: string, search = "") => {
     const url = request.nextUrl.clone();
     url.pathname = pathname;
+    // query 必须走 search：若混入 pathname，"?" 会被编码成 "%3F" 导致 404
+    if (search) url.search = search;
     const response = NextResponse.redirect(url);
     // 重定向响应也要带上可能已刷新的会话 cookie
     supabaseResponse.cookies
@@ -88,9 +90,7 @@ export default async function proxy(request: NextRequest) {
 
   if (matchesAny(path, PROTECTED_PREFIXES) && !user) {
     const loginPath = `/${effectiveLocale}/login`;
-    return redirectTo(
-      `${loginPath}?redirect=${encodeURIComponent(path)}`,
-    );
+    return redirectTo(loginPath, `?redirect=${encodeURIComponent(path)}`);
   }
   if (matchesAny(path, AUTH_PAGES) && user) {
     return redirectTo(`/${effectiveLocale}/dashboard`);
