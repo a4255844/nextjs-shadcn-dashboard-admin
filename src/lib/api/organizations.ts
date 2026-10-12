@@ -21,8 +21,9 @@ const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // role 列是 text + check 约束（非原生 enum），gen types 推导为 string，
-// 需运行时校验后收窄（与 customers status 的处理同理，DB check 属可信来源）
-function parseOrgRole(v: string): OrgRole | null {
+// 需运行时校验后收窄（与 customers status 的处理同理，DB check 属可信来源）。
+// members.ts 等同域模块复用此收窄，故导出。
+export function parseOrgRole(v: string): OrgRole | null {
   return v === "admin" || v === "member" ? v : null;
 }
 

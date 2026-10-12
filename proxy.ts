@@ -11,6 +11,7 @@ const PROTECTED_PREFIXES = [
   "/dashboard",
   "/customers",
   "/tickets",
+  "/organization",
   "/profile",
   "/settings",
   "/invite", // 消费邀请链接需先登录（redirect 参数带回跳）

@@ -192,6 +192,15 @@ export type Database = {
         Returns: string
       }
       create_organization: { Args: { p_name: string }; Returns: string }
+      get_active_invite: {
+        Args: { p_org_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string
+          role: string
+          token: string
+        }[]
+      }
       is_org_admin: { Args: { check_org_id: string }; Returns: boolean }
       is_org_member: { Args: { check_org_id: string }; Returns: boolean }
       join_organization: {
@@ -200,6 +209,26 @@ export type Database = {
           already_member: boolean
           org_id: string
         }[]
+      }
+      list_org_members: {
+        Args: { p_org_id: string }
+        Returns: {
+          avatar_url: string
+          email: string
+          first_name: string
+          joined_at: string
+          last_name: string
+          role: string
+          user_id: string
+        }[]
+      }
+      remove_member: {
+        Args: { p_org_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      update_member_role: {
+        Args: { p_org_id: string; p_role: string; p_user_id: string }
+        Returns: undefined
       }
     }
     Enums: {

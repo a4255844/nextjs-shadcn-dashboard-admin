@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { Check, Copy, Link2, Loader2, RotateCcw } from "lucide-react";
+import { Link2, Loader2, RotateCcw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { createInvite } from "@/lib/actions/organizations";
+import InviteLinkField from "@/components/orgs/InviteLinkField";
 
 interface InviteDialogProps {
   open: boolean;
@@ -25,7 +25,7 @@ interface InviteDialogProps {
 
 /**
  * 生成一次性邀请链接（单活跃链接语义：重新生成即失效旧链接）。
- * 链接用 window.location.origin 拼接，dev/生产环境天然一致。
+ * 链接展示/复制抽到 InviteLinkField（组织管理页 InviteCard 复用）。
  */
 export default function InviteDialog({
   open,
@@ -33,13 +33,10 @@ export default function InviteDialog({
   orgId,
 }: InviteDialogProps) {
   const t = useTranslations("orgs.invite");
-  const tErrors = useTranslations("orgs.errors");
-  const locale = useLocale();
   const router = useRouter();
 
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   async function handleGenerate() {
     setLoading(true);
@@ -51,24 +48,13 @@ export default function InviteDialog({
       return;
     }
     setToken(result.token ?? null);
-    setCopied(false);
-  }
-
-  async function handleCopy() {
-    if (token === null) return;
-    const url = `${window.location.origin}/${locale}/invite/${token}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-    } catch {
-      // 剪贴板不可用（如非安全上下文），静默失败——链接仍可手动选中复制
-    }
+    // 服务端为唯一真源：刷新让组织管理页的 InviteCard 同步新链接
+    router.refresh();
   }
 
   function handleOpenChange(next: boolean) {
     if (!next) {
       setToken(null);
-      setCopied(false);
       setLoading(false);
     }
     onOpenChange(next);
@@ -85,27 +71,7 @@ export default function InviteDialog({
         <div className="flex flex-col gap-3">
           {token !== null ? (
             <>
-              <div className="flex items-center gap-2">
-                <Input
-                  readOnly
-                  value={`${typeof window !== "undefined" ? window.location.origin : ""}/${locale}/invite/${token}`}
-                  dir="ltr"
-                  className="text-xs"
-                  onFocus={(e) => e.target.select()}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCopy}
-                  aria-label={copied ? t("copied") : t("copy")}
-                >
-                  {copied ? (
-                    <Check className="size-4 text-primary" />
-                  ) : (
-                    <Copy className="size-4" />
-                  )}
-                </Button>
-              </div>
+              <InviteLinkField token={token} />
               <p className="text-xs text-muted-foreground">{t("roleHint")}</p>
             </>
           ) : (

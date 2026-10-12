@@ -7,6 +7,7 @@ import {
   Gem,
   TrendingDown,
   Ticket,
+  Building2,
   CircleUserRound,
   Settings,
 } from "lucide-react";
@@ -63,6 +64,12 @@ const SidebarContent: MenuItem[] = [
         name: "tickets",
         icon: Ticket,
         url: "/tickets",
+      },
+      {
+        id: uniqueId(),
+        name: "organization",
+        icon: Building2,
+        url: "/organization",
       },
     ],
   },

@@ -15,6 +15,7 @@
       "tickets": "Tickets",
       "profile": "Perfil",
       "settings": "Ajustes",
+      "organization": "Organización",
       "viewSource": "Ver código fuente"
     }
   },
@@ -271,6 +272,32 @@
     }
   },
   "orgs": {
+    "page": {
+      "title": "Organización",
+      "description": "Gestiona miembros, roles y tu enlace de invitación."
+    },
+    "members": {
+      "columns": {
+        "member": "Miembro",
+        "role": "Rol",
+        "joined": "Se unió",
+        "actions": "Acciones"
+      },
+      "you": "Tú",
+      "roles": {
+        "admin": "Administrador",
+        "member": "Miembro"
+      },
+      "actions": {
+        "openAria": "Abrir acciones de miembro"
+      },
+      "removeDialog": {
+        "title": "Eliminar miembro",
+        "description": "{name} perderá el acceso a esta organización.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar"
+      }
+    },
     "switcher": {
       "openAria": "Cambiar de organización",
       "noOrg": "Sin organización"
@@ -293,6 +320,26 @@
       "copy": "Copiar enlace",
       "copied": "Copiado",
       "roleHint": "Cualquier persona con este enlace se une como miembro después de iniciar sesión."
+    },
+    "inviteCard": {
+      "title": "Enlace de invitación",
+      "createdAt": "Creado",
+      "expiresAt": "Expira"
+    },
+    "leave": {
+      "title": "Abandonar la organización",
+      "button": "Abandonar la organización",
+      "lastAdminHint": "Eres el único administrador. Promueve a otro administrador antes de irte.",
+      "dialogTitle": "Abandonar la organización",
+      "dialogDescription": "Perderás el acceso a {orgName}. Puedes volver a unirte con un nuevo enlace de invitación.",
+      "confirm": "Abandonar",
+      "cancel": "Cancelar"
+    },
+    "toasts": {
+      "roleUpdated": "Rol actualizado",
+      "memberRemoved": "Miembro eliminado",
+      "left": "Has abandonado la organización",
+      "inviteRegenerated": "Enlace de invitación actualizado"
     },
     "invitePage": {
       "title": "Has recibido una invitación",
@@ -318,7 +365,11 @@
     },
     "errors": {
       "generic": "Algo salió mal. Inténtalo de nuevo.",
-      "authRequired": "Inicia sesión primero."
+      "authRequired": "Inicia sesión primero.",
+      "lastAdmin": "La organización debe conservar al menos un administrador.",
+      "notAdmin": "No tienes permiso para hacer eso.",
+      "notMember": "Ya no eres miembro de esta organización.",
+      "invalidRole": "Rol no válido."
     }
   },
   "login": {

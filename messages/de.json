@@ -15,6 +15,7 @@
       "tickets": "Tickets",
       "profile": "Profil",
       "settings": "Einstellungen",
+      "organization": "Organisation",
       "viewSource": "Quellcode ansehen"
     }
   },
@@ -271,6 +272,32 @@
     }
   },
   "orgs": {
+    "page": {
+      "title": "Organisation",
+      "description": "Verwalte Mitglieder, Rollen und deinen Einladungslink."
+    },
+    "members": {
+      "columns": {
+        "member": "Mitglied",
+        "role": "Rolle",
+        "joined": "Beigetreten",
+        "actions": "Aktionen"
+      },
+      "you": "Du",
+      "roles": {
+        "admin": "Administrator",
+        "member": "Mitglied"
+      },
+      "actions": {
+        "openAria": "Mitgliederaktionen öffnen"
+      },
+      "removeDialog": {
+        "title": "Mitglied entfernen",
+        "description": "{name} verliert den Zugriff auf diese Organisation.",
+        "confirm": "Entfernen",
+        "cancel": "Abbrechen"
+      }
+    },
     "switcher": {
       "openAria": "Organisation wechseln",
       "noOrg": "Keine Organisation"
@@ -293,6 +320,26 @@
       "copy": "Link kopieren",
       "copied": "Kopiert",
       "roleHint": "Jeder mit diesem Link tritt nach der Anmeldung als Mitglied bei."
+    },
+    "inviteCard": {
+      "title": "Einladungslink",
+      "createdAt": "Erstellt",
+      "expiresAt": "Läuft ab"
+    },
+    "leave": {
+      "title": "Organisation verlassen",
+      "button": "Organisation verlassen",
+      "lastAdminHint": "Du bist der einzige Administrator. Befördere zuerst ein anderes Mitglied zum Administrator, bevor du gehst.",
+      "dialogTitle": "Organisation verlassen",
+      "dialogDescription": "Du verlierst den Zugriff auf {orgName}. Du kannst mit einem neuen Einladungslink wieder beitreten.",
+      "confirm": "Verlassen",
+      "cancel": "Abbrechen"
+    },
+    "toasts": {
+      "roleUpdated": "Rolle aktualisiert",
+      "memberRemoved": "Mitglied entfernt",
+      "left": "Du hast die Organisation verlassen",
+      "inviteRegenerated": "Einladungslink aktualisiert"
     },
     "invitePage": {
       "title": "Du wurdest eingeladen",
@@ -318,7 +365,11 @@
     },
     "errors": {
       "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-      "authRequired": "Bitte melde dich zuerst an."
+      "authRequired": "Bitte melde dich zuerst an.",
+      "lastAdmin": "Die Organisation muss mindestens einen Administrator behalten.",
+      "notAdmin": "Du hast keine Berechtigung für diese Aktion.",
+      "notMember": "Du bist nicht mehr Mitglied dieser Organisation.",
+      "invalidRole": "Ungültige Rolle."
     }
   },
   "login": {

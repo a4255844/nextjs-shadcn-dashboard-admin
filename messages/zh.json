@@ -15,6 +15,7 @@
       "tickets": "工单",
       "profile": "个人资料",
       "settings": "设置",
+      "organization": "组织",
       "viewSource": "查看源码"
     }
   },
@@ -271,6 +272,32 @@
     }
   },
   "orgs": {
+    "page": {
+      "title": "组织",
+      "description": "管理成员、角色与邀请链接。"
+    },
+    "members": {
+      "columns": {
+        "member": "成员",
+        "role": "角色",
+        "joined": "加入时间",
+        "actions": "操作"
+      },
+      "you": "你",
+      "roles": {
+        "admin": "管理员",
+        "member": "成员"
+      },
+      "actions": {
+        "openAria": "打开成员操作"
+      },
+      "removeDialog": {
+        "title": "移除成员",
+        "description": "{name} 将失去对该组织的访问权限。",
+        "confirm": "移除",
+        "cancel": "取消"
+      }
+    },
     "switcher": {
       "openAria": "切换组织",
       "noOrg": "无组织"
@@ -293,6 +320,26 @@
       "copy": "复制链接",
       "copied": "已复制",
       "roleHint": "任何人通过此链接登录后即以成员身份加入。"
+    },
+    "inviteCard": {
+      "title": "邀请链接",
+      "createdAt": "生成时间",
+      "expiresAt": "过期时间"
+    },
+    "leave": {
+      "title": "退出组织",
+      "button": "退出组织",
+      "lastAdminHint": "你是唯一管理员，请先提升其他成员为管理员后再退出。",
+      "dialogTitle": "退出组织",
+      "dialogDescription": "你将失去对 {orgName} 的访问权限。可凭新邀请链接重新加入。",
+      "confirm": "退出",
+      "cancel": "取消"
+    },
+    "toasts": {
+      "roleUpdated": "角色已更新",
+      "memberRemoved": "成员已移除",
+      "left": "已退出组织",
+      "inviteRegenerated": "邀请链接已更新"
     },
     "invitePage": {
       "title": "你收到了邀请",
@@ -318,7 +365,11 @@
     },
     "errors": {
       "generic": "出错了，请重试。",
-      "authRequired": "请先登录。"
+      "authRequired": "请先登录。",
+      "lastAdmin": "组织至少需要保留一名管理员。",
+      "notAdmin": "你没有执行该操作的权限。",
+      "notMember": "你已不是该组织的成员。",
+      "invalidRole": "无效的角色。"
     }
   },
   "login": {

@@ -15,6 +15,7 @@
       "tickets": "Tickets",
       "profile": "Profile",
       "settings": "Settings",
+      "organization": "Organization",
       "viewSource": "View Source"
     }
   },
@@ -271,6 +272,32 @@
     }
   },
   "orgs": {
+    "page": {
+      "title": "Organization",
+      "description": "Manage members, roles and your invite link."
+    },
+    "members": {
+      "columns": {
+        "member": "Member",
+        "role": "Role",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "you": "You",
+      "roles": {
+        "admin": "Admin",
+        "member": "Member"
+      },
+      "actions": {
+        "openAria": "Open member actions"
+      },
+      "removeDialog": {
+        "title": "Remove member",
+        "description": "{name} will lose access to this organization.",
+        "confirm": "Remove",
+        "cancel": "Cancel"
+      }
+    },
     "switcher": {
       "openAria": "Switch organization",
       "noOrg": "No organization"
@@ -293,6 +320,26 @@
       "copy": "Copy link",
       "copied": "Copied",
       "roleHint": "Anyone with this link joins as a member after signing in."
+    },
+    "inviteCard": {
+      "title": "Invite link",
+      "createdAt": "Created",
+      "expiresAt": "Expires"
+    },
+    "leave": {
+      "title": "Leave organization",
+      "button": "Leave organization",
+      "lastAdminHint": "You are the only admin. Promote another admin before leaving.",
+      "dialogTitle": "Leave organization",
+      "dialogDescription": "You will lose access to {orgName}. You can rejoin with a new invite link.",
+      "confirm": "Leave",
+      "cancel": "Cancel"
+    },
+    "toasts": {
+      "roleUpdated": "Role updated",
+      "memberRemoved": "Member removed",
+      "left": "You have left the organization",
+      "inviteRegenerated": "Invite link updated"
     },
     "invitePage": {
       "title": "You've been invited",
@@ -318,7 +365,11 @@
     },
     "errors": {
       "generic": "Something went wrong. Please try again.",
-      "authRequired": "Please sign in first."
+      "authRequired": "Please sign in first.",
+      "lastAdmin": "The organization must keep at least one admin.",
+      "notAdmin": "You don't have permission to do that.",
+      "notMember": "You are no longer a member of this organization.",
+      "invalidRole": "Invalid role."
     }
   },
   "login": {

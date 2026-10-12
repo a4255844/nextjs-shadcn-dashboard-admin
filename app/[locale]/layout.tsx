@@ -2,6 +2,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { CustomizerProvider } from "@/components/customizer/customizer-context";
+import Toaster from "@/components/shared/toaster";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -24,7 +25,10 @@ export default async function LocaleLayout({
   // 这里只挂与 locale 相关的 providers。
   return (
     <NextIntlClientProvider>
-      <CustomizerProvider>{children}</CustomizerProvider>
+      <CustomizerProvider>
+        {children}
+        <Toaster />
+      </CustomizerProvider>
     </NextIntlClientProvider>
   );
 }

@@ -9,6 +9,7 @@ import {
   joinOrganization,
   type JoinErrorCode,
 } from "@/lib/api/organizations";
+import { toErrorCode } from "./rpc-errors";
 
 export interface CreateOrgResult {
   ok: boolean;
@@ -36,20 +37,6 @@ const CREATE_INVITE_ERRORS = [
   "invalid_role",
 ] as const;
 const JOIN_ERRORS = ["auth_required", "invalid", "used", "expired"] as const;
-
-/**
- * rpc raise exception 的异常码经 PostgREST 出现在 error.message 中。
- * 先做已知码白名单校验，通过后收窄（断言紧邻校验）。
- */
-function toErrorCode<E extends string>(
-  message: string,
-  known: readonly E[],
-  fallback: Extract<E, "network">,
-): E {
-  return (known as readonly string[]).includes(message)
-    ? (message as E)
-    : fallback;
-}
 
 async function writeActiveOrgCookie(orgId: string): Promise<void> {
   const cookieStore = await cookies();
