@@ -5,13 +5,23 @@ import StatCard from "@/components/shared/stat-card";
 import StyleAwareWrapper from "@/components/shared/StyleAwareWrapper";
 import StyleDivider from "@/components/shared/StyleDivider";
 import CustomersTable from "@/components/dashboards/customers/customers-table";
+import NoOrgState from "@/components/orgs/NoOrgState";
 import { getCustomers } from "@/lib/api/customers";
+import { getActiveOrg } from "@/lib/api/organizations";
 
 const page = async () => {
   const t = await getTranslations("customers");
 
-  // RSC 直查 DB（真实数据源）；表格统计都从同一份 rows 聚合
-  const rows = await getCustomers();
+  // 当前激活组织（cookie -> 第一个组织 -> null 的 fallback 链，
+  // 见 getActiveOrg）；无组织时渲染创建引导空态
+  const org = await getActiveOrg();
+  if (org === null) {
+    return <NoOrgState />;
+  }
+
+  // RSC 直查 DB（真实数据源）；表格统计都从同一份 rows 聚合。
+  // 必须按 active org 过滤（RLS 只保证读权限，不做数据过滤）
+  const rows = await getCustomers(org.id);
   const total = rows.length;
   const activeCount = rows.filter((r) => r.status === "active").length;
   const vipCount = rows.filter((r) => r.status === "vip").length;

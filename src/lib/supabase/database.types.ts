@@ -58,6 +58,50 @@ export type Database = {
           },
         ]
       }
+      invites: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          org_id: string
+          role: string
+          token: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          org_id: string
+          role?: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          org_id?: string
+          role?: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           created_at: string
@@ -143,8 +187,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_invite: {
+        Args: { p_org_id: string; p_role?: string }
+        Returns: string
+      }
+      create_organization: { Args: { p_name: string }; Returns: string }
       is_org_admin: { Args: { check_org_id: string }; Returns: boolean }
       is_org_member: { Args: { check_org_id: string }; Returns: boolean }
+      join_organization: {
+        Args: { p_token: string }
+        Returns: {
+          already_member: boolean
+          org_id: string
+        }[]
+      }
     }
     Enums: {
       customer_status: "active" | "inactive" | "vip" | "atRisk"

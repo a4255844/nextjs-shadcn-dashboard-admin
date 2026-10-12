@@ -13,6 +13,7 @@ const PROTECTED_PREFIXES = [
   "/tickets",
   "/profile",
   "/settings",
+  "/invite", // 消费邀请链接需先登录（redirect 参数带回跳）
 ];
 
 /** 仅未登录可访问的页面：已登录访问时跳转 dashboard */

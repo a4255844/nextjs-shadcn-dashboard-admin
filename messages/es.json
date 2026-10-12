@@ -270,6 +270,57 @@
       }
     }
   },
+  "orgs": {
+    "switcher": {
+      "openAria": "Cambiar de organización",
+      "noOrg": "Sin organización"
+    },
+    "create": {
+      "title": "Crear organización",
+      "description": "Serás el administrador de la nueva organización.",
+      "nameLabel": "Nombre de la organización",
+      "namePlaceholder": "p. ej. Acme S.L.",
+      "submit": "Crear",
+      "cancel": "Cancelar",
+      "errorName": "El nombre debe tener entre 1 y 60 caracteres."
+    },
+    "invite": {
+      "title": "Invitar miembro",
+      "description": "Comparte el enlace de un solo uso: caduca en 7 días y deja de ser válido tras usarse o regenerarse.",
+      "empty": "No hay un enlace de invitación activo. Genera uno para compartirlo.",
+      "generate": "Generar enlace",
+      "regenerate": "Regenerar",
+      "copy": "Copiar enlace",
+      "copied": "Copiado",
+      "roleHint": "Cualquier persona con este enlace se une como miembro después de iniciar sesión."
+    },
+    "invitePage": {
+      "title": "Has recibido una invitación",
+      "description": "Acepta la invitación para unirte a la organización y empezar a colaborar.",
+      "accept": "Aceptar invitación",
+      "joining": "Uniéndose...",
+      "successTitle": "¡Bienvenido a bordo!",
+      "alreadyMember": "Ya eres miembro de esta organización.",
+      "go": "Ir al espacio de trabajo",
+      "errorTitle": "Invitación no disponible",
+      "error": {
+        "invalid": "Este enlace de invitación no es válido.",
+        "expired": "Este enlace de invitación ha caducado. Pide uno nuevo al administrador.",
+        "used": "Este enlace de invitación ya se ha utilizado.",
+        "generic": "Algo salió mal. Inténtalo de nuevo."
+      },
+      "backHome": "Volver al espacio de trabajo"
+    },
+    "noOrgState": {
+      "title": "Aún no hay organización",
+      "description": "Crea una organización para empezar a gestionar tus clientes.",
+      "cta": "Crear organización"
+    },
+    "errors": {
+      "generic": "Algo salió mal. Inténtalo de nuevo.",
+      "authRequired": "Inicia sesión primero."
+    }
+  },
   "login": {
     "title": "Bienvenido de nuevo",
     "subtitle": "Inicia sesión en tu cuenta para continuar",

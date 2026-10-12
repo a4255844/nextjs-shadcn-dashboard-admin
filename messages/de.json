@@ -270,6 +270,57 @@
       }
     }
   },
+  "orgs": {
+    "switcher": {
+      "openAria": "Organisation wechseln",
+      "noOrg": "Keine Organisation"
+    },
+    "create": {
+      "title": "Organisation erstellen",
+      "description": "Du wirst Administrator der neuen Organisation.",
+      "nameLabel": "Name der Organisation",
+      "namePlaceholder": "z. B. Acme GmbH",
+      "submit": "Erstellen",
+      "cancel": "Abbrechen",
+      "errorName": "Der Name muss 1-60 Zeichen lang sein."
+    },
+    "invite": {
+      "title": "Mitglied einladen",
+      "description": "Teile den Einmal-Link: Er läuft nach 7 Tagen ab und wird nach der Verwendung oder beim Neuerstellen ungültig.",
+      "empty": "Kein aktiver Einladungslink. Erstelle einen, um ihn zu teilen.",
+      "generate": "Link erstellen",
+      "regenerate": "Neu erstellen",
+      "copy": "Link kopieren",
+      "copied": "Kopiert",
+      "roleHint": "Jeder mit diesem Link tritt nach der Anmeldung als Mitglied bei."
+    },
+    "invitePage": {
+      "title": "Du wurdest eingeladen",
+      "description": "Nimm die Einladung an, um der Organisation beizutreten und zusammenzuarbeiten.",
+      "accept": "Einladung annehmen",
+      "joining": "Beitreten...",
+      "successTitle": "Willkommen an Bord!",
+      "alreadyMember": "Du bist bereits Mitglied dieser Organisation.",
+      "go": "Zum Arbeitsbereich",
+      "errorTitle": "Einladung nicht verfügbar",
+      "error": {
+        "invalid": "Dieser Einladungslink ist ungültig.",
+        "expired": "Dieser Einladungslink ist abgelaufen. Bitte fordere einen neuen vom Administrator an.",
+        "used": "Dieser Einladungslink wurde bereits verwendet.",
+        "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+      },
+      "backHome": "Zurück zum Arbeitsbereich"
+    },
+    "noOrgState": {
+      "title": "Noch keine Organisation",
+      "description": "Erstelle eine Organisation, um deine Kunden zu verwalten.",
+      "cta": "Organisation erstellen"
+    },
+    "errors": {
+      "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "authRequired": "Bitte melde dich zuerst an."
+    }
+  },
   "login": {
     "title": "Willkommen zurück",
     "subtitle": "Melde dich bei deinem Konto an, um fortzufahren",

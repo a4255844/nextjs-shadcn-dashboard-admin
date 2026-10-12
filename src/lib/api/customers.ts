@@ -23,14 +23,17 @@ function toCustomerRow(row: CustomerDbRow): CustomerRow {
   };
 }
 
-// 读取全部 customers（服务端 RSC 使用）。
+// 读取指定组织的全部 customers（服务端 RSC 使用）。
 // 排序与前端表格无关（表格是客户端排序），这里只保证返回顺序稳定。
-export async function getCustomers(): Promise<CustomerRow[]> {
+// 必须显式按 org_id 过滤：RLS 只保证"所属组织并集"（读权限），
+// 多组织用户不做 eq 会看到所有组织的客户（RLS 不是数据过滤的替代品）。
+export async function getCustomers(orgId: string): Promise<CustomerRow[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("customers")
     .select("*")
+    .eq("org_id", orgId)
     .order("created_at", { ascending: false })
     .order("name", { ascending: true });
 

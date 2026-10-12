@@ -6,10 +6,19 @@ import Profile from "./Profile";
 import LightDark from "./Light-Dark";
 import Notifications from "./Notifications";
 import LocaleSwitch from "./LocaleSwitch";
+import OrgSwitcher from "./OrgSwitcher";
 import Customizer from "@/components/customizer/customizer-panel";
 import type { CurrentUser } from "@/lib/api/auth";
+import type { OrgSummary } from "@/lib/api/organizations";
 
-const Header = ({ user }: { user: CurrentUser | null }) => {
+interface HeaderProps {
+  user: CurrentUser | null;
+  /** 服务端取数传入（Header 是 client 组件，不自带 server 取数） */
+  orgs: OrgSummary[];
+  activeOrg: OrgSummary | null;
+}
+
+const Header = ({ user, orgs, activeOrg }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-30 shrink-0">
       <div className="border-b border-border bg-card/85 backdrop-blur supports-[backdrop-filter]:bg-card/70 md:rounded-t-xl">
@@ -26,6 +35,7 @@ const Header = ({ user }: { user: CurrentUser | null }) => {
             </div>
 
             <div className="flex items-center gap-0 sm:gap-1">
+              <OrgSwitcher orgs={orgs} activeOrg={activeOrg} />
               <LocaleSwitch />
               <Customizer />
               <LightDark />

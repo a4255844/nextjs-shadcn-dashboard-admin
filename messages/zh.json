@@ -270,6 +270,57 @@
       }
     }
   },
+  "orgs": {
+    "switcher": {
+      "openAria": "切换组织",
+      "noOrg": "无组织"
+    },
+    "create": {
+      "title": "创建组织",
+      "description": "你将成为新组织的管理员。",
+      "nameLabel": "组织名称",
+      "namePlaceholder": "例如：Acme 公司",
+      "submit": "创建",
+      "cancel": "取消",
+      "errorName": "名称需为 1-60 个字符。"
+    },
+    "invite": {
+      "title": "邀请成员",
+      "description": "分享一次性链接：7 天后过期，使用后或重新生成后失效。",
+      "empty": "暂无有效邀请链接，点击生成后分享。",
+      "generate": "生成链接",
+      "regenerate": "重新生成",
+      "copy": "复制链接",
+      "copied": "已复制",
+      "roleHint": "任何人通过此链接登录后即以成员身份加入。"
+    },
+    "invitePage": {
+      "title": "你收到了邀请",
+      "description": "接受邀请即可加入组织开始协作。",
+      "accept": "接受邀请",
+      "joining": "加入中...",
+      "successTitle": "欢迎加入！",
+      "alreadyMember": "你已经是该组织的成员。",
+      "go": "进入工作台",
+      "errorTitle": "邀请不可用",
+      "error": {
+        "invalid": "邀请链接无效。",
+        "expired": "邀请链接已过期，请向管理员索取新链接。",
+        "used": "邀请链接已被使用。",
+        "generic": "出错了，请重试。"
+      },
+      "backHome": "返回工作台"
+    },
+    "noOrgState": {
+      "title": "还没有组织",
+      "description": "创建组织即可开始管理你的客户。",
+      "cta": "创建组织"
+    },
+    "errors": {
+      "generic": "出错了，请重试。",
+      "authRequired": "请先登录。"
+    }
+  },
   "login": {
     "title": "欢迎回来",
     "subtitle": "登录你的账号以继续",

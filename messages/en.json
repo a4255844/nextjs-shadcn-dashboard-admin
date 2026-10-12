@@ -270,6 +270,57 @@
       }
     }
   },
+  "orgs": {
+    "switcher": {
+      "openAria": "Switch organization",
+      "noOrg": "No organization"
+    },
+    "create": {
+      "title": "Create organization",
+      "description": "You will become the admin of the new organization.",
+      "nameLabel": "Organization name",
+      "namePlaceholder": "e.g. Acme Inc.",
+      "submit": "Create",
+      "cancel": "Cancel",
+      "errorName": "Name must be 1-60 characters."
+    },
+    "invite": {
+      "title": "Invite member",
+      "description": "Share the one-time link: it expires in 7 days and becomes invalid after use or when regenerated.",
+      "empty": "No active invite link. Generate one to share.",
+      "generate": "Generate link",
+      "regenerate": "Regenerate",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "roleHint": "Anyone with this link joins as a member after signing in."
+    },
+    "invitePage": {
+      "title": "You've been invited",
+      "description": "Accept the invitation to join the organization and start collaborating.",
+      "accept": "Accept invitation",
+      "joining": "Joining...",
+      "successTitle": "Welcome aboard!",
+      "alreadyMember": "You're already a member of this organization.",
+      "go": "Go to workspace",
+      "errorTitle": "Invitation unavailable",
+      "error": {
+        "invalid": "This invitation link is invalid.",
+        "expired": "This invitation link has expired. Ask the admin for a new one.",
+        "used": "This invitation link has already been used.",
+        "generic": "Something went wrong. Please try again."
+      },
+      "backHome": "Back to workspace"
+    },
+    "noOrgState": {
+      "title": "No organization yet",
+      "description": "Create an organization to start managing your customers.",
+      "cta": "Create organization"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "authRequired": "Please sign in first."
+    }
+  },
   "login": {
     "title": "Welcome back",
     "subtitle": "Sign in to your account to continue",
