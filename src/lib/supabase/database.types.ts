@@ -143,7 +143,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_org_admin: { Args: { check_org_id: string }; Returns: boolean }
+      is_org_member: { Args: { check_org_id: string }; Returns: boolean }
     }
     Enums: {
       customer_status: "active" | "inactive" | "vip" | "atRisk"
