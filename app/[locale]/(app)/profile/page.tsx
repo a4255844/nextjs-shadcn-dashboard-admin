@@ -1,15 +1,27 @@
 import { getTranslations } from "next-intl/server";
-import { PagePlaceholder } from "@/components/page-placeholder";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/api/auth";
+import ProfileForm from "@/components/profile/profile-form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function ProfilePage() {
   const t = await getTranslations("pages.profile");
-  const tPages = await getTranslations("pages");
+  const user = await getCurrentUser();
+
+  if (user === null) {
+    redirect("/login");
+  }
 
   return (
-    <PagePlaceholder
-      title={t("title")}
-      description={t("description")}
-      badge={tPages("comingSoon")}
-    />
+    <div className="mx-auto max-w-xl py-8 px-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("title")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProfileForm user={user} />
+        </CardContent>
+      </Card>
+    </div>
   );
 }

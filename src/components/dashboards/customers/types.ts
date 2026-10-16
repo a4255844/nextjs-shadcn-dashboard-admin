@@ -70,4 +70,5 @@ export interface CustomerRow {
   spent: number;
   createdAt: string; // ISO 日期，展示时 format
   avatarColor: string; // 头像背景色（首字母 fallback 用）
+  avatarUrl: string | null; // Storage 公开 URL；null = 无头像（用首字母 fallback）
 }

@@ -81,7 +81,11 @@ const page = async () => {
             </div>
           }
         >
-          <CustomersTable rows={rows} />
+          <CustomersTable
+            rows={rows}
+            orgId={org.id}
+            isAdmin={org.role === "admin"}
+          />
         </Suspense>
       </div>
     </StyleAwareWrapper>

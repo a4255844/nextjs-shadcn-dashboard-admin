@@ -63,7 +63,30 @@
     },
     "profile": {
       "title": "Profile",
-      "description": "User profile with avatar, tabs and account details."
+      "description": "Manage your personal information.",
+      "fields": {
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email"
+      },
+      "avatar": {
+        "change": "Change avatar",
+        "remove": "Remove avatar"
+      },
+      "actions": {
+        "save": "Save changes"
+      },
+      "toasts": {
+        "updated": "Profile updated"
+      },
+      "errors": {
+        "required": "This field is required",
+        "tooLong": "Must be 50 characters or fewer",
+        "invalidAvatar": "Invalid avatar reference",
+        "invalidType": "Choose an image file (JPEG, PNG or WebP)",
+        "tooLarge": "The image is too large",
+        "uploadFailed": "Failed to upload the avatar. Please try again."
+      }
     },
     "settings": {
       "title": "Settings",
@@ -254,7 +277,7 @@
       },
       "actions": {
         "label": "Open row actions",
-        "view": "View",
+        "add": "Add customer",
         "edit": "Edit",
         "delete": "Delete"
       },
@@ -269,6 +292,56 @@
         "rowsPerPage": "Rows per page",
         "noData": "No customers found"
       }
+    },
+    "form": {
+      "titleCreate": "Add customer",
+      "titleEdit": "Edit customer",
+      "description": "Customer records are visible to everyone in your organization.",
+      "fields": {
+        "name": "Name",
+        "email": "Email",
+        "company": "Company",
+        "status": "Status",
+        "spent": "Spent (USD)"
+      },
+      "placeholders": {
+        "name": "e.g. Jane Cooper",
+        "email": "jane@company.com",
+        "company": "Acme Inc."
+      },
+      "avatar": {
+        "change": "Change avatar",
+        "remove": "Remove avatar"
+      },
+      "submit": "Add customer",
+      "save": "Save changes",
+      "cancel": "Cancel",
+      "errors": {
+        "required": "This field is required",
+        "tooLong": "Must be 100 characters or fewer",
+        "invalidEmail": "Enter a valid email address",
+        "invalidStatus": "Select a valid status",
+        "invalidSpent": "Enter a whole number of 0 or greater",
+        "duplicateEmail": "A customer with this email already exists",
+        "invalidAvatar": "Invalid avatar reference",
+        "invalidType": "Choose an image file (JPEG, PNG or WebP)",
+        "tooLarge": "The image is too large",
+        "uploadFailed": "Failed to upload the avatar. Please try again.",
+        "forbidden": "Only organization admins can make this change",
+        "notFound": "This customer no longer exists",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "deleteDialog": {
+      "title": "Delete customer",
+      "description": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "toasts": {
+      "created": "Customer created",
+      "updated": "Customer updated",
+      "deleted": "Customer deleted"
     }
   },
   "orgs": {

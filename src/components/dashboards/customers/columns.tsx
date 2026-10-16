@@ -10,8 +10,8 @@ import {
   rowSortingFeature,
   tableFeatures,
 } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,8 +53,19 @@ function initials(name: string): string {
   );
 }
 
+// 列定义 hook 入参：admin 才注入行操作回调（member 无操作列）
+interface UseColumnsOptions {
+  isAdmin: boolean;
+  onEdit: (customer: CustomerRow) => void;
+  onDelete: (customer: CustomerRow) => void;
+}
+
 // 列定义 hook：i18n + locale 感知，返回 memoized 的 ColumnDef 数组
-export function useColumns(): ColumnDef<typeof features, CustomerRow>[] {
+export function useColumns({
+  isAdmin,
+  onEdit,
+  onDelete,
+}: UseColumnsOptions): ColumnDef<typeof features, CustomerRow>[] {
   const t = useTranslations("customers.table");
   const locale = useLocale();
 
@@ -90,6 +101,9 @@ export function useColumns(): ColumnDef<typeof features, CustomerRow>[] {
             return (
               <div className="flex items-center gap-3">
                 <Avatar size="sm">
+                  {c.avatarUrl !== null && (
+                    <AvatarImage src={c.avatarUrl} alt={c.name} />
+                  )}
                   <AvatarFallback
                     className={cn("text-xs font-medium", c.avatarColor)}
                   >
@@ -173,41 +187,56 @@ export function useColumns(): ColumnDef<typeof features, CustomerRow>[] {
             </span>
           ),
         },
-        {
-          id: "actions",
-          header: () => (
-            <div className="text-end pe-2">{t("columns.actions")}</div>
-          ),
-          enableSorting: false,
-          cell: ({ row }) => (
-            <div className="flex justify-end pe-1">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" className="size-7">
-                    <MoreHorizontal className="size-4" />
-                    <span className="sr-only">{t("actions.label")}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-36">
-                  <DropdownMenuItem>
-                    <Eye className="size-4" />
-                    {t("actions.view")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Pencil className="size-4" />
-                    {t("actions.edit")}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem variant="destructive">
-                    <Trash2 className="size-4" />
-                    {t("actions.delete")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ),
-        },
+        // admin 专属：行操作列（member 不渲染，整表只读；RLS 为最终兜底）
+        ...(isAdmin
+          ? [
+              {
+                id: "actions",
+                header: () => (
+                  <div className="text-end pe-2">{t("columns.actions")}</div>
+                ),
+                enableSorting: false,
+                cell: ({ row }) => {
+                  const c = row.original;
+                  return (
+                    <div className="flex justify-end pe-1">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon-sm" className="size-7">
+                            <MoreHorizontal className="size-4" />
+                            <span className="sr-only">{t("actions.label")}</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-36">
+                          {/* Radix 纪律：菜单 onSelect 后延迟 50ms 再开 Dialog，
+                              等菜单关闭落定，避免关闭后二次打开竞态 */}
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setTimeout(() => onEdit(c), 50);
+                            }}
+                          >
+                            <Pencil className="size-4" />
+                            {t("actions.edit")}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onSelect={() => {
+                              setTimeout(() => onDelete(c), 50);
+                            }}
+                          >
+                            <Trash2 className="size-4" />
+                            {t("actions.delete")}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  );
+                },
+              } satisfies ColumnDef<typeof features, CustomerRow>,
+            ]
+          : []),
       ];
     },
-    [t, locale],
+    [t, locale, isAdmin, onEdit, onDelete],
   );
 }

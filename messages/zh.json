@@ -63,7 +63,30 @@
     },
     "profile": {
       "title": "个人资料",
-      "description": "包含头像、标签页与账户信息的个人资料页。"
+      "description": "管理您的个人信息。",
+      "fields": {
+        "firstName": "名",
+        "lastName": "姓",
+        "email": "邮箱"
+      },
+      "avatar": {
+        "change": "更换头像",
+        "remove": "移除头像"
+      },
+      "actions": {
+        "save": "保存更改"
+      },
+      "toasts": {
+        "updated": "个人资料已更新"
+      },
+      "errors": {
+        "required": "此字段为必填",
+        "tooLong": "不超过 50 个字符",
+        "invalidAvatar": "头像链接无效",
+        "invalidType": "请选择图片文件（JPEG、PNG 或 WebP）",
+        "tooLarge": "图片过大",
+        "uploadFailed": "头像上传失败，请重试。"
+      }
     },
     "settings": {
       "title": "设置",
@@ -254,7 +277,7 @@
       },
       "actions": {
         "label": "打开行操作",
-        "view": "查看",
+        "add": "新增客户",
         "edit": "编辑",
         "delete": "删除"
       },
@@ -269,6 +292,56 @@
         "rowsPerPage": "每页行数",
         "noData": "未找到客户"
       }
+    },
+    "form": {
+      "titleCreate": "新增客户",
+      "titleEdit": "编辑客户",
+      "description": "客户记录对组织内所有成员可见。",
+      "fields": {
+        "name": "姓名",
+        "email": "邮箱",
+        "company": "公司",
+        "status": "状态",
+        "spent": "消费（美元）"
+      },
+      "placeholders": {
+        "name": "如：简·库珀",
+        "email": "jane@company.com",
+        "company": "Acme 公司"
+      },
+      "avatar": {
+        "change": "更换头像",
+        "remove": "移除头像"
+      },
+      "submit": "新增客户",
+      "save": "保存修改",
+      "cancel": "取消",
+      "errors": {
+        "required": "此项为必填项",
+        "tooLong": "不能超过 100 个字符",
+        "invalidEmail": "请输入有效的邮箱地址",
+        "invalidStatus": "请选择有效的状态",
+        "invalidSpent": "请输入大于等于 0 的整数",
+        "duplicateEmail": "该邮箱的客户已存在",
+        "invalidAvatar": "头像链接无效",
+        "invalidType": "请选择图片文件（JPEG、PNG 或 WebP）",
+        "tooLarge": "图片过大",
+        "uploadFailed": "头像上传失败，请重试。",
+        "forbidden": "仅组织管理员可执行此操作",
+        "notFound": "该客户不存在或已被删除",
+        "generic": "操作失败，请重试。"
+      }
+    },
+    "deleteDialog": {
+      "title": "删除客户",
+      "description": "确定要删除 {name} 吗？此操作无法撤销。",
+      "confirm": "删除",
+      "cancel": "取消"
+    },
+    "toasts": {
+      "created": "客户已新增",
+      "updated": "客户已更新",
+      "deleted": "客户已删除"
     }
   },
   "orgs": {

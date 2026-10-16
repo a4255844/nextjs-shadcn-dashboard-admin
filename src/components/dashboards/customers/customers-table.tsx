@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -12,21 +19,24 @@ import {
 } from "@tanstack/react-table";
 import {
   Search,
+  Plus,
+  ChevronDown,
   ChevronsLeft,
   ChevronLeft,
   ChevronRight,
   ChevronsRight,
+  Loader2,
 } from "lucide-react";
 import { DashboardCard } from "@/components/shared/dashboard-card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -45,6 +55,8 @@ import {
   type CustomerRow,
   type StatusKey,
 } from "./types";
+import CustomerFormDialog from "./customer-form-dialog";
+import CustomerDeleteDialog from "./customer-delete-dialog";
 
 // 状态筛选值：all 表示全部，其余与 StatusKey 对齐
 type StatusFilter = StatusKey | "all";
@@ -60,14 +72,35 @@ const STATUS_FILTER_OPTIONS: readonly StatusFilter[] = [
 // 表格数据由服务端页面（RSC）从 DB 查询后传入
 interface CustomersTableProps {
   rows: CustomerRow[];
+  orgId: string;
+  /** 当前用户在激活组织内是否为 admin（member 整表只读，RLS 为最终兜底） */
+  isAdmin: boolean;
 }
 
-export default function CustomersTable({ rows }: CustomersTableProps) {
+export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("customers.table");
-  const columns = useColumns();
+
+  // ---- 写操作弹窗状态 ----
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<CustomerRow | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<CustomerRow | null>(null);
+
+  const handleEdit = useCallback((c: CustomerRow) => {
+    setEditingCustomer(c);
+    setFormOpen(true);
+  }, []);
+  const handleDelete = useCallback((c: CustomerRow) => {
+    setDeleteTarget(c);
+  }, []);
+  const handleAdd = () => {
+    setEditingCustomer(null);
+    setFormOpen(true);
+  };
+
+  const columns = useColumns({ isAdmin, onEdit: handleEdit, onDelete: handleDelete });
 
   // ---- 从 URL search params 派生表格状态（URL 是唯一状态源）----
   const q = searchParams.get("q") ?? "";
@@ -84,6 +117,10 @@ export default function CustomersTable({ rows }: CustomersTableProps) {
   // 每次交互都拿到数据库最新数据（多用户协同时不出现脏读）。
   // dev 下因国际延迟每次 ~600ms；生产环境（Vercel 与 Supabase 同区域）
   // 为几十 ms。数据量大后的演进方向：筛选/分页下推到 DB 查询，只回传一页。
+  //
+  // useTransition：把 router.replace 标记为过渡更新，isPending 覆盖
+  // RSC 取数全过程，驱动表格区的 loading 遮罩。
+  const [isPending, startTransition] = useTransition();
   const setParams = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(searchParams.toString());
     for (const [k, v] of Object.entries(updates)) {
@@ -91,7 +128,9 @@ export default function CustomersTable({ rows }: CustomersTableProps) {
       else next.set(k, v);
     }
     const qs = next.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    startTransition(() => {
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    });
   };
 
   // ---- 搜索输入：local state + 防抖同步到 URL（每次提交都向服务端取最新数据）----
@@ -182,13 +221,23 @@ export default function CustomersTable({ rows }: CustomersTableProps) {
   const rangeTo = Math.min(page * size, totalRows);
   const safeCurrent = Math.min(page, Math.max(pageCount, 1));
 
+  // 删除最后一页最后一条等场景：RSC 刷新后总页数收缩，URL 中的 page 越界，
+  // 自动回退到最后一页
+  useEffect(() => {
+    if (page > pageCount) {
+      setParams({ page: String(Math.max(pageCount, 1)) });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, pageCount]);
+
   const pageNumbers = useMemo(
     () => Array.from({ length: pageCount }, (_, i) => i + 1),
     [pageCount],
   );
 
   return (
-    <DashboardCard className="flex flex-col">
+    <>
+      <DashboardCard className="flex flex-col">
       {/* 卡片头：搜索 + 状态筛选 + 行数 */}
       <div className="flex flex-col gap-3 border-b border-border p-4 md:flex-row md:items-center md:justify-between">
         <div className="relative max-w-64 w-full">
@@ -202,45 +251,55 @@ export default function CustomersTable({ rows }: CustomersTableProps) {
           />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Select
-            value={statusFilter}
-            onValueChange={(v) =>
-              setParams({
-                status: v === "all" ? null : v,
-                page: null,
-              })
-            }
-          >
-            <SelectTrigger size="sm" className="w-36" aria-label={t("filter.all")}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STATUS_FILTER_OPTIONS.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s === "all" ? t("filter.all") : t(`status.${s}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={String(size)}
-            onValueChange={(v) => setParams({ size: v, page: null })}
-          >
-            <SelectTrigger size="sm" className="w-28" aria-label={t("pagination.rowsPerPage")}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {PAGE_SIZE_OPTIONS.map((n) => (
-                <SelectItem key={n} value={String(n)}>
-                  {n} / {t("pagination.rows")}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {isAdmin && (
+            <Button size="sm" onClick={handleAdd}>
+              <Plus className="size-4" />
+              {t("actions.add")}
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 px-2 font-medium text-muted-foreground hover:text-foreground cursor-pointer"
+                aria-label={t("filter.all")}
+              >
+                {statusFilter === "all"
+                  ? t("filter.all")
+                  : t(`status.${statusFilter}`)}
+                <ChevronDown className="size-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-36">
+              <DropdownMenuRadioGroup
+                value={statusFilter}
+                onValueChange={(v) => {
+                  // Radix 落定纪律：关闭动画期间同步 router.replace 会打断关闭流程
+                  // 导致菜单弹回（与 LocaleSwitch 的 50ms 延迟导航同理）
+                  window.setTimeout(
+                    () => setParams({ status: v === "all" ? null : v, page: null }),
+                    50,
+                  );
+                }}
+              >
+                {STATUS_FILTER_OPTIONS.map((s) => (
+                  <DropdownMenuRadioItem
+                    key={s}
+                    value={s}
+                    className="cursor-pointer"
+                  >
+                    {s === "all" ? t("filter.all") : t(`status.${s}`)}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* 表格主体 */}
+      {/* 表格主体：请求中（transition 取数）叠加半透明遮罩 + spinner */}
+      <div className="relative" aria-busy={isPending}>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((hg) => (
@@ -285,6 +344,15 @@ export default function CustomersTable({ rows }: CustomersTableProps) {
           )}
         </TableBody>
       </Table>
+        {isPending && (
+          <div
+            className="absolute inset-0 z-10 flex items-center justify-center bg-background/60"
+            aria-hidden="true"
+          >
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          </div>
+        )}
+      </div>
 
       {/* 分页栏 */}
       <div className="flex flex-col gap-3 border-t border-border p-4 md:flex-row md:items-center md:justify-between">
@@ -297,7 +365,40 @@ export default function CustomersTable({ rows }: CustomersTableProps) {
                 total: totalRows,
               })}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 px-2 font-medium text-muted-foreground hover:text-foreground cursor-pointer"
+                aria-label={t("pagination.rowsPerPage")}
+              >
+                {size} / {t("pagination.rows")}
+                <ChevronDown className="size-3.5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-36">
+              <DropdownMenuRadioGroup
+                value={String(size)}
+                onValueChange={(v) => {
+                  // Radix 落定纪律：延迟到菜单关闭落定后再写 URL（同状态筛选）
+                  window.setTimeout(() => setParams({ size: v, page: null }), 50);
+                }}
+              >
+                {PAGE_SIZE_OPTIONS.map((n) => (
+                  <DropdownMenuRadioItem
+                    key={n}
+                    value={String(n)}
+                    className="cursor-pointer"
+                  >
+                    {n} / {t("pagination.rows")}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="icon-sm"
@@ -346,8 +447,26 @@ export default function CustomersTable({ rows }: CustomersTableProps) {
           >
             <ChevronsRight className="size-4" />
           </Button>
+          </div>
         </div>
       </div>
-    </DashboardCard>
+      </DashboardCard>
+
+      {isAdmin && (
+        <>
+          <CustomerFormDialog
+            open={formOpen}
+            onOpenChange={setFormOpen}
+            orgId={orgId}
+            customer={editingCustomer}
+          />
+          <CustomerDeleteDialog
+            orgId={orgId}
+            target={deleteTarget}
+            onClose={() => setDeleteTarget(null)}
+          />
+        </>
+      )}
+    </>
   );
 }

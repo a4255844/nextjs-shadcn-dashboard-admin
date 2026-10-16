@@ -63,7 +63,30 @@
     },
     "profile": {
       "title": "Profil",
-      "description": "Benutzerprofil mit Avatar, Tabs und Kontodetails."
+      "description": "Verwalten Sie Ihre persönlichen Informationen.",
+      "fields": {
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "email": "E-Mail"
+      },
+      "avatar": {
+        "change": "Avatar ändern",
+        "remove": "Avatar entfernen"
+      },
+      "actions": {
+        "save": "Änderungen speichern"
+      },
+      "toasts": {
+        "updated": "Profil aktualisiert"
+      },
+      "errors": {
+        "required": "Dieses Feld ist erforderlich",
+        "tooLong": "Maximal 50 Zeichen",
+        "invalidAvatar": "Ungültiger Avatar-Verweis",
+        "invalidType": "Bitte eine Bilddatei wählen (JPEG, PNG oder WebP)",
+        "tooLarge": "Das Bild ist zu groß",
+        "uploadFailed": "Avatar konnte nicht hochgeladen werden. Bitte erneut versuchen."
+      }
     },
     "settings": {
       "title": "Einstellungen",
@@ -254,7 +277,7 @@
       },
       "actions": {
         "label": "Zeilenaktionen öffnen",
-        "view": "Anzeigen",
+        "add": "Kunde hinzufügen",
         "edit": "Bearbeiten",
         "delete": "Löschen"
       },
@@ -269,6 +292,56 @@
         "rowsPerPage": "Zeilen pro Seite",
         "noData": "Keine Kunden gefunden"
       }
+    },
+    "form": {
+      "titleCreate": "Kunde hinzufügen",
+      "titleEdit": "Kunde bearbeiten",
+      "description": "Kundendaten sind für alle Mitglieder deiner Organisation sichtbar.",
+      "fields": {
+        "name": "Name",
+        "email": "E-Mail",
+        "company": "Unternehmen",
+        "status": "Status",
+        "spent": "Ausgegeben (USD)"
+      },
+      "placeholders": {
+        "name": "z. B. Jane Cooper",
+        "email": "jane@firma.com",
+        "company": "Acme GmbH"
+      },
+      "avatar": {
+        "change": "Avatar ändern",
+        "remove": "Avatar entfernen"
+      },
+      "submit": "Kunde hinzufügen",
+      "save": "Änderungen speichern",
+      "cancel": "Abbrechen",
+      "errors": {
+        "required": "Dieses Feld ist erforderlich",
+        "tooLong": "Darf höchstens 100 Zeichen lang sein",
+        "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
+        "invalidStatus": "Bitte wähle einen gültigen Status",
+        "invalidSpent": "Bitte gib eine ganze Zahl größer oder gleich 0 ein",
+        "duplicateEmail": "Ein Kunde mit dieser E-Mail-Adresse existiert bereits",
+        "invalidAvatar": "Ungültiger Avatar-Verweis",
+        "invalidType": "Bitte eine Bilddatei wählen (JPEG, PNG oder WebP)",
+        "tooLarge": "Das Bild ist zu groß",
+        "uploadFailed": "Avatar konnte nicht hochgeladen werden. Bitte erneut versuchen.",
+        "forbidden": "Nur Organisationsadministratoren dürfen diese Änderung vornehmen",
+        "notFound": "Dieser Kunde existiert nicht mehr",
+        "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+      }
+    },
+    "deleteDialog": {
+      "title": "Kunde löschen",
+      "description": "Möchtest du {name} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirm": "Löschen",
+      "cancel": "Abbrechen"
+    },
+    "toasts": {
+      "created": "Kunde erstellt",
+      "updated": "Kunde aktualisiert",
+      "deleted": "Kunde gelöscht"
     }
   },
   "orgs": {

@@ -17,6 +17,7 @@ export type Database = {
       customers: {
         Row: {
           avatar_color: string | null
+          avatar_url: string | null
           company: string
           created_at: string
           email: string
@@ -28,6 +29,7 @@ export type Database = {
         }
         Insert: {
           avatar_color?: string | null
+          avatar_url?: string | null
           company: string
           created_at?: string
           email: string
@@ -39,6 +41,7 @@ export type Database = {
         }
         Update: {
           avatar_color?: string | null
+          avatar_url?: string | null
           company?: string
           created_at?: string
           email?: string
