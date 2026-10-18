@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { CustomizerProvider } from "@/components/customizer/customizer-context";
 import Toaster from "@/components/shared/toaster";
+import RouteProgress from "@/components/shared/route-progress";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -27,6 +28,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider>
       <CustomizerProvider>
         {children}
+        <RouteProgress />
         <Toaster />
       </CustomizerProvider>
     </NextIntlClientProvider>
