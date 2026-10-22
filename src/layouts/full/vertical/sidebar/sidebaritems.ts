@@ -6,7 +6,7 @@ import {
   UsersRound,
   Gem,
   TrendingDown,
-  Ticket,
+  Receipt,
   Building2,
   CircleUserRound,
   Settings,
@@ -61,9 +61,9 @@ const SidebarContent: MenuItem[] = [
       },
       {
         id: uniqueId(),
-        name: "tickets",
-        icon: Ticket,
-        url: "/tickets",
+        name: "orders",
+        icon: Receipt,
+        url: "/orders",
       },
       {
         id: uniqueId(),

@@ -12,11 +12,11 @@
       "allCustomers": "Alle Kunden",
       "highValue": "Top-Kunden",
       "atRisk": "Gefährdet",
-      "tickets": "Tickets",
       "profile": "Profil",
       "settings": "Einstellungen",
       "organization": "Organisation",
-      "viewSource": "Quellcode ansehen"
+      "viewSource": "Quellcode ansehen",
+      "orders": "Bestellungen"
     }
   },
   "header": {
@@ -32,9 +32,9 @@
     "profile": {
       "home": "Startseite",
       "profile": "Profil",
-      "tickets": "Tickets",
       "settings": "Einstellungen",
-      "logOut": "Abmelden"
+      "logOut": "Abmelden",
+      "orders": "Bestellungen"
     }
   },
   "pages": {
@@ -56,10 +56,6 @@
           "description": "Konten mit nachlassender Aktivität oder überfälligen Verlängerungen, die Aufmerksamkeit brauchen."
         }
       }
-    },
-    "tickets": {
-      "title": "Tickets",
-      "description": "Ein CRUD-Workflow zum Erstellen, Priorisieren und Aktualisieren von Support-Tickets."
     },
     "profile": {
       "title": "Profil",
@@ -91,6 +87,99 @@
     "settings": {
       "title": "Einstellungen",
       "description": "Einstellungsformular mit react-hook-form und zod-Validierung."
+    },
+    "orders": {
+      "title": "Bestellungen",
+      "description": "Verfolgen Sie Verkäufe, Zahlungen und Bestellstatus pro Kunde.",
+      "stats": {
+        "total": "Total Orders",
+        "totalAmount": "Total Revenue",
+        "paid": "Paid",
+        "pending": "Pending",
+        "cta": "See Statistics"
+      },
+      "table": {
+        "search": "Search orders...",
+        "loading": "Loading...",
+        "filter": {
+          "all": "All statuses"
+        },
+        "status": {
+          "pending": "Pending",
+          "paid": "Paid",
+          "refunded": "Refunded",
+          "cancelled": "Cancelled"
+        },
+        "columns": {
+          "number": "Order",
+          "customer": "Customer",
+          "status": "Status",
+          "amount": "Amount",
+          "createdAt": "Date",
+          "actions": "Actions"
+        },
+        "actions": {
+          "label": "Open row actions",
+          "add": "Add order",
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "pagination": {
+          "showing": "Showing {from}-{to} of {total}",
+          "pageAria": "Page {current} of {total}",
+          "first": "First page",
+          "prev": "Previous page",
+          "next": "Next page",
+          "last": "Last page",
+          "rows": "rows",
+          "rowsPerPage": "Rows per page",
+          "noData": "No orders found"
+        }
+      },
+      "form": {
+        "titleCreate": "Add order",
+        "titleEdit": "Edit order",
+        "description": "Orders let you track sales and payment status per customer.",
+        "fields": {
+          "number": "Order number",
+          "customer": "Customer",
+          "amount": "Amount (USD)",
+          "status": "Status",
+          "paymentMethod": "Payment method",
+          "notes": "Notes"
+        },
+        "placeholders": {
+          "customer": "Select customer...",
+          "amount": "0.00",
+          "paymentMethod": "e.g. Credit card, PayPal",
+          "notes": "Optional internal notes"
+        },
+        "submit": "Add order",
+        "save": "Save changes",
+        "cancel": "Cancel",
+        "errors": {
+          "required": "This field is required",
+          "tooLong": "Must be {max} characters or fewer",
+          "invalidAmount": "Enter a valid amount of 0 or greater",
+          "invalidStatus": "Select a valid status",
+          "invalidCustomer": "Select a valid customer",
+          "duplicateNumber": "This order number already exists",
+          "forbidden": "Only organization admins can make this change",
+          "notFound": "This order no longer exists",
+          "generic": "Something went wrong. Please try again."
+        }
+      },
+      "deleteDialog": {
+        "title": "Delete order",
+        "description": "Are you sure you want to delete order {number}? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      },
+      "toasts": {
+        "created": "Order created",
+        "updated": "Order updated",
+        "deleted": "Order deleted"
+      }
     }
   },
   "customizer": {

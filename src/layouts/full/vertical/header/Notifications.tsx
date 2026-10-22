@@ -97,7 +97,7 @@ const Notifications = ({ className }: { className?: string }) => {
           {/* Footer Button */}
           <div className="pt-5 px-6">
             <Button className="w-full" asChild>
-              <Link href="/tickets">{t("seeAll")}</Link>
+              <Link href="/orders">{t("seeAll")}</Link>
             </Button>
           </div>
         </DropdownMenuContent>

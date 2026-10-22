@@ -10,7 +10,7 @@ const handleI18nRouting = createIntlMiddleware(routing);
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/customers",
-  "/tickets",
+  "/orders",
   "/organization",
   "/profile",
   "/settings",

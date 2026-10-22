@@ -137,6 +137,57 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_id: string
+          id: string
+          notes: string | null
+          number: string
+          org_id: string
+          payment_method: string | null
+          status: Database["public"]["Enums"]["order_status"]
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_id: string
+          id?: string
+          notes?: string | null
+          number: string
+          org_id: string
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_id?: string
+          id?: string
+          notes?: string | null
+          number?: string
+          org_id?: string
+          payment_method?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string
@@ -195,6 +246,7 @@ export type Database = {
         Returns: string
       }
       create_organization: { Args: { p_name: string }; Returns: string }
+      generate_order_number: { Args: { p_org_id: string }; Returns: string }
       get_active_invite: {
         Args: { p_org_id: string }
         Returns: {
@@ -236,6 +288,7 @@ export type Database = {
     }
     Enums: {
       customer_status: "active" | "inactive" | "vip" | "atRisk"
+      order_status: "pending" | "paid" | "refunded" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -364,6 +417,7 @@ export const Constants = {
   public: {
     Enums: {
       customer_status: ["active", "inactive", "vip", "atRisk"],
+      order_status: ["pending", "paid", "refunded", "cancelled"],
     },
   },
 } as const

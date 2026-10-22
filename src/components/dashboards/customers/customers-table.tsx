@@ -149,7 +149,7 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
     }
     const timer = setTimeout(() => {
       setParams({ q: inputQ.trim() || null, page: null });
-    }, 250);
+    }, 500);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputQ]);

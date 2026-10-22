@@ -1,6 +1,6 @@
 //   Notification Data
 import { Calendar, Settings, Command, LayoutPanelLeft } from 'lucide-react';
-import { Home, User, Ticket, Settings as SettingsIcon } from 'lucide-react';
+import { Home, User, Receipt, Settings as SettingsIcon } from 'lucide-react';
 import type { NotificationType, ProfileType } from "./types";
 
 const Notification: NotificationType[] = [
@@ -72,9 +72,9 @@ const profileDD: ProfileType[] = [
     href: '/profile',
   },
   {
-    avatar: Ticket,
-    titleKey: 'tickets',
-    href: '/tickets',
+    avatar: Receipt,
+    titleKey: 'orders',
+    href: '/orders',
   },
   {
     avatar: SettingsIcon,
