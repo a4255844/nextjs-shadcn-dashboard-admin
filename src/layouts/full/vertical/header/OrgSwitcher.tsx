@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import {
   Building2,
   ChevronDown,
@@ -37,7 +36,6 @@ interface OrgSwitcherProps {
  */
 export default function OrgSwitcher({ orgs, activeOrg }: OrgSwitcherProps) {
   const t = useTranslations("orgs");
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [createOpen, setCreateOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -52,7 +50,12 @@ export default function OrgSwitcher({ orgs, activeOrg }: OrgSwitcherProps) {
     if (orgId === activeOrg?.id) return;
     startTransition(async () => {
       await setActiveOrganization(orgId);
-      router.refresh();
+      // 硬刷新：整棵客户端树重建，彻底清掉所有依赖"当前组织数据"的本地状态
+      // （勾选集合、搜索词、已打开弹窗等）。router.refresh() 只换 RSC 数据，
+      // client state 会残留上一组织的值。
+      // 同时丢掉查询串：表格的 q/status/sort/page 都写在 URL 上，
+      // 不丢的话新组织会继承上一组织的筛选条件。
+      window.location.replace(window.location.pathname);
     });
   }
 

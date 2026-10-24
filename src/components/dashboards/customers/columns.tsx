@@ -7,6 +7,7 @@ import {
   createPaginatedRowModel,
   createSortedRowModel,
   rowPaginationFeature,
+  rowSelectionFeature,
   rowSortingFeature,
   tableFeatures,
 } from "@tanstack/react-table";
@@ -14,6 +15,7 @@ import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +30,7 @@ import type { CustomerRow, StatusKey } from "./types";
 export const features = tableFeatures({
   rowSortingFeature,
   rowPaginationFeature,
+  rowSelectionFeature,
   sortedRowModel: createSortedRowModel(),
   paginatedRowModel: createPaginatedRowModel(),
 });
@@ -80,9 +83,41 @@ export function useColumns({
         year: "numeric",
         month: "short",
         day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
 
       return [
+        // 勾选列：表头只作用于当前页，单元格单行切换
+        {
+          id: "select",
+          enableSorting: false,
+          header: ({ table }) => {
+            const pageRows = table.getRowModel().rows;
+            const allSelected =
+              pageRows.length > 0 && pageRows.every((r) => r.getIsSelected());
+            const someSelected = pageRows.some((r) => r.getIsSelected());
+            return (
+              <Checkbox
+                aria-label={t("select.all")}
+                checked={
+                  allSelected || (someSelected ? "indeterminate" : false)
+                }
+                onCheckedChange={(v) => {
+                  const next = v === true;
+                  for (const row of pageRows) row.toggleSelected(next);
+                }}
+              />
+            );
+          },
+          cell: ({ row }) => (
+            <Checkbox
+              aria-label={t("select.row")}
+              checked={row.getIsSelected()}
+              onCheckedChange={(v) => row.toggleSelected(v === true)}
+            />
+          ),
+        },
         {
           accessorKey: "name",
           header: ({ column }) => (

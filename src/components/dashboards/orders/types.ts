@@ -62,6 +62,7 @@ export interface OrderRow {
   orgId: string;
   customerId: string;
   customerName: string;
+  customerEmail: string;
   number: string;
   amount: number;
   status: OrderStatus;

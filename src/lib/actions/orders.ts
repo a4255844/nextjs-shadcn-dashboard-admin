@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
   deleteOrder,
+  deleteOrders,
   insertOrder,
   patchOrder,
   type OrderWriteInput,
@@ -158,4 +159,32 @@ export async function removeOrder(
 
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+// 批量删除结果（共享 BatchDeleteDialog 使用）
+export type BatchDeleteResult =
+  | { ok: true; deleted: number }
+  | { ok: false; errorCode: "forbidden" | "not_found" | "network" };
+
+// 批量删除可返回的错误码（写操作专属码不出现在删除链路）
+const DELETE_ERROR_CODES = ["not_found", "forbidden", "network"] as const;
+
+export async function removeOrders(
+  orgId: string,
+  ids: string[],
+): Promise<BatchDeleteResult> {
+  try {
+    const deleted = await deleteOrders(orgId, ids);
+    revalidatePath("/", "layout");
+    return { ok: true, deleted };
+  } catch (err) {
+    return {
+      ok: false,
+      errorCode: toErrorCode(
+        err instanceof Error ? err.message : "network",
+        DELETE_ERROR_CODES,
+        "network",
+      ),
+    };
+  }
 }

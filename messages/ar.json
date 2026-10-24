@@ -122,7 +122,8 @@
           "label": "Open row actions",
           "add": "Add order",
           "edit": "Edit",
-          "delete": "Delete"
+          "delete": "Delete",
+          "deleteSelected": "حذف المحدد ({count})"
         },
         "pagination": {
           "showing": "Showing {from}-{to} of {total}",
@@ -134,6 +135,29 @@
           "rows": "rows",
           "rowsPerPage": "Rows per page",
           "noData": "No orders found"
+        },
+        "export": {
+          "label": "تصدير",
+          "selected": "تصدير المحدد ({count})",
+          "all": "تصدير جميع الطلبات"
+        },
+        "select": {
+          "all": "تحديد الكل",
+          "row": "تحديد الصف"
+        },
+        "import": {
+          "label": "استيراد"
+        },
+        "batchDelete": {
+          "title": "حذف الطلبات",
+          "description": "هل أنت متأكد من حذف {count} طلب محدد؟ لا يمكن التراجع عن هذا الإجراء.",
+          "confirm": "حذف",
+          "cancel": "إلغاء",
+          "errors": {
+            "forbidden": "يمكن لمسؤولي المؤسسة فقط حذف الطلبات",
+            "notFound": "هذه الطلبات لم تعد موجودة",
+            "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+          }
         }
       },
       "form": {
@@ -178,7 +202,44 @@
       "toasts": {
         "created": "Order created",
         "updated": "Order updated",
-        "deleted": "Order deleted"
+        "deleted": "Order deleted",
+        "exportedAll": "تم تصدير {count} من الطلبات",
+        "exportedSelected": "تم تصدير {count} من الطلبات المحددة",
+        "exportFailed": "فشل التصدير. حاول مرة أخرى.",
+        "deletedMany": "تم حذف {count} طلب"
+      },
+      "import": {
+        "title": "Import Orders",
+        "description": "Upload a CSV file. Rows are validated before import.",
+        "dropHint": "Drop CSV file here, or click to select",
+        "browse": "Browse file",
+        "preview": "Preview ({count} rows)",
+        "previewHint": "The first 10 rows are shown below.",
+        "moreRows": "more rows hidden",
+        "requiredHint": "Required columns: Email, Amount, Status",
+        "requiredCols": "Required columns",
+        "submit": "Import {count} rows",
+        "importing": "Importing…",
+        "importAnother": "Import another",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "result": {
+          "success": "All {count} rows imported.",
+          "partial": "{inserted} imported, {count} rows had errors.",
+          "failed": "Import failed for {count} rows.",
+          "detailAll": "All {total} rows from the file were processed."
+        },
+        "toasts": {
+          "success": "{count} order(s) imported",
+          "nothing": "Nothing to import."
+        },
+        "downloadErrors": "Download error report",
+        "error": "Error",
+        "moreErrors": "more errors hidden",
+        "errors": {
+          "notCsv": "File must be a .csv",
+          "emptyFile": "File is empty"
+        }
       }
     }
   },
@@ -368,7 +429,8 @@
         "label": "فتح إجراءات الصف",
         "add": "إضافة عميل",
         "edit": "تحرير",
-        "delete": "حذف"
+        "delete": "حذف",
+        "deleteSelected": "حذف المحدد ({count})"
       },
       "pagination": {
         "showing": "عرض {from}-{to} من {total}",
@@ -380,6 +442,30 @@
         "rows": "صفوف",
         "rowsPerPage": "الصفوف لكل صفحة",
         "noData": "لم يتم العثور على عملاء"
+      },
+      "export": {
+        "label": "تصدير",
+        "selected": "تصدير المحدد ({count})",
+        "all": "تصدير جميع العملاء"
+      },
+      "select": {
+        "all": "تحديد الكل",
+        "row": "تحديد الصف"
+      },
+      "import": {
+        "label": "استيراد"
+      },
+      "batchDelete": {
+        "title": "حذف العملاء",
+        "description": "هل أنت متأكد من حذف {count} عميل محدد؟ لا يمكن التراجع عن هذا الإجراء.",
+        "note": "سيتم حذف طلبات هؤلاء العملاء أيضًا.",
+        "confirm": "حذف",
+        "cancel": "إلغاء",
+        "errors": {
+          "forbidden": "يمكن لمسؤولي المؤسسة فقط حذف العملاء",
+          "notFound": "هؤلاء العملاء لم يعودوا موجودين",
+          "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+        }
       }
     },
     "form": {
@@ -430,7 +516,45 @@
     "toasts": {
       "created": "تمت إضافة العميل",
       "updated": "تم تحديث العميل",
-      "deleted": "تم حذف العميل"
+      "deleted": "تم حذف العميل",
+      "exportedAll": "تم تصدير {count} من العملاء",
+      "exportedSelected": "تم تصدير {count} من العملاء المحددين",
+      "exportFailed": "فشل التصدير. حاول مرة أخرى.",
+      "deletedMany": "تم حذف {count} عميل"
+    },
+    "import": {
+      "title": "Import Customers",
+      "description": "Upload a CSV file. Rows are validated before import.",
+      "dropHint": "Drop CSV file here, or click to select",
+      "browse": "Browse file",
+      "preview": "Preview ({count} rows)",
+      "previewHint": "The first 10 rows are shown below.",
+      "moreRows": "more rows hidden",
+      "requiredHint": "Required columns: Name, Email, Company",
+      "requiredCols": "Required columns",
+      "submit": "Import {count} rows",
+      "importing": "Importing…",
+      "importAnother": "Import another",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "result": {
+        "success": "All {count} rows imported.",
+        "allImported": "",
+        "partial": "{inserted} imported, {count} rows had errors.",
+        "failed": "Import failed for {count} rows.",
+        "detailAll": "All {total} rows from the file were processed."
+      },
+      "toasts": {
+        "success": "{count} customer(s) imported",
+        "nothing": "All rows already exist in the organization."
+      },
+      "downloadErrors": "Download error report",
+      "error": "Error",
+      "moreErrors": "more errors hidden",
+      "errors": {
+        "notCsv": "File must be a .csv",
+        "emptyFile": "File is empty"
+      }
     }
   },
   "orgs": {

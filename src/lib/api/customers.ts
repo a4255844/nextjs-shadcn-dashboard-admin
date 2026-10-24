@@ -48,6 +48,37 @@ export async function getCustomers(orgId: string): Promise<CustomerRow[]> {
 // 供统计卡聚合用的状态枚举引用（保持类型同源）
 export type CustomerStatusValue = Enums<"customer_status">;
 
+// PostgREST 单次 select 默认最多 1000 行，导出需要按 range 分批拉取
+const EXPORT_PAGE_SIZE = 1000;
+
+// 导出专用：分页拉全量，绕过 1000 行上限。
+// ids 为 null 表示导出全部；传数组时直接按 id 过滤，避免先拉全表再内存筛选。
+export async function getCustomersForExport(
+  orgId: string,
+  ids: string[] | null,
+): Promise<CustomerRow[]> {
+  const supabase = await createClient();
+  const rows: CustomerRow[] = [];
+
+  for (let from = 0; ; from += EXPORT_PAGE_SIZE) {
+    const base = supabase.from("customers").select("*").eq("org_id", orgId);
+    const filtered = ids === null ? base : base.in("id", ids);
+    const { data, error } = await filtered
+      .order("created_at", { ascending: false })
+      .order("name", { ascending: true })
+      .range(from, from + EXPORT_PAGE_SIZE - 1);
+
+    if (error !== null) {
+      throw new Error(`Failed to fetch customers for export: ${error.message}`);
+    }
+
+    rows.push(...data.map(toCustomerRow));
+    if (data.length < EXPORT_PAGE_SIZE) break;
+  }
+
+  return rows;
+}
+
 // 新建/编辑客户的白名单写入字段（不含 org_id：由服务端按 active org 注入；
 // 不含 avatar_color / created_at：走 DB 默认）
 export interface CustomerWriteInput {
@@ -91,6 +122,31 @@ export async function insertCustomer(
   }
 }
 
+// 批量新建客户（导入用）：单次请求写入，避免逐行跨境往返
+export async function insertCustomers(
+  orgId: string,
+  inputs: CustomerWriteInput[],
+): Promise<void> {
+  if (inputs.length === 0) return;
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("customers").insert(
+    inputs.map((input) => ({
+      org_id: orgId,
+      name: input.name,
+      email: input.email,
+      company: input.company,
+      status: input.status,
+      spent: input.spent,
+      avatar_url: input.avatar_url,
+    })),
+  );
+
+  if (error !== null) {
+    throw new Error(toPgErrorCode(error.code));
+  }
+}
+
 // 编辑客户（org_id 双重限定：既防越组织改行，也用于 0 行判定）
 export async function patchCustomer(
   orgId: string,
@@ -119,6 +175,31 @@ export async function patchCustomer(
   if (data.length === 0) {
     throw new Error("not_found");
   }
+}
+
+// 批量删除客户：级联删除其名下订单（0009 的 customer_id 外键 on delete cascade）
+// 返回实际删除行数（已被他人删掉的行不计入）
+export async function deleteCustomers(
+  orgId: string,
+  ids: string[],
+): Promise<number> {
+  if (ids.length === 0) return 0;
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("customers")
+    .delete()
+    .eq("org_id", orgId)
+    .in("id", ids)
+    .select("id");
+
+  if (error !== null) {
+    throw new Error(toPgErrorCode(error.code));
+  }
+  if (data.length === 0) {
+    throw new Error("not_found");
+  }
+  return data.length;
 }
 
 // 删除客户（同样 org_id 限定 + 0 行判定）

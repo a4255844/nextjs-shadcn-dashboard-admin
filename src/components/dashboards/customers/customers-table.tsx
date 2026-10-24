@@ -15,6 +15,7 @@ import {
   flexRender,
   useTable,
   type PaginationState,
+  type RowSelectionState,
   type SortingState,
 } from "@tanstack/react-table";
 import {
@@ -26,6 +27,9 @@ import {
   ChevronRight,
   ChevronsRight,
   Loader2,
+  Download,
+  Upload,
+  Trash2,
 } from "lucide-react";
 import { DashboardCard } from "@/components/shared/dashboard-card";
 import { Input } from "@/components/ui/input";
@@ -33,9 +37,11 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Table,
@@ -57,6 +63,12 @@ import {
 } from "./types";
 import CustomerFormDialog from "./customer-form-dialog";
 import CustomerDeleteDialog from "./customer-delete-dialog";
+import ImportDialog from "@/components/shared/import-dialog";
+import BatchDeleteDialog from "@/components/shared/batch-delete-dialog";
+import { removeCustomers } from "@/lib/actions/customers";
+import { importCustomersCsv } from "@/lib/actions/imports";
+import { csvTimestamp } from "@/lib/csv";
+import { toast } from "sonner";
 
 // 状态筛选值：all 表示全部，其余与 StatusKey 对齐
 type StatusFilter = StatusKey | "all";
@@ -82,6 +94,7 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("customers.table");
+  const tp = useTranslations("customers");
 
   // ---- 写操作弹窗状态 ----
   const [formOpen, setFormOpen] = useState(false);
@@ -100,12 +113,51 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
     setFormOpen(true);
   };
 
-  const columns = useColumns({ isAdmin, onEdit: handleEdit, onDelete: handleDelete });
-
   // ---- 从 URL search params 派生表格状态（URL 是唯一状态源）----
   const q = searchParams.get("q") ?? "";
   const statusFilter: StatusFilter =
     parseStatus(searchParams.get("status")) ?? "all";
+
+  // ---- CSV 导出 / 导入 ----
+  const [importOpen, setImportOpen] = useState(false);
+
+  // ---- 行勾选：key 为行 id（getRowId），跨分页/筛选保留 ----
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const selectedCount = Object.keys(rowSelection).length;
+
+  // ---- 批量删除 ----
+  const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
+
+  const doExport = useCallback(
+    (exportAll: boolean) => {
+      // 直接通过 <a href> 触发浏览器原生下载，零 JS 请求，零加载状态
+      const params = new URLSearchParams({ orgId });
+      if (!exportAll) {
+        const ids = Object.keys(rowSelection);
+        if (ids.length === 0) {
+          toast.error(tp("toasts.exportFailed"));
+          return;
+        }
+        params.set("mode", "selected");
+        params.set("ids", ids.join(","));
+      }
+      const a = document.createElement("a");
+      a.href = `/api/export/customers?${params.toString()}`;
+      a.download = `customers-${csvTimestamp()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      toast.success(
+        exportAll
+          ? tp("toasts.exportedAll", { count: rows.length })
+          : tp("toasts.exportedSelected", { count: Object.keys(rowSelection).length }),
+      );
+    },
+    [orgId, rows.length, rowSelection, tp],
+  );
+
+  const columns = useColumns({ isAdmin, onEdit: handleEdit, onDelete: handleDelete });
   const sortCol = parseSortableColumn(searchParams.get("sort"));
   const sortDir = parseSortDir(searchParams.get("order"));
   const pageStr = searchParams.get("page");
@@ -128,6 +180,10 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
       else next.set(k, v);
     }
     const qs = next.toString();
+    // 没有实际变化就不导航：首屏时服务端已按当前 URL 渲染数据，
+    // 此时若再 replace 一次（StrictMode 双执行 effect、表格内部 no-op 回调等
+    // 都会触发），会白白再发一次 RSC 请求
+    if (qs === searchParams.toString()) return;
     startTransition(() => {
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     });
@@ -193,8 +249,13 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
     features,
     data: filteredData,
     columns,
-    state: { sorting, pagination },
+    state: { sorting, pagination, rowSelection },
+    getRowId: (row) => row.id,
     enableMultiSort: false,
+    // 分页由 URL 控制：data 引用每次 RSC 重查都会变，
+    // 默认的 autoResetPageIndex 会把页码重置回 1，必须禁用
+    autoResetPageIndex: false,
+    onRowSelectionChange: setRowSelection,
     onSortingChange: (updater) => {
       const next =
         typeof updater === "function" ? updater(sorting) : updater;
@@ -208,6 +269,13 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
     onPaginationChange: (updater) => {
       const next =
         typeof updater === "function" ? updater(pagination) : updater;
+      // 无变化不写 URL（v9 会在挂载/数据变更时以 no-op 触发本回调）
+      if (
+        next.pageIndex === pagination.pageIndex &&
+        next.pageSize === pagination.pageSize
+      ) {
+        return;
+      }
       setParams({
         page: String(next.pageIndex + 1),
         size: String(next.pageSize),
@@ -255,6 +323,57 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
             <Button size="sm" onClick={handleAdd}>
               <Plus className="size-4" />
               {t("actions.add")}
+            </Button>
+          )}
+          {isAdmin && selectedCount > 0 && (
+            <Button
+              size="sm"
+              variant="destructive"
+              className="gap-1.5 cursor-pointer"
+              onClick={() => setBatchDeleteOpen(true)}
+            >
+              <Trash2 className="size-3.5" />
+              {t("actions.deleteSelected", { count: selectedCount })}
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 cursor-pointer"
+                aria-label={t("export.label")}
+              >
+                <Download className="size-3.5" />
+                {t("export.label")}
+                <ChevronDown className="size-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-40">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                disabled={selectedCount === 0}
+                onClick={() => doExport(false)}
+              >
+                {t("export.selected", { count: selectedCount })}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => doExport(true)}
+              >
+                {t("export.all")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {isAdmin && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 cursor-pointer"
+              onClick={() => setImportOpen(true)}
+            >
+              <Upload className="size-3.5" />
+              {t("import.label")}
             </Button>
           )}
           <DropdownMenu>
@@ -329,7 +448,10 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
             </TableRow>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() ? "selected" : undefined}
+              >
                 {/* v9：getVisibleCells 归 columnVisibilityFeature；未注册隐藏列能力时 getAllCells 等价 */}
                 {row.getAllCells().map((cell) => (
                   <TableCell key={cell.id} className="py-2">
@@ -464,6 +586,25 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
             orgId={orgId}
             target={deleteTarget}
             onClose={() => setDeleteTarget(null)}
+          />
+          <ImportDialog
+            open={importOpen}
+            onOpenChange={setImportOpen}
+            orgId={orgId}
+            columnLabels={["Name", "Email", "Company", "Status", "Spent"]}
+            actionFn={importCustomersCsv}
+            tNamespace="customers.import"
+          />
+          <BatchDeleteDialog
+            open={batchDeleteOpen}
+            onOpenChange={setBatchDeleteOpen}
+            count={selectedCount}
+            ids={Object.keys(rowSelection)}
+            orgId={orgId}
+            actionFn={removeCustomers}
+            tNamespace="customers"
+            note={t("batchDelete.note")}
+            onDeleted={() => setRowSelection({})}
           />
         </>
       )}

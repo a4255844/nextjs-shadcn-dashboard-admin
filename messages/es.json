@@ -122,7 +122,8 @@
           "label": "Open row actions",
           "add": "Add order",
           "edit": "Edit",
-          "delete": "Delete"
+          "delete": "Delete",
+          "deleteSelected": "Eliminar seleccionados ({count})"
         },
         "pagination": {
           "showing": "Showing {from}-{to} of {total}",
@@ -134,6 +135,29 @@
           "rows": "rows",
           "rowsPerPage": "Rows per page",
           "noData": "No orders found"
+        },
+        "export": {
+          "label": "Exportar",
+          "selected": "Exportar selección ({count})",
+          "all": "Exportar todos los pedidos"
+        },
+        "select": {
+          "all": "Seleccionar todo",
+          "row": "Seleccionar fila"
+        },
+        "import": {
+          "label": "Importar"
+        },
+        "batchDelete": {
+          "title": "Eliminar pedidos",
+          "description": "¿Seguro que quieres eliminar los {count} pedidos seleccionados? Esta acción no se puede deshacer.",
+          "confirm": "Eliminar",
+          "cancel": "Cancelar",
+          "errors": {
+            "forbidden": "Solo los administradores de la organización pueden eliminar pedidos",
+            "notFound": "Estos pedidos ya no existen",
+            "generic": "Algo salió mal. Inténtalo de nuevo."
+          }
         }
       },
       "form": {
@@ -178,7 +202,44 @@
       "toasts": {
         "created": "Order created",
         "updated": "Order updated",
-        "deleted": "Order deleted"
+        "deleted": "Order deleted",
+        "exportedAll": "{count} pedidos exportados",
+        "exportedSelected": "{count} pedidos seleccionados exportados",
+        "exportFailed": "Error al exportar. Inténtalo de nuevo.",
+        "deletedMany": "{count} pedidos eliminados"
+      },
+      "import": {
+        "title": "Import Orders",
+        "description": "Upload a CSV file. Rows are validated before import.",
+        "dropHint": "Drop CSV file here, or click to select",
+        "browse": "Browse file",
+        "preview": "Preview ({count} rows)",
+        "previewHint": "The first 10 rows are shown below.",
+        "moreRows": "more rows hidden",
+        "requiredHint": "Required columns: Email, Amount, Status",
+        "requiredCols": "Required columns",
+        "submit": "Import {count} rows",
+        "importing": "Importing…",
+        "importAnother": "Import another",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "result": {
+          "success": "All {count} rows imported.",
+          "partial": "{inserted} imported, {count} rows had errors.",
+          "failed": "Import failed for {count} rows.",
+          "detailAll": "All {total} rows from the file were processed."
+        },
+        "toasts": {
+          "success": "{count} order(s) imported",
+          "nothing": "Nothing to import."
+        },
+        "downloadErrors": "Download error report",
+        "error": "Error",
+        "moreErrors": "more errors hidden",
+        "errors": {
+          "notCsv": "File must be a .csv",
+          "emptyFile": "File is empty"
+        }
       }
     }
   },
@@ -368,7 +429,8 @@
         "label": "Abrir acciones de fila",
         "add": "Añadir cliente",
         "edit": "Editar",
-        "delete": "Eliminar"
+        "delete": "Eliminar",
+        "deleteSelected": "Eliminar seleccionados ({count})"
       },
       "pagination": {
         "showing": "Mostrando {from}-{to} de {total}",
@@ -380,6 +442,30 @@
         "rows": "filas",
         "rowsPerPage": "Filas por página",
         "noData": "No se encontraron clientes"
+      },
+      "export": {
+        "label": "Exportar",
+        "selected": "Exportar selección ({count})",
+        "all": "Exportar todos los clientes"
+      },
+      "select": {
+        "all": "Seleccionar todo",
+        "row": "Seleccionar fila"
+      },
+      "import": {
+        "label": "Importar"
+      },
+      "batchDelete": {
+        "title": "Eliminar clientes",
+        "description": "¿Seguro que quieres eliminar los {count} clientes seleccionados? Esta acción no se puede deshacer.",
+        "note": "Los pedidos de estos clientes también se eliminarán.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar",
+        "errors": {
+          "forbidden": "Solo los administradores de la organización pueden eliminar clientes",
+          "notFound": "Estos clientes ya no existen",
+          "generic": "Algo salió mal. Inténtalo de nuevo."
+        }
       }
     },
     "form": {
@@ -430,7 +516,45 @@
     "toasts": {
       "created": "Cliente creado",
       "updated": "Cliente actualizado",
-      "deleted": "Cliente eliminado"
+      "deleted": "Cliente eliminado",
+      "exportedAll": "{count} clientes exportados",
+      "exportedSelected": "{count} clientes seleccionados exportados",
+      "exportFailed": "Error al exportar. Inténtalo de nuevo.",
+      "deletedMany": "{count} clientes eliminados"
+    },
+    "import": {
+      "title": "Import Customers",
+      "description": "Upload a CSV file. Rows are validated before import.",
+      "dropHint": "Drop CSV file here, or click to select",
+      "browse": "Browse file",
+      "preview": "Preview ({count} rows)",
+      "previewHint": "The first 10 rows are shown below.",
+      "moreRows": "more rows hidden",
+      "requiredHint": "Required columns: Name, Email, Company",
+      "requiredCols": "Required columns",
+      "submit": "Import {count} rows",
+      "importing": "Importing…",
+      "importAnother": "Import another",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "result": {
+        "success": "All {count} rows imported.",
+        "allImported": "",
+        "partial": "{inserted} imported, {count} rows had errors.",
+        "failed": "Import failed for {count} rows.",
+        "detailAll": "All {total} rows from the file were processed."
+      },
+      "toasts": {
+        "success": "{count} customer(s) imported",
+        "nothing": "All rows already exist in the organization."
+      },
+      "downloadErrors": "Download error report",
+      "error": "Error",
+      "moreErrors": "more errors hidden",
+      "errors": {
+        "notCsv": "File must be a .csv",
+        "emptyFile": "File is empty"
+      }
     }
   },
   "orgs": {

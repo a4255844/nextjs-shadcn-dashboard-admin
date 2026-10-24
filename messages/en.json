@@ -122,7 +122,8 @@
           "label": "Open row actions",
           "add": "Add order",
           "edit": "Edit",
-          "delete": "Delete"
+          "delete": "Delete",
+          "deleteSelected": "Delete selected ({count})"
         },
         "pagination": {
           "showing": "Showing {from}-{to} of {total}",
@@ -134,6 +135,29 @@
           "rows": "rows",
           "rowsPerPage": "Rows per page",
           "noData": "No orders found"
+        },
+        "export": {
+          "label": "Export",
+          "selected": "Export selected ({count})",
+          "all": "Export all orders"
+        },
+        "select": {
+          "all": "Select all",
+          "row": "Select row"
+        },
+        "import": {
+          "label": "Import"
+        },
+        "batchDelete": {
+          "title": "Delete orders",
+          "description": "Are you sure you want to delete the {count} selected order(s)? This action cannot be undone.",
+          "confirm": "Delete",
+          "cancel": "Cancel",
+          "errors": {
+            "forbidden": "Only organization admins can delete orders",
+            "notFound": "These orders no longer exist",
+            "generic": "Something went wrong. Please try again."
+          }
         }
       },
       "form": {
@@ -178,7 +202,44 @@
       "toasts": {
         "created": "Order created",
         "updated": "Order updated",
-        "deleted": "Order deleted"
+        "deleted": "Order deleted",
+        "exportedAll": "Exported {count} orders",
+        "exportedSelected": "Exported {count} selected orders",
+        "exportFailed": "Export failed. Please try again.",
+        "deletedMany": "Deleted {count} orders"
+      },
+      "import": {
+        "title": "Import Orders",
+        "description": "Upload a CSV file. Rows are validated before import.",
+        "dropHint": "Drop CSV file here, or click to select",
+        "browse": "Browse file",
+        "preview": "Preview ({count} rows)",
+        "previewHint": "The first 10 rows are shown below.",
+        "moreRows": "more rows hidden",
+        "requiredHint": "Required columns: Email, Amount, Status",
+        "requiredCols": "Required columns",
+        "submit": "Import {count} rows",
+        "importing": "Importing…",
+        "importAnother": "Import another",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "result": {
+          "success": "All {count} rows imported.",
+          "partial": "{inserted} imported, {count} rows had errors.",
+          "failed": "Import failed for {count} rows.",
+          "detailAll": "All {total} rows from the file were processed."
+        },
+        "toasts": {
+          "success": "{count} order(s) imported",
+          "nothing": "Nothing to import."
+        },
+        "downloadErrors": "Download error report",
+        "error": "Error",
+        "moreErrors": "more errors hidden",
+        "errors": {
+          "notCsv": "File must be a .csv",
+          "emptyFile": "File is empty"
+        }
       }
     }
   },
@@ -368,7 +429,8 @@
         "label": "Open row actions",
         "add": "Add customer",
         "edit": "Edit",
-        "delete": "Delete"
+        "delete": "Delete",
+        "deleteSelected": "Delete selected ({count})"
       },
       "pagination": {
         "showing": "Showing {from}-{to} of {total}",
@@ -380,6 +442,30 @@
         "rows": "rows",
         "rowsPerPage": "Rows per page",
         "noData": "No customers found"
+      },
+      "export": {
+        "label": "Export",
+        "selected": "Export selected ({count})",
+        "all": "Export all customers"
+      },
+      "select": {
+        "all": "Select all",
+        "row": "Select row"
+      },
+      "import": {
+        "label": "Import"
+      },
+      "batchDelete": {
+        "title": "Delete customers",
+        "description": "Are you sure you want to delete the {count} selected customer(s)? This action cannot be undone.",
+        "note": "Orders belonging to these customers will also be deleted.",
+        "confirm": "Delete",
+        "cancel": "Cancel",
+        "errors": {
+          "forbidden": "Only organization admins can delete customers",
+          "notFound": "These customers no longer exist",
+          "generic": "Something went wrong. Please try again."
+        }
       }
     },
     "form": {
@@ -430,7 +516,45 @@
     "toasts": {
       "created": "Customer created",
       "updated": "Customer updated",
-      "deleted": "Customer deleted"
+      "deleted": "Customer deleted",
+      "exportedAll": "Exported {count} customers",
+      "exportedSelected": "Exported {count} selected customers",
+      "exportFailed": "Export failed. Please try again.",
+      "deletedMany": "Deleted {count} customers"
+    },
+    "import": {
+      "title": "Import Customers",
+      "description": "Upload a CSV file. Rows are validated before import.",
+      "dropHint": "Drop CSV file here, or click to select",
+      "browse": "Browse file",
+      "preview": "Preview ({count} rows)",
+      "previewHint": "The first 10 rows are shown below.",
+      "moreRows": "more rows hidden",
+      "requiredHint": "Required columns: Name, Email, Company",
+      "requiredCols": "Required columns",
+      "submit": "Import {count} rows",
+      "importing": "Importing…",
+      "importAnother": "Import another",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "result": {
+        "success": "All {count} rows imported.",
+        "allImported": "",
+        "partial": "{inserted} imported, {count} rows had errors.",
+        "failed": "Import failed for {count} rows.",
+        "detailAll": "All {total} rows from the file were processed."
+      },
+      "toasts": {
+        "success": "{count} customer(s) imported",
+        "nothing": "All rows already exist in the organization."
+      },
+      "downloadErrors": "Download error report",
+      "error": "Error",
+      "moreErrors": "more errors hidden",
+      "errors": {
+        "notCsv": "File must be a .csv",
+        "emptyFile": "File is empty"
+      }
     }
   },
   "orgs": {
