@@ -122,7 +122,8 @@
           "label": "Open row actions",
           "add": "Add order",
           "edit": "Edit",
-          "delete": "Delete"
+          "delete": "Delete",
+          "deleteSelected": "Ausgewählte löschen ({count})"
         },
         "pagination": {
           "showing": "Showing {from}-{to} of {total}",
@@ -134,6 +135,29 @@
           "rows": "rows",
           "rowsPerPage": "Rows per page",
           "noData": "No orders found"
+        },
+        "export": {
+          "label": "Export",
+          "selected": "Auswahl exportieren ({count})",
+          "all": "Alle Bestellungen exportieren"
+        },
+        "select": {
+          "all": "Alle auswählen",
+          "row": "Zeile auswählen"
+        },
+        "import": {
+          "label": "Importieren"
+        },
+        "batchDelete": {
+          "title": "Bestellungen löschen",
+          "description": "Möchten Sie die {count} ausgewählten Bestellungen wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+          "confirm": "Löschen",
+          "cancel": "Abbrechen",
+          "errors": {
+            "forbidden": "Nur Organisationsadministratoren können Bestellungen löschen",
+            "notFound": "Diese Bestellungen existieren nicht mehr",
+            "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+          }
         }
       },
       "form": {
@@ -178,7 +202,44 @@
       "toasts": {
         "created": "Order created",
         "updated": "Order updated",
-        "deleted": "Order deleted"
+        "deleted": "Order deleted",
+        "exportedAll": "{count} Bestellungen exportiert",
+        "exportedSelected": "{count} ausgewählte Bestellungen exportiert",
+        "exportFailed": "Export fehlgeschlagen. Bitte erneut versuchen.",
+        "deletedMany": "{count} Bestellungen gelöscht"
+      },
+      "import": {
+        "title": "Import Orders",
+        "description": "Upload a CSV file. Rows are validated before import.",
+        "dropHint": "Drop CSV file here, or click to select",
+        "browse": "Browse file",
+        "preview": "Preview ({count} rows)",
+        "previewHint": "The first 10 rows are shown below.",
+        "moreRows": "more rows hidden",
+        "requiredHint": "Required columns: Email, Amount, Status",
+        "requiredCols": "Required columns",
+        "submit": "Import {count} rows",
+        "importing": "Importing…",
+        "importAnother": "Import another",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "result": {
+          "success": "All {count} rows imported.",
+          "partial": "{inserted} imported, {count} rows had errors.",
+          "failed": "Import failed for {count} rows.",
+          "detailAll": "All {total} rows from the file were processed."
+        },
+        "toasts": {
+          "success": "{count} order(s) imported",
+          "nothing": "Nothing to import."
+        },
+        "downloadErrors": "Download error report",
+        "error": "Error",
+        "moreErrors": "more errors hidden",
+        "errors": {
+          "notCsv": "File must be a .csv",
+          "emptyFile": "File is empty"
+        }
       }
     }
   },
@@ -368,7 +429,8 @@
         "label": "Zeilenaktionen öffnen",
         "add": "Kunde hinzufügen",
         "edit": "Bearbeiten",
-        "delete": "Löschen"
+        "delete": "Löschen",
+        "deleteSelected": "Ausgewählte löschen ({count})"
       },
       "pagination": {
         "showing": "Zeige {from}-{to} von {total}",
@@ -380,6 +442,30 @@
         "rows": "Zeilen",
         "rowsPerPage": "Zeilen pro Seite",
         "noData": "Keine Kunden gefunden"
+      },
+      "export": {
+        "label": "Export",
+        "selected": "Auswahl exportieren ({count})",
+        "all": "Alle Kunden exportieren"
+      },
+      "select": {
+        "all": "Alle auswählen",
+        "row": "Zeile auswählen"
+      },
+      "import": {
+        "label": "Importieren"
+      },
+      "batchDelete": {
+        "title": "Kunden löschen",
+        "description": "Möchten Sie die {count} ausgewählten Kunden wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "note": "Bestellungen dieser Kunden werden ebenfalls gelöscht.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen",
+        "errors": {
+          "forbidden": "Nur Organisationsadministratoren können Kunden löschen",
+          "notFound": "Diese Kunden existieren nicht mehr",
+          "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+        }
       }
     },
     "form": {
@@ -430,7 +516,45 @@
     "toasts": {
       "created": "Kunde erstellt",
       "updated": "Kunde aktualisiert",
-      "deleted": "Kunde gelöscht"
+      "deleted": "Kunde gelöscht",
+      "exportedAll": "{count} Kunden exportiert",
+      "exportedSelected": "{count} ausgewählte Kunden exportiert",
+      "exportFailed": "Export fehlgeschlagen. Bitte erneut versuchen.",
+      "deletedMany": "{count} Kunden gelöscht"
+    },
+    "import": {
+      "title": "Import Customers",
+      "description": "Upload a CSV file. Rows are validated before import.",
+      "dropHint": "Drop CSV file here, or click to select",
+      "browse": "Browse file",
+      "preview": "Preview ({count} rows)",
+      "previewHint": "The first 10 rows are shown below.",
+      "moreRows": "more rows hidden",
+      "requiredHint": "Required columns: Name, Email, Company",
+      "requiredCols": "Required columns",
+      "submit": "Import {count} rows",
+      "importing": "Importing…",
+      "importAnother": "Import another",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "result": {
+        "success": "All {count} rows imported.",
+        "allImported": "",
+        "partial": "{inserted} imported, {count} rows had errors.",
+        "failed": "Import failed for {count} rows.",
+        "detailAll": "All {total} rows from the file were processed."
+      },
+      "toasts": {
+        "success": "{count} customer(s) imported",
+        "nothing": "All rows already exist in the organization."
+      },
+      "downloadErrors": "Download error report",
+      "error": "Error",
+      "moreErrors": "more errors hidden",
+      "errors": {
+        "notCsv": "File must be a .csv",
+        "emptyFile": "File is empty"
+      }
     }
   },
   "orgs": {

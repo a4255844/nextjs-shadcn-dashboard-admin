@@ -55,10 +55,14 @@ export default function RouteProgress() {
       const link = target?.closest("a");
       if (!(link instanceof HTMLAnchorElement)) return;
       if (link.target === "_blank") return;
+      // 下载链接不会改变 pathname，进度条无法 finish，必须跳过
+      if (link.hasAttribute("download")) return;
       // 仅同源导航触发
       try {
         const url = new URL(link.href);
         if (url.origin !== window.location.origin) return;
+        // /api/ 不是页面路由，不走导航进度条
+        if (url.pathname.startsWith("/api/")) return;
       } catch {
         return;
       }

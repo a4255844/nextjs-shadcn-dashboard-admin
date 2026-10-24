@@ -18,7 +18,7 @@ interface OrderJoinRow {
   payment_method: string | null;
   notes: string | null;
   created_at: string;
-  customers: { name: string } | null;
+  customers: { name: string; email: string } | null;
 }
 
 function toOrderRow(row: OrderJoinRow): OrderRow {
@@ -27,6 +27,7 @@ function toOrderRow(row: OrderJoinRow): OrderRow {
     orgId: row.org_id,
     customerId: row.customer_id,
     customerName: row.customers?.name ?? "",
+    customerEmail: row.customers?.email ?? "",
     number: row.number,
     amount: row.amount,
     status: row.status,
@@ -36,13 +37,13 @@ function toOrderRow(row: OrderJoinRow): OrderRow {
   };
 }
 
-// 读取指定组织的全部 orders（left join customers 拿名称）
+// 读取指定组织的全部 orders（left join customers 拿名称 + email）
 export async function getOrders(orgId: string): Promise<OrderRow[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("orders")
-    .select("id, org_id, customer_id, number, amount, status, payment_method, notes, created_at, customers(name)")
+    .select("id, org_id, customer_id, number, amount, status, payment_method, notes, created_at, customers(name, email)")
     .eq("org_id", orgId)
     .order("created_at", { ascending: false })
     .order("number", { ascending: false });
@@ -127,6 +128,30 @@ export async function patchOrder(
   if (data.length === 0) {
     throw new Error("not_found");
   }
+}
+
+// 批量删除订单：返回实际删除行数
+export async function deleteOrders(
+  orgId: string,
+  ids: string[],
+): Promise<number> {
+  if (ids.length === 0) return 0;
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("orders")
+    .delete()
+    .eq("org_id", orgId)
+    .in("id", ids)
+    .select("id");
+
+  if (error !== null) {
+    throw new Error(toPgErrorCode(error.code));
+  }
+  if (data.length === 0) {
+    throw new Error("not_found");
+  }
+  return data.length;
 }
 
 export async function deleteOrder(

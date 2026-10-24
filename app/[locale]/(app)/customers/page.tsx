@@ -81,7 +81,10 @@ const page = async () => {
             </div>
           }
         >
+          {/* key=org.id：切换组织时强制重挂载，清空勾选/搜索/弹窗等本地状态，
+              避免上一组织的行 id 残留在勾选集合里（服务端已按 org_id 限定兜底） */}
           <CustomersTable
+            key={org.id}
             rows={rows}
             orgId={org.id}
             isAdmin={org.role === "admin"}

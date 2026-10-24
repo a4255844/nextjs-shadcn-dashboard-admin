@@ -121,6 +121,31 @@ export async function patchCustomer(
   }
 }
 
+// 批量删除客户：级联删除其名下订单（0009 的 customer_id 外键 on delete cascade）
+// 返回实际删除行数（已被他人删掉的行不计入）
+export async function deleteCustomers(
+  orgId: string,
+  ids: string[],
+): Promise<number> {
+  if (ids.length === 0) return 0;
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("customers")
+    .delete()
+    .eq("org_id", orgId)
+    .in("id", ids)
+    .select("id");
+
+  if (error !== null) {
+    throw new Error(toPgErrorCode(error.code));
+  }
+  if (data.length === 0) {
+    throw new Error("not_found");
+  }
+  return data.length;
+}
+
 // 删除客户（同样 org_id 限定 + 0 行判定）
 export async function deleteCustomer(
   orgId: string,

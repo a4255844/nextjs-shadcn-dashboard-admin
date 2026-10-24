@@ -78,7 +78,9 @@ const page = async () => {
             </div>
           }
         >
+          {/* key=org.id：切换组织时强制重挂载，清空勾选/搜索/弹窗等本地状态 */}
           <OrdersTable
+            key={org.id}
             rows={rows}
             orgId={org.id}
             isAdmin={org.role === "admin"}
