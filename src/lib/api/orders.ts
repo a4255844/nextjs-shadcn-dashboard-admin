@@ -21,6 +21,10 @@ interface OrderJoinRow {
   customers: { name: string; email: string } | null;
 }
 
+// orders 查询列（列表与导出共用，含 customers 关联）
+const ORDER_SELECT =
+  "id, org_id, customer_id, number, amount, status, payment_method, notes, created_at, customers(name, email)";
+
 function toOrderRow(row: OrderJoinRow): OrderRow {
   return {
     id: row.id,
@@ -43,7 +47,7 @@ export async function getOrders(orgId: string): Promise<OrderRow[]> {
 
   const { data, error } = await supabase
     .from("orders")
-    .select("id, org_id, customer_id, number, amount, status, payment_method, notes, created_at, customers(name, email)")
+    .select(ORDER_SELECT)
     .eq("org_id", orgId)
     .order("created_at", { ascending: false })
     .order("number", { ascending: false });
@@ -53,6 +57,37 @@ export async function getOrders(orgId: string): Promise<OrderRow[]> {
   }
 
   return data.map(toOrderRow);
+}
+
+// PostgREST 单次 select 默认最多 1000 行，导出需要按 range 分批拉取
+const EXPORT_PAGE_SIZE = 1000;
+
+// 导出专用：分页拉全量，绕过 1000 行上限。
+// ids 为 null 表示导出全部；传数组时直接按 id 过滤，避免先拉全表再内存筛选。
+export async function getOrdersForExport(
+  orgId: string,
+  ids: string[] | null,
+): Promise<OrderRow[]> {
+  const supabase = await createClient();
+  const rows: OrderRow[] = [];
+
+  for (let from = 0; ; from += EXPORT_PAGE_SIZE) {
+    const base = supabase.from("orders").select(ORDER_SELECT).eq("org_id", orgId);
+    const filtered = ids === null ? base : base.in("id", ids);
+    const { data, error } = await filtered
+      .order("created_at", { ascending: false })
+      .order("number", { ascending: false })
+      .range(from, from + EXPORT_PAGE_SIZE - 1);
+
+    if (error !== null) {
+      throw new Error(`Failed to fetch orders for export: ${error.message}`);
+    }
+
+    rows.push(...data.map(toOrderRow));
+    if (data.length < EXPORT_PAGE_SIZE) break;
+  }
+
+  return rows;
 }
 
 // 新建/编辑订单的白名单写入字段（number 服务端生成；org_id 服务端注入）
@@ -78,6 +113,59 @@ async function generateOrderNumber(orgId: string): Promise<string> {
     throw new Error(`Failed to generate order number: ${error.message}`);
   }
   return data as string;
+}
+
+// 批量取号（导入用）：generate_order_number 的序号是「当日该组织订单数 + 1」，
+// 所以一次调用即可按序推导出后续单号，避免每单一次往返。
+// 若期间有并发下单导致撞号，调用方回退到逐条重新取号插入。
+const ORDER_NUMBER_PATTERN = /^(ORD-\d{8}-)(\d{4,})$/;
+
+export async function generateOrderNumbers(
+  orgId: string,
+  count: number,
+): Promise<string[]> {
+  if (count <= 0) return [];
+  const first = await generateOrderNumber(orgId);
+  const match = ORDER_NUMBER_PATTERN.exec(first);
+  if (match === null) {
+    throw new Error("unexpected_order_number_format");
+  }
+  const prefix = match[1];
+  const start = Number(match[2]);
+  return Array.from(
+    { length: count },
+    (_, i) => `${prefix}${String(start + i).padStart(4, "0")}`,
+  );
+}
+
+// 带单号的订单写入字段（批量插入用：单号已由 generateOrderNumbers 一次生成）
+export interface OrderNumberedInput extends OrderWriteInput {
+  number: string;
+}
+
+// 批量新建订单（导入用）：单次请求写入，避免逐行跨境往返
+export async function insertOrders(
+  orgId: string,
+  inputs: OrderNumberedInput[],
+): Promise<void> {
+  if (inputs.length === 0) return;
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("orders").insert(
+    inputs.map((input) => ({
+      org_id: orgId,
+      customer_id: input.customer_id,
+      number: input.number,
+      amount: input.amount,
+      status: input.status,
+      payment_method: input.payment_method,
+      notes: input.notes,
+    })),
+  );
+
+  if (error !== null) {
+    throw new Error(toPgErrorCode(error.code));
+  }
 }
 
 export async function insertOrder(

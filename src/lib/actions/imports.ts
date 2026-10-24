@@ -6,9 +6,10 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import {
   insertCustomer,
+  insertCustomers,
   type CustomerWriteInput,
 } from "@/lib/api/customers";
-import { insertOrder } from "@/lib/api/orders";
+import { generateOrderNumbers, insertOrder, insertOrders } from "@/lib/api/orders";
 import { parseCsv } from "@/lib/csv";
 import { z } from "zod";
 
@@ -110,11 +111,23 @@ export async function importCustomersCsv(
     }
   }
 
-  // 查本组织已有 email，避免导入重复
-  const existing = new Set(await getOrgCustomerEmails(orgId));
+  // 查本组织已有 email，避免导入重复。
+  // DB 查询失败必须整体中止：否则重复校验会静默失效，只能靠唯一约束兜底。
+  let existing: Set<string>;
+  try {
+    existing = new Set(await getOrgCustomerEmails(orgId));
+  } catch {
+    return {
+      ok: false,
+      inserted: 0,
+      totalRows: parsed.rows.length,
+      errors: [{ row: 0, message: "network" }],
+    };
+  }
 
   const errors: ImportError[] = [];
-  const ready: CustomerWriteInput[] = [];
+  // rowNum 随输入一起保存，插入失败时直接用它报行号，避免事后推算
+  const ready: { rowNum: number; input: CustomerWriteInput }[] = [];
 
   for (let i = 0; i < parsed.rows.length; i++) {
     const row = parsed.rows[i];
@@ -158,38 +171,46 @@ export async function importCustomersCsv(
 
     existing.add(result.data.email.toLowerCase());
     ready.push({
-      name: result.data.name,
-      email: result.data.email,
-      company: result.data.company,
-      status: st,
-      spent: result.data.spent,
-      avatar_url: null,
+      rowNum,
+      input: {
+        name: result.data.name,
+        email: result.data.email,
+        company: result.data.company,
+        status: st,
+        spent: result.data.spent,
+        avatar_url: null,
+      },
     });
   }
 
-  // 批量插入
+  // 批量插入（单次请求）；只有批量失败时才回退到逐条插入以定位失败行
   let inserted = 0;
-  for (const input of ready) {
-    try {
-      await insertCustomer(orgId, input);
-      inserted++;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "network";
-      // 找 ready 里对应的 row（用 email 匹配）
-      const idxInReady = ready.indexOf(input);
-      const originalRowNum = errors.length > 0
-        ? errors[errors.length - 1].row + idxInReady + 1
-        : idxInReady + 1;
-      errors.push({ row: originalRowNum, field: "email", message: msg });
+  try {
+    await insertCustomers(orgId, ready.map((item) => item.input));
+    inserted = ready.length;
+  } catch {
+    for (const item of ready) {
+      try {
+        await insertCustomer(orgId, item.input);
+        inserted++;
+      } catch (err) {
+        errors.push({
+          row: item.rowNum,
+          field: "email",
+          message: err instanceof Error ? err.message : "network",
+        });
+      }
     }
   }
+
+  const nonEmptyRows = parsed.rows.filter(
+    (r) => !r.every((c) => c.trim() === ""),
+  ).length;
 
   // 有任何一行写入成功就要刷新列表（导入是写操作，与 CRUD 一致）
   if (inserted > 0) revalidatePath("/", "layout");
 
-  if (errors.length === 0 && inserted === parsed.rows.filter((_, idx) =>
-    !parsed.rows[idx].every((c) => c.trim() === "")
-  ).length) {
+  if (errors.length === 0 && inserted === nonEmptyRows) {
     return { ok: true, inserted, totalRows: parsed.rows.length };
   }
   return { ok: false, inserted, totalRows: parsed.rows.length, errors };
@@ -202,7 +223,7 @@ async function getOrgCustomerEmails(orgId: string): Promise<string[]> {
     .from("customers")
     .select("email")
     .eq("org_id", orgId);
-  if (error !== null) return [];
+  if (error !== null) throw new Error(error.message);
   return data.map((r) => r.email.toLowerCase());
 }
 
@@ -248,11 +269,30 @@ export async function importOrdersCsv(
     };
   }
 
-  // 先查本组织 customers → Map<email(lower), id>
-  const emailMap = await buildCustomerEmailMap(orgId);
+  // 先查本组织 customers → Map<email(lower), id>。
+  // 查询失败必须整体中止：否则所有行都会被误判成 invalidCustomer。
+  let emailMap: Map<string, string>;
+  try {
+    emailMap = await buildCustomerEmailMap(orgId);
+  } catch {
+    return {
+      ok: false,
+      inserted: 0,
+      totalRows: parsed.rows.length,
+      errors: [{ row: 0, message: "network" }],
+    };
+  }
 
   const errors: ImportError[] = [];
-  const ready: { customerEmail: string; amount: number; status: typeof ORDER_STATUS_VALUES[number]; paymentMethod: string; notes: string }[] = [];
+  // rowNum / customerId 随输入一起保存，插入失败时直接报行号，无需事后推算
+  const ready: {
+    rowNum: number;
+    customerId: string;
+    amount: number;
+    status: typeof ORDER_STATUS_VALUES[number];
+    paymentMethod: string;
+    notes: string;
+  }[] = [];
 
   for (let i = 0; i < parsed.rows.length; i++) {
     const row = parsed.rows[i];
@@ -291,7 +331,8 @@ export async function importOrdersCsv(
     }
 
     ready.push({
-      customerEmail: result.data.email,
+      rowNum,
+      customerId,
       amount: Number(result.data.amount.toFixed(2)),
       status: st,
       paymentMethod: result.data.paymentMethod || "",
@@ -299,27 +340,39 @@ export async function importOrdersCsv(
     });
   }
 
-  // 批量插入（逐行调 insertOrder，每行触发 RPC 生成 order number）
+  // 一次取号后批量插入；失败时回退到逐条插入（每行重新取号）以定位失败行
   let inserted = 0;
-  for (const row of ready) {
-    const customerId = emailMap.get(row.customerEmail.toLowerCase())!;
-    try {
-      await insertOrder(orgId, {
-        customer_id: customerId,
-        amount: row.amount,
-        status: row.status,
-        payment_method: row.paymentMethod || null,
-        notes: row.notes || null,
-      });
-      inserted++;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "network";
-      const rowNum = errors.find((e, idx) =>
-        idx === errors.length - 1
-          ? true
-          : errors[idx + 1].row === e.row + 1
-      )?.row ?? 0;
-      errors.push({ row: rowNum + 1, message: msg });
+  try {
+    const numbers = await generateOrderNumbers(orgId, ready.length);
+    await insertOrders(
+      orgId,
+      ready.map((item, i) => ({
+        customer_id: item.customerId,
+        number: numbers[i],
+        amount: item.amount,
+        status: item.status,
+        payment_method: item.paymentMethod || null,
+        notes: item.notes || null,
+      })),
+    );
+    inserted = ready.length;
+  } catch {
+    for (const item of ready) {
+      try {
+        await insertOrder(orgId, {
+          customer_id: item.customerId,
+          amount: item.amount,
+          status: item.status,
+          payment_method: item.paymentMethod || null,
+          notes: item.notes || null,
+        });
+        inserted++;
+      } catch (err) {
+        errors.push({
+          row: item.rowNum,
+          message: err instanceof Error ? err.message : "network",
+        });
+      }
     }
   }
 
@@ -339,7 +392,7 @@ async function buildCustomerEmailMap(orgId: string): Promise<Map<string, string>
     .from("customers")
     .select("id, email")
     .eq("org_id", orgId);
-  if (error !== null || data === null) return new Map();
+  if (error !== null || data === null) throw new Error("network");
   const map = new Map<string, string>();
   for (const r of data) map.set(r.email.toLowerCase(), r.id);
   return map;
