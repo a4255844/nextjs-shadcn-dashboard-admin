@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllOrders } from "@/lib/api/orders";
+import { hasPermissionInOrg } from "@/lib/api/roles";
 import { ORDERS_CSV_HEADERS, csvTimestamp, encodeCsv, formatCsvDate } from "@/lib/csv";
 
 export async function GET(request: NextRequest) {
@@ -11,6 +12,11 @@ export async function GET(request: NextRequest) {
 
     if (!orgId) {
       return NextResponse.json({ error: "orgId required" }, { status: 400 });
+    }
+
+    // 服务端权限校验：未授予 orders.export 的角色直接拒绝（RLS 仍为兜底）
+    if (!(await hasPermissionInOrg(orgId, "orders.export"))) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
 
     // selected 模式直接按 id 查（org_id 已限定，RLS 再兜底），不再拉全表后内存过滤

@@ -53,6 +53,12 @@ import {
 } from "@/components/ui/table";
 import { features, useColumns } from "./columns";
 import {
+  can,
+  CUSTOMER_SCOPE_KEYS,
+  type CustomerScope,
+  type PermissionMap,
+} from "@/lib/permissions";
+import {
   PAGE_SIZE_OPTIONS,
   parsePageSize,
   parseSortableColumn,
@@ -85,8 +91,13 @@ const STATUS_FILTER_OPTIONS: readonly StatusFilter[] = [
 interface CustomersTableProps {
   rows: CustomerRow[];
   orgId: string;
-  /** 当前用户在激活组织内是否为 admin（member 整表只读，RLS 为最终兜底） */
-  isAdmin: boolean;
+  /** 当前用户在该组织的权限集合（按钮/操作列按权限渲染；RLS 为最终兜底） */
+  permissions: PermissionMap;
+  /**
+   * 权限作用域：三个子菜单各自独立授权。
+   * 默认 all（全部客户），分群页传入对应 scope。
+   */
+  scope?: CustomerScope;
   /**
    * 分群页使用：固定状态筛选。
    * 传入后忽略 URL 的 status 参数、隐藏状态下拉，
@@ -98,9 +109,17 @@ interface CustomersTableProps {
 export default function CustomersTable({
   rows,
   orgId,
-  isAdmin,
+  permissions,
+  scope = "all",
   lockedStatus,
 }: CustomersTableProps) {
+  // 分群作用域没有 create/import（页面上不提供这两个入口）
+  const scopeKeys = CUSTOMER_SCOPE_KEYS[scope];
+  const canCreate = scopeKeys.create !== undefined && can(permissions, scopeKeys.create);
+  const canUpdate = can(permissions, scopeKeys.update);
+  const canDelete = can(permissions, scopeKeys.delete);
+  const canExport = can(permissions, scopeKeys.export);
+  const canImport = scopeKeys.import !== undefined && can(permissions, scopeKeys.import);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -143,7 +162,7 @@ export default function CustomersTable({
   const doExport = useCallback(
     (exportAll: boolean) => {
       // 直接通过 <a href> 触发浏览器原生下载，零 JS 请求，零加载状态
-      const params = new URLSearchParams({ orgId });
+      const params = new URLSearchParams({ orgId, scope });
       // 分群页：「导出全部」只导出该分群，而不是整个组织
       if (lockedStatus !== undefined) {
         params.set("status", lockedStatus);
@@ -170,10 +189,16 @@ export default function CustomersTable({
           : tp("toasts.exportedSelected", { count: Object.keys(rowSelection).length }),
       );
     },
-    [orgId, rows.length, rowSelection, tp, lockedStatus],
+    [orgId, scope, rows.length, rowSelection, tp, lockedStatus],
   );
 
-  const columns = useColumns({ isAdmin, onEdit: handleEdit, onDelete: handleDelete });
+  const columns = useColumns({
+    canUpdate,
+    canDelete,
+    canExport,
+    onEdit: handleEdit,
+    onDelete: handleDelete,
+  });
   const sortCol = parseSortableColumn(searchParams.get("sort"));
   const sortDir = parseSortDir(searchParams.get("order"));
   const pageStr = searchParams.get("page");
@@ -335,13 +360,13 @@ export default function CustomersTable({
           />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {isAdmin && lockedStatus === undefined && (
+          {canCreate && lockedStatus === undefined && (
             <Button size="sm" onClick={handleAdd}>
               <Plus className="size-4" />
               {t("actions.add")}
             </Button>
           )}
-          {isAdmin && selectedCount > 0 && (
+          {canDelete && selectedCount > 0 && (
             <Button
               size="sm"
               variant="destructive"
@@ -352,36 +377,38 @@ export default function CustomersTable({
               {t("actions.deleteSelected", { count: selectedCount })}
             </Button>
           )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 cursor-pointer"
-                aria-label={t("export.label")}
-              >
-                <Download className="size-3.5" />
-                {t("export.label")}
-                <ChevronDown className="size-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-40">
-              <DropdownMenuItem
-                className="cursor-pointer"
-                disabled={selectedCount === 0}
-                onClick={() => doExport(false)}
-              >
-                {t("export.selected", { count: selectedCount })}
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => doExport(true)}
-              >
-                {t("export.all")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {isAdmin && lockedStatus === undefined && (
+          {canExport && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 cursor-pointer"
+                  aria-label={t("export.label")}
+                >
+                  <Download className="size-3.5" />
+                  {t("export.label")}
+                  <ChevronDown className="size-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-40">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  disabled={selectedCount === 0}
+                  onClick={() => doExport(false)}
+                >
+                  {t("export.selected", { count: selectedCount })}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => doExport(true)}
+                >
+                  {t("export.all")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          {canImport && lockedStatus === undefined && (
             <Button
               size="sm"
               variant="outline"
@@ -592,41 +619,43 @@ export default function CustomersTable({
       </div>
       </DashboardCard>
 
-      {isAdmin && (
-        <>
-          <CustomerFormDialog
-            open={formOpen}
-            onOpenChange={setFormOpen}
-            orgId={orgId}
-            customer={editingCustomer}
-          />
-          <CustomerDeleteDialog
-            orgId={orgId}
-            target={deleteTarget}
-            onClose={() => setDeleteTarget(null)}
-          />
-          {lockedStatus === undefined && (
-            <ImportDialog
-              open={importOpen}
-              onOpenChange={setImportOpen}
-              orgId={orgId}
-              columnLabels={["Name", "Email", "Company", "Status", "Spent"]}
-              actionFn={importCustomersCsv}
-              tNamespace="customers.import"
-            />
-          )}
-          <BatchDeleteDialog
-            open={batchDeleteOpen}
-            onOpenChange={setBatchDeleteOpen}
-            count={selectedCount}
-            ids={Object.keys(rowSelection)}
-            orgId={orgId}
-            actionFn={removeCustomers}
-            tNamespace="customers"
-            note={t("batchDelete.note")}
-            onDeleted={() => setRowSelection({})}
-          />
-        </>
+      {(canCreate || canUpdate) && (
+        <CustomerFormDialog
+          open={formOpen}
+          onOpenChange={setFormOpen}
+          orgId={orgId}
+          customer={editingCustomer}
+        />
+      )}
+      {canDelete && (
+        <CustomerDeleteDialog
+          orgId={orgId}
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+        />
+      )}
+      {canImport && lockedStatus === undefined && (
+        <ImportDialog
+          open={importOpen}
+          onOpenChange={setImportOpen}
+          orgId={orgId}
+          columnLabels={["Name", "Email", "Company", "Status", "Spent"]}
+          actionFn={importCustomersCsv}
+          tNamespace="customers.import"
+        />
+      )}
+      {canDelete && (
+        <BatchDeleteDialog
+          open={batchDeleteOpen}
+          onOpenChange={setBatchDeleteOpen}
+          count={selectedCount}
+          ids={Object.keys(rowSelection)}
+          orgId={orgId}
+          actionFn={removeCustomers}
+          tNamespace="customers"
+          note={t("batchDelete.note")}
+          onDeleted={() => setRowSelection({})}
+        />
       )}
     </>
   );

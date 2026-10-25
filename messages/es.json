@@ -39,6 +39,11 @@
   },
   "pages": {
     "comingSoon": "Próximamente",
+    "forbidden": {
+      "title": "No tienes acceso a esta página",
+      "description": "Tu rol actual no incluye permiso para esta página. Pide a un administrador de la organización que ajuste tu rol o permisos.",
+      "back": "Ir a una página accesible"
+    },
     "dashboard": {
       "title": "Panel",
       "description": "Tarjetas KPI, gráficos y una visión general de las métricas clave del negocio."
@@ -581,12 +586,20 @@
         "actions": "Acciones"
       },
       "you": "Tú",
-      "roles": {
-        "admin": "Administrador",
-        "member": "Miembro"
-      },
+      "extraBadge": "+{count}",
+      "extraBadgeTitle": "{count} permisos adicionales",
+      "deniedBadge": "-{count}",
+      "deniedBadgeTitle": "{count} permisos revocados",
       "actions": {
-        "openAria": "Abrir acciones de miembro"
+        "openAria": "Abrir acciones de miembro",
+        "permissions": "Ajustar permisos"
+      },
+      "permissionsDialog": {
+        "title": "Permisos del miembro",
+        "description": "Ajusta los permisos de {name}. Los cambios solo aplican a este miembro y se borran al cambiar su rol.",
+        "overrideHint": "Desmarca para revocar un permiso heredado del rol; marca uno que no tenga para concederlo además.",
+        "submit": "Guardar",
+        "cancel": "Cancelar"
       },
       "removeDialog": {
         "title": "Eliminar miembro",
@@ -616,10 +629,12 @@
       "regenerate": "Regenerar",
       "copy": "Copiar enlace",
       "copied": "Copiado",
-      "roleHint": "Cualquier persona con este enlace se une como miembro después de iniciar sesión."
+      "roleLabel": "Rol al unirse",
+      "roleHint": "Cualquier persona con este enlace se une con el rol seleccionado después de iniciar sesión."
     },
     "inviteCard": {
       "title": "Enlace de invitación",
+      "role": "Rol",
       "createdAt": "Creado",
       "expiresAt": "Expira"
     },
@@ -636,7 +651,107 @@
       "roleUpdated": "Rol actualizado",
       "memberRemoved": "Miembro eliminado",
       "left": "Has abandonado la organización",
-      "inviteRegenerated": "Enlace de invitación actualizado"
+      "inviteRegenerated": "Enlace de invitación actualizado",
+      "roleCreated": "Rol creado",
+      "roleSaved": "Rol guardado",
+      "roleDeleted": "Rol eliminado",
+      "memberPermissionsSaved": "Permisos adicionales actualizados"
+    },
+    "roles": {
+      "title": "Roles y permisos",
+      "description": "Crea roles personalizados y elige las páginas y acciones a las que puede acceder cada rol.",
+      "systemBadge": "Sistema",
+      "builtin": {
+        "admin": "Administrador",
+        "manager": "Gerente",
+        "sales": "Ventas",
+        "viewer": "Lector"
+      },
+      "create": "Nuevo rol",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "permissionCount": "{count} permisos",
+      "hint": "Los roles fijos no se pueden eliminar, pero sus permisos sí se pueden editar. Los cambios aplican a todos los miembros con ese rol.",
+      "kind": {
+        "menu": "Permiso de menú",
+        "action": "Permiso de botón"
+      },
+      "alwaysAvailable": "Perfil y Ajustes están disponibles para todos los miembros y no requieren permisos.",
+      "modules": {
+        "dashboard": "Panel",
+        "customers": "Clientes",
+        "orders": "Pedidos",
+        "members": "Miembros",
+        "org": "Organización"
+      },
+      "permissions": {
+        "dashboard": {
+          "browse": "Explorar panel",
+          "ecommerce": { "browse": "Explorar comercio electrónico" }
+        },
+        "customers": {
+          "browse": "Explorar clientes",
+          "create": "Crear clientes",
+          "update": "Editar clientes",
+          "delete": "Eliminar clientes",
+          "export": "Exportar clientes",
+          "import": "Importar clientes",
+          "high_value": {
+            "browse": "Explorar clientes de alto valor",
+            "update": "Editar clientes de alto valor",
+            "delete": "Eliminar clientes de alto valor",
+            "export": "Exportar clientes de alto valor"
+          },
+          "at_risk": {
+            "browse": "Explorar clientes en riesgo",
+            "update": "Editar clientes en riesgo",
+            "delete": "Eliminar clientes en riesgo",
+            "export": "Exportar clientes en riesgo"
+          }
+        },
+        "orders": {
+          "browse": "Explorar pedidos",
+          "create": "Crear pedidos",
+          "update": "Editar pedidos",
+          "delete": "Eliminar pedidos",
+          "export": "Exportar pedidos",
+          "import": "Importar pedidos"
+        },
+        "members": {
+          "browse": "Explorar miembros",
+          "invite": "Invitar miembros",
+          "manage": "Gestionar roles de miembros"
+        },
+        "org": {
+          "update": "Actualizar organización",
+          "delete": "Eliminar organización"
+        }
+      },
+      "form": {
+        "createTitle": "Nuevo rol",
+        "editTitle": "Editar rol",
+        "description": "Los nombres de rol son únicos en la organización. Elige las páginas y acciones de este rol.",
+        "nameLabel": "Nombre del rol",
+        "namePlaceholder": "p. ej. Ventas",
+        "systemNameHint": "El nombre de los roles fijos no se puede cambiar; solo los permisos.",
+        "permissionsLabel": "Permisos",
+        "submitCreate": "Crear",
+        "submitSave": "Guardar",
+        "cancel": "Cancelar",
+        "errorName": "El nombre debe tener entre 1 y 40 caracteres.",
+        "errorTaken": "Ese nombre de rol ya está en uso.",
+        "noPermission": "Selecciona al menos un permiso."
+      },
+      "deleteDialog": {
+        "title": "Eliminar rol",
+        "description": "El rol {name} se eliminará. No se puede eliminar mientras lo usen miembros o una invitación activa.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar"
+      }
+    },
+    "noAccess": {
+      "title": "Sin acceso",
+      "description": "Tu rol actual no tiene acceso a esta página. Pide ayuda a un administrador de la organización."
     },
     "invitePage": {
       "title": "Has recibido una invitación",
@@ -664,9 +779,12 @@
       "generic": "Algo salió mal. Inténtalo de nuevo.",
       "authRequired": "Inicia sesión primero.",
       "lastAdmin": "La organización debe conservar al menos un administrador.",
-      "notAdmin": "No tienes permiso para hacer eso.",
+      "notAllowed": "No tienes permiso para hacer eso.",
       "notMember": "Ya no eres miembro de esta organización.",
-      "invalidRole": "Rol no válido."
+      "invalidRole": "Rol no válido.",
+      "invalidPermission": "Se incluyó un permiso desconocido.",
+      "systemRole": "Los roles del sistema no se pueden modificar ni eliminar.",
+      "roleInUse": "Este rol aún está asignado a miembros o a una invitación activa."
     }
   },
   "login": {

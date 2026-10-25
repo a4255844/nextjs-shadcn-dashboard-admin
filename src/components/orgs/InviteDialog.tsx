@@ -13,14 +13,26 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { OrgRole } from "@/lib/api/roles";
+import { roleLabel } from "@/lib/role-label";
 import { createInvite } from "@/lib/actions/organizations";
 import InviteLinkField from "@/components/orgs/InviteLinkField";
 
 interface InviteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** 当前组织 id（服务端已校验 admin 角色，这里仅透传） */
+  /** 当前组织 id（服务端已校验 members.invite，这里仅透传） */
   orgId: string;
+  /** 当前组织可选角色（邀请时指定加入后的角色） */
+  roles: OrgRole[];
 }
 
 /**
@@ -31,19 +43,29 @@ export default function InviteDialog({
   open,
   onOpenChange,
   orgId,
+  roles,
 }: InviteDialogProps) {
   const t = useTranslations("orgs.invite");
+  const tRoles = useTranslations("orgs.roles");
   const router = useRouter();
 
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [roleId, setRoleId] = useState<string>(
+    () =>
+      roles.find((r) => !r.isSystem)?.id ??
+      roles.find((r) => r.isSystem && r.name.toLowerCase() === "viewer")?.id ??
+      roles[0]?.id ??
+      "",
+  );
 
   async function handleGenerate() {
+    if (roleId === "") return;
     setLoading(true);
-    const result = await createInvite(orgId);
+    const result = await createInvite(orgId, roleId);
     setLoading(false);
     if (!result.ok) {
-      // not_admin 理论上不会发生（入口已按服务端 role 门控），兜底提示
+      // not_allowed 理论上不会发生（入口已按服务端权限门控），兜底提示
       setToken(null);
       return;
     }
@@ -69,6 +91,31 @@ export default function InviteDialog({
         </DialogHeader>
 
         <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="invite-role">{t("roleLabel")}</Label>
+            <Select
+              value={roleId}
+              onValueChange={setRoleId}
+              disabled={loading || roles.length === 0}
+            >
+              <SelectTrigger id="invite-role" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                position="popper"
+                align="start"
+                sideOffset={4}
+                className="w-(--radix-select-trigger-width) min-w-(--radix-select-trigger-width)"
+              >
+                {roles.map((role) => (
+                  <SelectItem key={role.id} value={role.id}>
+                    {roleLabel(role, tRoles)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {token !== null ? (
             <>
               <InviteLinkField token={token} />
@@ -83,7 +130,7 @@ export default function InviteDialog({
           <Button
             variant={token === null ? "default" : "outline"}
             onClick={handleGenerate}
-            disabled={loading}
+            disabled={loading || roleId === ""}
           >
             {loading ? (
               <Loader2 className="size-4 animate-spin" />

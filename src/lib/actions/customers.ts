@@ -11,6 +11,10 @@ import {
 } from "@/lib/api/customers";
 import { toErrorCode } from "@/lib/actions/rpc-errors";
 import {
+  hasAnyPermissionInOrg,
+  hasPermissionInOrg,
+} from "@/lib/api/roles";
+import {
   customerFormSchema,
   validateCustomerForm,
 } from "@/lib/validations/customer";
@@ -135,6 +139,11 @@ export async function createCustomer(
   orgId: string,
   raw: CustomerFormInput,
 ): Promise<CustomerResult> {
+  // 后端权限兜底：即使客户端绕过隐藏按钮直接调用 action，也会被拒绝
+  if (!(await hasPermissionInOrg(orgId, "customers.create"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   const parsed = validateCustomerInput(raw, orgId);
   if (!parsed.ok) return { ok: false, fieldErrors: parsed.fieldErrors };
 
@@ -154,6 +163,10 @@ export async function updateCustomer(
   id: string,
   raw: CustomerFormInput,
 ): Promise<CustomerResult> {
+  if (!(await hasPermissionInOrg(orgId, "customers.update"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   const parsed = validateCustomerInput(raw, orgId);
   if (!parsed.ok) return { ok: false, fieldErrors: parsed.fieldErrors };
 
@@ -172,6 +185,10 @@ export async function removeCustomer(
   orgId: string,
   id: string,
 ): Promise<CustomerResult> {
+  if (!(await hasPermissionInOrg(orgId, "customers.delete"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   try {
     await deleteCustomer(orgId, id);
   } catch (err) {
@@ -202,6 +219,10 @@ export async function removeCustomers(
   orgId: string,
   ids: string[],
 ): Promise<BatchDeleteResult> {
+  if (!(await hasPermissionInOrg(orgId, "customers.delete"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   try {
     const deleted = await deleteCustomers(orgId, ids);
     revalidatePath("/", "layout");
@@ -236,6 +257,16 @@ export async function uploadCustomerAvatar(
   orgId: string,
   formData: FormData,
 ): Promise<AvatarUploadResult> {
+  // 头像同时服务于新建与编辑表单，任一权限即可
+  if (
+    !(await hasAnyPermissionInOrg(orgId, [
+      "customers.create",
+      "customers.update",
+    ]))
+  ) {
+    return { ok: false, errorCode: "uploadFailed" };
+  }
+
   const file = formData.get("file");
   if (!(file instanceof File)) {
     return { ok: false, errorCode: "invalidType" };

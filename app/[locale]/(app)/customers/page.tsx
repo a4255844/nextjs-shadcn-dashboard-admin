@@ -8,6 +8,8 @@ import CustomersTable from "@/components/dashboards/customers/customers-table";
 import NoOrgState from "@/components/orgs/NoOrgState";
 import { getCustomers } from "@/lib/api/customers";
 import { getActiveOrg } from "@/lib/api/organizations";
+import { toPermissionMap } from "@/lib/permissions";
+import { requirePermission } from "@/lib/route-guard";
 
 const page = async () => {
   const t = await getTranslations("customers");
@@ -18,6 +20,9 @@ const page = async () => {
   if (org === null) {
     return <NoOrgState />;
   }
+
+  // 路由守卫：未勾选 customers.browse 时渲染无权访问页，不渲染本页内容
+  await requirePermission(org.permissions, "customers.browse");
 
   // RSC 直查 DB（真实数据源）；表格统计都从同一份 rows 聚合。
   // 必须按 active org 过滤（RLS 只保证读权限，不做数据过滤）
@@ -87,7 +92,7 @@ const page = async () => {
             key={org.id}
             rows={rows}
             orgId={org.id}
-            isAdmin={org.role === "admin"}
+            permissions={toPermissionMap(org.permissions)}
           />
         </Suspense>
       </div>

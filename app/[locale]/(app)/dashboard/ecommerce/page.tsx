@@ -7,9 +7,19 @@ import SalesDistribution from "@/components/dashboards/ecommerce/sales-distribut
 import StatCard from "@/components/shared/stat-card";
 import StyleAwareWrapper from "@/components/shared/StyleAwareWrapper";
 import StyleDivider from "@/components/shared/StyleDivider";
+import NoOrgState from "@/components/orgs/NoOrgState";
+import { getActiveOrg } from "@/lib/api/organizations";
+import { requirePermission } from "@/lib/route-guard";
 
 const page = async () => {
   const t = await getTranslations("ecommerce.stats");
+
+  const org = await getActiveOrg();
+  if (org === null) {
+    return <NoOrgState />;
+  }
+
+  await requirePermission(org.permissions, "dashboard.ecommerce.browse");
 
   return (
     <StyleAwareWrapper

@@ -10,6 +10,7 @@ import StyleDivider from "@/components/shared/StyleDivider";
 import NoOrgState from "@/components/orgs/NoOrgState";
 import { Handbag, Clock, Users } from "lucide-react";
 import { getActiveOrg } from "@/lib/api/organizations";
+import { requirePermission } from "@/lib/route-guard";
 import { getCurrentUser } from "@/lib/api/auth";
 import { getDashboardData } from "@/lib/api/dashboard";
 import { parseDashboardRange } from "@/components/dashboards/modern/types";
@@ -42,6 +43,8 @@ const page = async ({ searchParams }: DashboardPageProps) => {
   if (org === null) {
     return <NoOrgState />;
   }
+
+  await requirePermission(org.permissions, "dashboard.browse");
 
   const rawRange = (await searchParams).range;
   const range =

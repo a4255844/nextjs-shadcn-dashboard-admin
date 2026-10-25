@@ -10,15 +10,18 @@ import OrgSwitcher from "./OrgSwitcher";
 import Customizer from "@/components/customizer/customizer-panel";
 import type { CurrentUser } from "@/lib/api/auth";
 import type { OrgSummary } from "@/lib/api/organizations";
+import type { OrgRole } from "@/lib/api/roles";
 
 interface HeaderProps {
   user: CurrentUser | null;
   /** 服务端取数传入（Header 是 client 组件，不自带 server 取数） */
   orgs: OrgSummary[];
   activeOrg: OrgSummary | null;
+  /** 当前组织角色列表（邀请弹窗用；无邀请权限时为空数组） */
+  roles: OrgRole[];
 }
 
-const Header = ({ user, orgs, activeOrg }: HeaderProps) => {
+const Header = ({ user, orgs, activeOrg, roles }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-30 shrink-0">
       <div className="border-b border-border bg-card/85 backdrop-blur supports-[backdrop-filter]:bg-card/70 md:rounded-t-xl">
@@ -35,7 +38,7 @@ const Header = ({ user, orgs, activeOrg }: HeaderProps) => {
             </div>
 
             <div className="flex items-center gap-0 sm:gap-1">
-              <OrgSwitcher orgs={orgs} activeOrg={activeOrg} />
+              <OrgSwitcher orgs={orgs} activeOrg={activeOrg} roles={roles} />
               <LocaleSwitch />
               <Customizer />
               <LightDark />

@@ -68,7 +68,7 @@ export type Database = {
           expires_at: string
           id: string
           org_id: string
-          role: string
+          role_id: string
           token: string
           used_at: string | null
           used_by: string | null
@@ -79,7 +79,7 @@ export type Database = {
           expires_at?: string
           id?: string
           org_id: string
-          role?: string
+          role_id: string
           token?: string
           used_at?: string | null
           used_by?: string | null
@@ -90,7 +90,7 @@ export type Database = {
           expires_at?: string
           id?: string
           org_id?: string
-          role?: string
+          role_id?: string
           token?: string
           used_at?: string | null
           used_by?: string | null
@@ -103,6 +103,46 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "invites_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_permissions: {
+        Row: {
+          granted: boolean
+          member_id: string
+          permission_key: string
+        }
+        Insert: {
+          granted?: boolean
+          member_id: string
+          permission_key: string
+        }
+        Update: {
+          granted?: boolean
+          member_id?: string
+          permission_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_permissions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_permissions_permission_key_fkey"
+            columns: ["permission_key"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["key"]
+          },
         ]
       }
       members: {
@@ -110,21 +150,21 @@ export type Database = {
           created_at: string
           id: string
           org_id: string
-          role: string
+          role_id: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           org_id: string
-          role?: string
+          role_id: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           org_id?: string
-          role?: string
+          role_id?: string
           user_id?: string
         }
         Relationships: [
@@ -133,6 +173,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
             referencedColumns: ["id"]
           },
         ]
@@ -206,6 +253,24 @@ export type Database = {
         }
         Relationships: []
       }
+      permissions: {
+        Row: {
+          key: string
+          module: string
+          sort: number
+        }
+        Insert: {
+          key: string
+          module: string
+          sort?: number
+        }
+        Update: {
+          key?: string
+          module?: string
+          sort?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -236,25 +301,108 @@ export type Database = {
         }
         Relationships: []
       }
+      roles: {
+        Row: {
+          created_at: string
+          id: string
+          is_system: boolean
+          name: string
+          org_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          name: string
+          org_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          name?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "role_permissions"
+            referencedColumns: ["role_id"]
+          },
+        ]
+      }
+      role_permissions: {
+        Row: {
+          permission_key: string
+          role_id: string
+        }
+        Insert: {
+          permission_key: string
+          role_id: string
+        }
+        Update: {
+          permission_key?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_key_fkey"
+            columns: ["permission_key"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       create_invite: {
-        Args: { p_org_id: string; p_role?: string }
+        Args: { p_org_id: string; p_role_id: string }
         Returns: string
       }
       create_organization: { Args: { p_name: string }; Returns: string }
+      create_role: {
+        Args: { p_name: string; p_org_id: string; p_permissions: string[] }
+        Returns: string
+      }
+      delete_role: { Args: { p_role_id: string }; Returns: undefined }
       generate_order_number: { Args: { p_org_id: string }; Returns: string }
       get_active_invite: {
         Args: { p_org_id: string }
         Returns: {
           created_at: string
           expires_at: string
-          role: string
+          role_id: string
+          role_name: string
           token: string
         }[]
+      }
+      has_member_permission: {
+        Args: { check_permission: string; p_member_id: string }
+        Returns: boolean
+      }
+      has_org_permission: {
+        Args: { check_org_id: string; check_permission: string }
+        Returns: boolean
       }
       is_org_admin: { Args: { check_org_id: string }; Returns: boolean }
       is_org_member: { Args: { check_org_id: string }; Returns: boolean }
@@ -269,20 +417,49 @@ export type Database = {
         Args: { p_org_id: string }
         Returns: {
           avatar_url: string
+          denied_permissions: string[]
           email: string
+          extra_permissions: string[]
           first_name: string
           joined_at: string
           last_name: string
-          role: string
+          role_id: string
+          role_name: string
           user_id: string
         }[]
+      }
+      list_org_roles: {
+        Args: { p_org_id: string }
+        Returns: {
+          id: string
+          is_system: boolean
+          name: string
+          permissions: string[]
+        }[]
+      }
+      my_org_permissions: {
+        Args: { p_org_id: string }
+        Returns: string[]
       }
       remove_member: {
         Args: { p_org_id: string; p_user_id: string }
         Returns: undefined
       }
+      set_member_permission_overrides: {
+        Args: {
+          p_denied: string[]
+          p_granted: string[]
+          p_org_id: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       update_member_role: {
-        Args: { p_org_id: string; p_role: string; p_user_id: string }
+        Args: { p_org_id: string; p_role_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      update_role: {
+        Args: { p_name: string; p_permissions: string[]; p_role_id: string }
         Returns: undefined
       }
     }

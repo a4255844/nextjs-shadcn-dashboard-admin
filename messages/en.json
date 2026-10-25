@@ -39,6 +39,11 @@
   },
   "pages": {
     "comingSoon": "Coming soon",
+    "forbidden": {
+      "title": "You don't have access to this page",
+      "description": "Your current role doesn't include permission for this page. Ask an organization admin to adjust your role or permissions.",
+      "back": "Go to an accessible page"
+    },
     "dashboard": {
       "title": "Dashboard",
       "description": "KPI cards, charts and a quick overview of key business metrics."
@@ -581,12 +586,20 @@
         "actions": "Actions"
       },
       "you": "You",
-      "roles": {
-        "admin": "Admin",
-        "member": "Member"
-      },
+      "extraBadge": "+{count}",
+      "extraBadgeTitle": "{count} extra permissions",
+      "deniedBadge": "-{count}",
+      "deniedBadgeTitle": "{count} revoked permissions",
       "actions": {
-        "openAria": "Open member actions"
+        "openAria": "Open member actions",
+        "permissions": "Adjust permissions"
+      },
+      "permissionsDialog": {
+        "title": "Member permissions",
+        "description": "Adjust {name}’s permissions. Changes apply only to this member and are cleared when their role changes.",
+        "overrideHint": "Uncheck to revoke a permission inherited from the role; check an unheld permission to grant it on top.",
+        "submit": "Save",
+        "cancel": "Cancel"
       },
       "removeDialog": {
         "title": "Remove member",
@@ -616,10 +629,12 @@
       "regenerate": "Regenerate",
       "copy": "Copy link",
       "copied": "Copied",
-      "roleHint": "Anyone with this link joins as a member after signing in."
+      "roleLabel": "Role after joining",
+      "roleHint": "Anyone with this link joins with the selected role after signing in."
     },
     "inviteCard": {
       "title": "Invite link",
+      "role": "Role",
       "createdAt": "Created",
       "expiresAt": "Expires"
     },
@@ -636,7 +651,107 @@
       "roleUpdated": "Role updated",
       "memberRemoved": "Member removed",
       "left": "You have left the organization",
-      "inviteRegenerated": "Invite link updated"
+      "inviteRegenerated": "Invite link updated",
+      "roleCreated": "Role created",
+      "roleSaved": "Role saved",
+      "roleDeleted": "Role deleted",
+      "memberPermissionsSaved": "Extra permissions updated"
+    },
+    "roles": {
+      "title": "Roles & permissions",
+      "description": "Create custom roles and pick the pages and actions each role can access.",
+      "systemBadge": "System",
+      "builtin": {
+        "admin": "Admin",
+        "manager": "Manager",
+        "sales": "Sales",
+        "viewer": "Viewer"
+      },
+      "create": "New role",
+      "edit": "Edit",
+      "delete": "Delete",
+      "permissionCount": "{count} permissions",
+      "hint": "Built-in roles can't be deleted, but their permissions are editable. Changes apply to every member holding the role.",
+      "kind": {
+        "menu": "Menu permission",
+        "action": "Button permission"
+      },
+      "alwaysAvailable": "Profile and Settings are available to all members and need no permission.",
+      "modules": {
+        "dashboard": "Dashboard",
+        "customers": "Customers",
+        "orders": "Orders",
+        "members": "Members",
+        "org": "Organization"
+      },
+      "permissions": {
+        "dashboard": {
+          "browse": "Browse dashboard",
+          "ecommerce": { "browse": "Browse e-commerce" }
+        },
+        "customers": {
+          "browse": "Browse customers",
+          "create": "Create customers",
+          "update": "Edit customers",
+          "delete": "Delete customers",
+          "export": "Export customers",
+          "import": "Import customers",
+          "high_value": {
+            "browse": "Browse high-value customers",
+            "update": "Edit high-value customers",
+            "delete": "Delete high-value customers",
+            "export": "Export high-value customers"
+          },
+          "at_risk": {
+            "browse": "Browse at-risk customers",
+            "update": "Edit at-risk customers",
+            "delete": "Delete at-risk customers",
+            "export": "Export at-risk customers"
+          }
+        },
+        "orders": {
+          "browse": "Browse orders",
+          "create": "Create orders",
+          "update": "Edit orders",
+          "delete": "Delete orders",
+          "export": "Export orders",
+          "import": "Import orders"
+        },
+        "members": {
+          "browse": "Browse members",
+          "invite": "Invite members",
+          "manage": "Manage member roles"
+        },
+        "org": {
+          "update": "Update organization",
+          "delete": "Delete organization"
+        }
+      },
+      "form": {
+        "createTitle": "New role",
+        "editTitle": "Edit role",
+        "description": "Role names are unique within the organization. Pick the pages and actions this role can access.",
+        "nameLabel": "Role name",
+        "namePlaceholder": "e.g. Sales",
+        "systemNameHint": "Built-in role names are fixed; only permissions can be changed.",
+        "permissionsLabel": "Permissions",
+        "submitCreate": "Create",
+        "submitSave": "Save",
+        "cancel": "Cancel",
+        "errorName": "Name must be 1-40 characters.",
+        "errorTaken": "This role name is already taken.",
+        "noPermission": "Select at least one permission."
+      },
+      "deleteDialog": {
+        "title": "Delete role",
+        "description": "Role {name} will be deleted. It can't be deleted while members or an active invite still use it.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+    "noAccess": {
+      "title": "No access",
+      "description": "Your current role doesn't have access to this page. Ask an organization admin."
     },
     "invitePage": {
       "title": "You've been invited",
@@ -664,9 +779,12 @@
       "generic": "Something went wrong. Please try again.",
       "authRequired": "Please sign in first.",
       "lastAdmin": "The organization must keep at least one admin.",
-      "notAdmin": "You don't have permission to do that.",
+      "notAllowed": "You don't have permission to do that.",
       "notMember": "You are no longer a member of this organization.",
-      "invalidRole": "Invalid role."
+      "invalidRole": "Invalid role.",
+      "invalidPermission": "Unknown permission included.",
+      "systemRole": "System roles can't be modified or deleted.",
+      "roleInUse": "This role is still assigned to members or an active invite."
     }
   },
   "login": {
