@@ -87,9 +87,20 @@ interface CustomersTableProps {
   orgId: string;
   /** 当前用户在激活组织内是否为 admin（member 整表只读，RLS 为最终兜底） */
   isAdmin: boolean;
+  /**
+   * 分群页使用：固定状态筛选。
+   * 传入后忽略 URL 的 status 参数、隐藏状态下拉，
+   * 并隐藏「新建 / 导入」（这些操作会写出不属于该分群的客户）。
+   */
+  lockedStatus?: StatusKey;
 }
 
-export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableProps) {
+export default function CustomersTable({
+  rows,
+  orgId,
+  isAdmin,
+  lockedStatus,
+}: CustomersTableProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -115,8 +126,9 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
 
   // ---- 从 URL search params 派生表格状态（URL 是唯一状态源）----
   const q = searchParams.get("q") ?? "";
+  // 分群页的状态由路由决定，URL 里的 status 不再生效
   const statusFilter: StatusFilter =
-    parseStatus(searchParams.get("status")) ?? "all";
+    lockedStatus ?? parseStatus(searchParams.get("status")) ?? "all";
 
   // ---- CSV 导出 / 导入 ----
   const [importOpen, setImportOpen] = useState(false);
@@ -132,6 +144,10 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
     (exportAll: boolean) => {
       // 直接通过 <a href> 触发浏览器原生下载，零 JS 请求，零加载状态
       const params = new URLSearchParams({ orgId });
+      // 分群页：「导出全部」只导出该分群，而不是整个组织
+      if (lockedStatus !== undefined) {
+        params.set("status", lockedStatus);
+      }
       if (!exportAll) {
         const ids = Object.keys(rowSelection);
         if (ids.length === 0) {
@@ -154,7 +170,7 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
           : tp("toasts.exportedSelected", { count: Object.keys(rowSelection).length }),
       );
     },
-    [orgId, rows.length, rowSelection, tp],
+    [orgId, rows.length, rowSelection, tp, lockedStatus],
   );
 
   const columns = useColumns({ isAdmin, onEdit: handleEdit, onDelete: handleDelete });
@@ -319,7 +335,7 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
           />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {isAdmin && (
+          {isAdmin && lockedStatus === undefined && (
             <Button size="sm" onClick={handleAdd}>
               <Plus className="size-4" />
               {t("actions.add")}
@@ -365,7 +381,7 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {isAdmin && (
+          {isAdmin && lockedStatus === undefined && (
             <Button
               size="sm"
               variant="outline"
@@ -376,44 +392,46 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
               {t("import.label")}
             </Button>
           )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1.5 px-2 font-medium text-muted-foreground hover:text-foreground cursor-pointer"
-                aria-label={t("filter.all")}
-              >
-                {statusFilter === "all"
-                  ? t("filter.all")
-                  : t(`status.${statusFilter}`)}
-                <ChevronDown className="size-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-36">
-              <DropdownMenuRadioGroup
-                value={statusFilter}
-                onValueChange={(v) => {
-                  // Radix 落定纪律：关闭动画期间同步 router.replace 会打断关闭流程
-                  // 导致菜单弹回（与 LocaleSwitch 的 50ms 延迟导航同理）
-                  window.setTimeout(
-                    () => setParams({ status: v === "all" ? null : v, page: null }),
-                    50,
-                  );
-                }}
-              >
-                {STATUS_FILTER_OPTIONS.map((s) => (
-                  <DropdownMenuRadioItem
-                    key={s}
-                    value={s}
-                    className="cursor-pointer"
-                  >
-                    {s === "all" ? t("filter.all") : t(`status.${s}`)}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {lockedStatus === undefined && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1.5 px-2 font-medium text-muted-foreground hover:text-foreground cursor-pointer"
+                  aria-label={t("filter.all")}
+                >
+                  {statusFilter === "all"
+                    ? t("filter.all")
+                    : t(`status.${statusFilter}`)}
+                  <ChevronDown className="size-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-36">
+                <DropdownMenuRadioGroup
+                  value={statusFilter}
+                  onValueChange={(v) => {
+                    // Radix 落定纪律：关闭动画期间同步 router.replace 会打断关闭流程
+                    // 导致菜单弹回（与 LocaleSwitch 的 50ms 延迟导航同理）
+                    window.setTimeout(
+                      () => setParams({ status: v === "all" ? null : v, page: null }),
+                      50,
+                    );
+                  }}
+                >
+                  {STATUS_FILTER_OPTIONS.map((s) => (
+                    <DropdownMenuRadioItem
+                      key={s}
+                      value={s}
+                      className="cursor-pointer"
+                    >
+                      {s === "all" ? t("filter.all") : t(`status.${s}`)}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
@@ -587,14 +605,16 @@ export default function CustomersTable({ rows, orgId, isAdmin }: CustomersTableP
             target={deleteTarget}
             onClose={() => setDeleteTarget(null)}
           />
-          <ImportDialog
-            open={importOpen}
-            onOpenChange={setImportOpen}
-            orgId={orgId}
-            columnLabels={["Name", "Email", "Company", "Status", "Spent"]}
-            actionFn={importCustomersCsv}
-            tNamespace="customers.import"
-          />
+          {lockedStatus === undefined && (
+            <ImportDialog
+              open={importOpen}
+              onOpenChange={setImportOpen}
+              orgId={orgId}
+              columnLabels={["Name", "Email", "Company", "Status", "Spent"]}
+              actionFn={importCustomersCsv}
+              tNamespace="customers.import"
+            />
+          )}
           <BatchDeleteDialog
             open={batchDeleteOpen}
             onOpenChange={setBatchDeleteOpen}

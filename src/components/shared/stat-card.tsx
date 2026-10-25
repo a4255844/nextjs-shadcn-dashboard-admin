@@ -8,7 +8,8 @@ import type { LucideIcon } from "lucide-react";
 interface StatCardProps {
   title: string;
   value: string;
-  badgeValue: string;
+  /** 不给则只显示数值（没有可比基数的场景，避免编造百分比） */
+  badgeValue?: string;
   badgeVariant?: "positive" | "negative";
   icon: LucideIcon;
   /** "See Statistics" 按钮文案（由服务端页面注入翻译，保持本组件为 RSC） */
@@ -32,11 +33,12 @@ export default function StatCard({
               <p className="text-sm font-normal text-foreground">{title}</p>
               <div className="flex items-center gap-2">
                 <h3 className="text-2xl font-semibold">{value}</h3>
-                {badgeVariant === "positive" ? (
-                  <Badge className="bg-chart-2/10! text-chart-2!">{badgeValue}</Badge>
-                ) : (
-                  <Badge variant="destructive">{badgeValue}</Badge>
-                )}
+                {badgeValue !== undefined &&
+                  (badgeVariant === "positive" ? (
+                    <Badge className="bg-chart-2/10! text-chart-2!">{badgeValue}</Badge>
+                  ) : (
+                    <Badge variant="destructive">{badgeValue}</Badge>
+                  ))}
               </div>
             </div>
             <div className="border border-border p-2.5 w-fit rounded-md">

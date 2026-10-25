@@ -28,13 +28,18 @@ function toCustomerRow(row: CustomerDbRow): CustomerRow {
 // 排序与前端表格无关（表格是客户端排序），这里只保证返回顺序稳定。
 // 必须显式按 org_id 过滤：RLS 只保证"所属组织并集"（读权限），
 // 多组织用户不做 eq 会看到所有组织的客户（RLS 不是数据过滤的替代品）。
-export async function getCustomers(orgId: string): Promise<CustomerRow[]> {
+// status 为 null 表示不按状态过滤（客户总表）；分群页传入固定状态，
+// 让过滤下推到 DB，避免把所有客户拉到应用层再筛。
+export async function getCustomers(
+  orgId: string,
+  status: CustomerStatusValue | null = null,
+): Promise<CustomerRow[]> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("customers")
-    .select("*")
-    .eq("org_id", orgId)
+  const base = supabase.from("customers").select("*").eq("org_id", orgId);
+  const filtered = status === null ? base : base.eq("status", status);
+
+  const { data, error } = await filtered
     .order("created_at", { ascending: false })
     .order("name", { ascending: true });
 
@@ -53,16 +58,20 @@ const EXPORT_PAGE_SIZE = 1000;
 
 // 导出专用：分页拉全量，绕过 1000 行上限。
 // ids 为 null 表示导出全部；传数组时直接按 id 过滤，避免先拉全表再内存筛选。
+// status 为 null 表示不按状态过滤；分群页导出时传入固定状态。
 export async function getCustomersForExport(
   orgId: string,
   ids: string[] | null,
+  status: CustomerStatusValue | null,
 ): Promise<CustomerRow[]> {
   const supabase = await createClient();
   const rows: CustomerRow[] = [];
 
   for (let from = 0; ; from += EXPORT_PAGE_SIZE) {
     const base = supabase.from("customers").select("*").eq("org_id", orgId);
-    const filtered = ids === null ? base : base.in("id", ids);
+    const withStatus =
+      status === null ? base : base.eq("status", status);
+    const filtered = ids === null ? withStatus : withStatus.in("id", ids);
     const { data, error } = await filtered
       .order("created_at", { ascending: false })
       .order("name", { ascending: true })

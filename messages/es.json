@@ -47,6 +47,14 @@
       "title": "Clientes",
       "description": "Tabla de datos con búsqueda, filtrado, ordenación y paginación gestionados por parámetros URL.",
       "segments": {
+        "loading": "Cargando…",
+        "stats": {
+          "customers": "Clientes en el segmento",
+          "totalSpent": "Valor de vida",
+          "avgSpent": "Gasto medio",
+          "topSpent": "Cliente destacado",
+          "cta": "Ver estadísticas"
+        },
         "highValue": {
           "title": "Clientes de alto valor",
           "description": "Cuentas principales ordenadas por valor de vida, con señales de ingresos y retención."

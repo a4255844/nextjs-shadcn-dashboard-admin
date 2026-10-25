@@ -47,6 +47,14 @@
       "title": "Kunden",
       "description": "Eine Datentabelle mit Suche, Filterung, Sortierung und Paginierung – gesteuert über URL-Parameter.",
       "segments": {
+        "loading": "Wird geladen…",
+        "stats": {
+          "customers": "Kunden im Segment",
+          "totalSpent": "Lebenszeitwert",
+          "avgSpent": "Durchschnittlicher Umsatz",
+          "topSpent": "Top-Kunde",
+          "cta": "Statistik ansehen"
+        },
         "highValue": {
           "title": "Top-Kunden",
           "description": "Wichtigste Konten nach Lebenszeitwert sortiert, mit Umsatz- und Bindungssignalen."

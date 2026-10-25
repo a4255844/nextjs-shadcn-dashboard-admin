@@ -47,6 +47,14 @@
       "title": "Customers",
       "description": "A data table with search, filtering, sorting and pagination driven by URL search params.",
       "segments": {
+        "loading": "Loading...",
+        "stats": {
+          "customers": "Customers in segment",
+          "totalSpent": "Lifetime value",
+          "avgSpent": "Average spend",
+          "topSpent": "Top spender",
+          "cta": "See Statistics"
+        },
         "highValue": {
           "title": "High-Value Customers",
           "description": "Top accounts ranked by lifetime value, with revenue and retention signals."

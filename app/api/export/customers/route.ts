@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCustomersForExport } from "@/lib/api/customers";
+import { parseStatus } from "@/components/dashboards/customers/types";
 import { CUSTOMERS_CSV_HEADERS, csvTimestamp, encodeCsv, formatCsvDate } from "@/lib/csv";
 
 export async function GET(request: NextRequest) {
@@ -8,6 +9,8 @@ export async function GET(request: NextRequest) {
     const orgId = searchParams.get("orgId");
     const mode = searchParams.get("mode");
     const idsParam = searchParams.get("ids");
+    // 分群页导出：限定状态，避免把整个组织的客户都导出
+    const status = parseStatus(searchParams.get("status"));
 
     if (!orgId) {
       return NextResponse.json({ error: "orgId required" }, { status: 400 });
@@ -18,7 +21,7 @@ export async function GET(request: NextRequest) {
       mode === "selected" && idsParam
         ? idsParam.split(",").filter((id) => id !== "")
         : null;
-    const rows = await getCustomersForExport(orgId, ids);
+    const rows = await getCustomersForExport(orgId, ids, status);
 
     const csv = encodeCsv([...CUSTOMERS_CSV_HEADERS], rows.map((c) => [
       c.name,

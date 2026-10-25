@@ -47,6 +47,14 @@
       "title": "客户",
       "description": "由 URL 查询参数驱动的数据表格，支持搜索、筛选、排序与分页。",
       "segments": {
+        "loading": "加载中…",
+        "stats": {
+          "customers": "分群客户数",
+          "totalSpent": "累计消费",
+          "avgSpent": "平均消费",
+          "topSpent": "最高客户消费",
+          "cta": "查看统计"
+        },
         "highValue": {
           "title": "高价值客户",
           "description": "按生命周期价值排名的重点客户，展示收入与留存信号。"
