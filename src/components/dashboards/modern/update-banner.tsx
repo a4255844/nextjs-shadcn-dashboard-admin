@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 
-export default function UpdateBanner() {
+export default function UpdateBanner({ pct }: { pct: number | null }) {
   const t = useTranslations('dashboard.banner');
   // 日期按当前语言环境格式化，而不是写死 en-US
   const locale = useLocale();
+  const value = pct === null ? '—' : `${pct >= 0 ? '+' : ''}${pct}%`;
+  const isDown = pct !== null && pct < 0;
 
   return (
     <DashboardCard className="py-3">
@@ -26,11 +28,14 @@ export default function UpdateBanner() {
           </div>
           <p className="text-sm font-normal">
             {t.rich('text', {
-              highlight: (chunks) => <span className="text-emerald-600">{chunks}</span>,
+              value,
+              highlight: (chunks) => (
+                <span className={isDown ? 'text-destructive' : 'text-emerald-600'}>{chunks}</span>
+              ),
             })}
           </p>
         </div>
-        <Link href="#">
+        <Link href="/orders">
           <Button variant={'outline'} className="flex gap-1.5 px-4 py-2 h-auto rounded-md cursor-pointer">
             {t('cta')}
             <span>

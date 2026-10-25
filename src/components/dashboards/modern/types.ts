@@ -1,13 +1,15 @@
 import type { LucideIcon } from "lucide-react";
+import type { StatusKey } from "@/components/dashboards/customers/types";
+import type { OrderStatus } from "@/components/dashboards/orders/types";
 
+// 仪表盘时间区间：月度 = 本自然月 vs 上月；年度 = 本年 vs 去年
+export type DashboardRange = "month" | "year";
 
-
-// 销售图表数据点（单个日期的新增/老用户数）
-export type SalesDataPoint = {
-  date: string;
-  newUser: number;
-  existingUser: number;
-};
+export function parseDashboardRange(
+  v: string | null | undefined,
+): DashboardRange | null {
+  return v === "month" || v === "year" ? v : null;
+}
 
 // recharts tooltip payload 单项
 export type TooltipItem = {
@@ -31,9 +33,41 @@ export type AnimatedTooltipContentProps = {
   label?: string;
   hideLabel?: boolean;
   config?: Record<string, ConfigEntry>;
+  /** 金额格式化用的当前语言环境 */
+  locale?: string;
 };
 
-// recent-orders 表格行
+// 销售图表单日数据点：按天聚合的已支付 / 待支付金额
+export type SalesPoint = {
+  /** 本地日期 YYYY-MM-DD，展示时按 locale 格式化 */
+  date: string;
+  paid: number;
+  unpaid: number;
+};
+
+// 单个周期（7/30/90 天）的序列 + 总计 + 上一等长周期总计（用于涨跌）
+export type SalesSeries = {
+  points: SalesPoint[];
+  total: number;
+  previousTotal: number;
+};
+
+export type SalesPeriodKey = "d7" | "d30" | "d90";
+
+export type SalesSeriesMap = Record<SalesPeriodKey, SalesSeries>;
+
+// 最近订单（仪表盘汇总表）
+export type RecentOrder = {
+  id: string;
+  number: string;
+  customerName: string;
+  customerEmail: string;
+  amount: number;
+  status: OrderStatus;
+  createdAt: string;
+};
+
+// recent-orders 表格行（模板遗留组件使用）
 export type ProductRow = {
   id: string;
   project: string;
@@ -45,29 +79,10 @@ export type ProductRow = {
   statustext: "On track" | "Delayed" | "Submitted";
 };
 
-// projects-orders 订单状态联合
-export type StatusKey = "Processing" | "Delayed" | "Delivered" | "Cancelled";
-
-// projects-orders 表格行
-export type OrderRow = {
-  id: string;
-  project: string;
-  avatar: string;
-  name: string;
-  role: string;
-  status: StatusKey;
-  price: string;
-  deadline: string;
-};
-
-// totals-assets 资产卡片数据项
-// id/title 即 dashboard.assets 下的 i18n key，二者保持一致
-export type AssetKey = "employees" | "projects" | "clients" | "events";
-
+// 客户分群卡片：id/title 即 dashboard.assets.items 下的 i18n key
 export type AssetItem = {
-  id: AssetKey;
-  title: AssetKey;
+  id: StatusKey;
   href: string;
-  value: string;
+  value: number;
   icon: LucideIcon;
 };

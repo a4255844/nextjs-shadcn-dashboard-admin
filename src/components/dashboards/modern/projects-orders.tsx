@@ -1,94 +1,23 @@
 'use client';
 
-import { useTranslations } from "next-intl";
-import { BriefcaseBusiness, ArrowDownUp, Ellipsis } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { ArrowUpRight, BriefcaseBusiness } from "lucide-react";
 import { CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { DashboardCard } from "@/components/shared/dashboard-card";
-import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import SimpleBar from "simplebar-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import type { OrderRow, StatusKey } from "./types";
+import { Link } from "@/i18n/navigation";
+import type { OrderStatus } from "@/components/dashboards/orders/types";
+import type { RecentOrder } from "./types";
 
-const statusConfig: Record<StatusKey, { bg: string; text: string }> = {
-  Processing: { bg: "bg-[#f54900]/10", text: "text-[#f54900]" },
-  Delayed: { bg: "bg-[#ec003f]/10", text: "text-[#ec003f]" },
-  Delivered: { bg: "bg-[#009689]/10", text: "text-[#009689]" },
-  Cancelled: { bg: "bg-[#ec003f]/10", text: "text-[#ec003f]" },
+// 订单状态配色：与订单页保持一致的语义（待处理/已完成/已退款/已取消）
+const statusConfig: Record<OrderStatus, { bg: string; text: string }> = {
+  pending: { bg: "bg-[#f54900]/10", text: "text-[#f54900]" },
+  paid: { bg: "bg-[#009689]/10", text: "text-[#009689]" },
+  refunded: { bg: "bg-[#ec003f]/10", text: "text-[#ec003f]" },
+  cancelled: { bg: "bg-muted", text: "text-muted-foreground" },
 };
-
-const orders: OrderRow[] = [
-    {
-      id: "SD-2026-001",
-      project: "Modernize",
-      avatar: "/images/profile/user-2.webp",
-      name: "Emily Carter",
-      role: "Project Manager",
-      status: "Processing",
-      price: "$2,499.00",
-      deadline: "Jun 14, 2026",
-    },
-    {
-      id: "SD-2026-002",
-      project: "Spike Admin",
-      avatar: "/images/profile/user-3.webp",
-      name: "Jason Miller",
-      role: "Web Developer",
-      status: "Delayed",
-      price: "$1,348.00",
-      deadline: "May 10, 2026",
-    },
-    {
-      id: "SD-2026-003",
-      project: "Material Pro",
-      avatar: "/images/profile/user-7.webp",
-      name: "Ryan Scott",
-      role: "UI/UX Designer",
-      status: "Delivered",
-      price: "$1,198.00",
-      deadline: "Jul 2, 2026",
-    },
-    {
-      id: "SD-2026-004",
-      project: "Xtreme Admin",
-      avatar: "/images/profile/user-6.webp",
-      name: "Olivia Williams",
-      role: "Frontend Developer",
-      status: "Delivered",
-      price: "$799.00",
-      deadline: "May 30, 2026",
-    },
-    {
-      id: "SD-2026-005",
-      project: "Nova Suite",
-      avatar: "/images/profile/user-4.webp",
-      name: "Lisa Park",
-      role: "Frontend Developer",
-      status: "Cancelled",
-      price: "$599.00",
-      deadline: "Jul 15, 2026",
-    },
-    {
-      id: "SD-2026-006",
-      project: "Pulse CRM",
-      avatar: "/images/profile/user-9.webp",
-      name: "David Kim",
-      role: "Backend Developer",
-      status: "Processing",
-      price: "$5,498.00",
-      deadline: "Jun 5, 2026",
-    },
-    {
-      id: "SD-2026-007",
-      project: "Vertex UI",
-      avatar: "/images/profile/user-1.webp",
-      name: "Anna Martinez",
-      role: "UI/UX Designer",
-      status: "Delivered",
-      price: "$1,199.00",
-      deadline: "Jun 18, 2026",
-    },
-  ];
 
 const getInitials = (name: string) =>
   name
@@ -98,8 +27,21 @@ const getInitials = (name: string) =>
     .join("")
     .toUpperCase();
 
-export default function ProjectsOrders() {
+export default function ProjectsOrders({ orders }: { orders: RecentOrder[] }) {
   const t = useTranslations("dashboard.orders");
+  const locale = useLocale();
+  const money = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  });
+  const dateTime = new Intl.DateTimeFormat(locale, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   return (
     <DashboardCard className="flex flex-col gap-0!">
@@ -107,133 +49,114 @@ export default function ProjectsOrders() {
       <CardHeader className="border-b border-border">
         <CardTitle className="flex items-center gap-2">
           <BriefcaseBusiness size={16} className="text-foreground" />
-          <span>
-            {t("title")}
-          </span>
+          <span>{t("title")}</span>
         </CardTitle>
       </CardHeader>
 
       {/* Table */}
       <CardContent className="px-0!">
-        <SimpleBar>
-          <div className="overflow-x-auto">
-            <div className="min-w-[820px]">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-border">
-                    <TableHead className="pl-4! px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[160px]">
-                      <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        {t("columns.project")}
-                        <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground">
-                      <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        {t("columns.item")}
-                        <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[130px]">
-                      <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        {t("columns.status")}
-                        <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[120px]">
-                      <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        {t("columns.price")}
-                        <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[130px]">
-                      <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        {t("columns.deadline")}
-                        <ArrowDownUp size={14} className="text-muted-foreground shrink-0" />
-                      </div>
-                    </TableHead>
-                    <TableHead className="pr-4! px-2 py-3 h-auto w-[48px]" />
-                  </TableRow>
-                </TableHeader>
+        <div className="overflow-x-auto">
+          <div className="min-w-[820px]">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-border">
+                  <TableHead className="pl-4! px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[170px]">
+                    {t("columns.order")}
+                  </TableHead>
+                  <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground">
+                    {t("columns.customer")}
+                  </TableHead>
+                  <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[130px]">
+                    {t("columns.status")}
+                  </TableHead>
+                  <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[120px]">
+                    {t("columns.amount")}
+                  </TableHead>
+                  <TableHead className="px-4 py-3 h-auto text-sm font-normal text-muted-foreground w-[150px]">
+                    {t("columns.createdAt")}
+                  </TableHead>
+                  <TableHead className="pr-4! px-2 py-3 h-auto w-[48px]" />
+                </TableRow>
+              </TableHeader>
 
-                <TableBody>
-                  {orders.map((order) => {
-                    const { bg, text } = statusConfig[order.status];
-                    return (
-                      <TableRow
-                        key={order.id}
-                        className="border-border hover:bg-muted/30"
-                      >
-                        {/* Project */}
-                        <TableCell className="pl-4! px-4 py-3 w-[160px]">
+              <TableBody>
+                {orders.length === 0 && (
+                  <TableRow className="border-border">
+                    <TableCell colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                      {t("empty")}
+                    </TableCell>
+                  </TableRow>
+                )}
+                {orders.map((order) => {
+                  const { bg, text } = statusConfig[order.status];
+                  return (
+                    <TableRow key={order.id} className="border-border hover:bg-muted/30">
+                      {/* Order number */}
+                      <TableCell className="pl-4! px-4 py-3 w-[170px]">
+                        <span className="text-sm font-medium text-foreground whitespace-nowrap">
+                          {order.number}
+                        </span>
+                      </TableCell>
+
+                      {/* Customer */}
+                      <TableCell className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-[30px] w-[30px] shrink-0">
+                            <AvatarFallback>{getInitials(order.customerName)}</AvatarFallback>
+                          </Avatar>
                           <div className="flex flex-col leading-5">
                             <span className="text-sm font-medium text-foreground whitespace-nowrap">
-                              {order.id}
+                              {order.customerName}
                             </span>
                             <span className="text-sm font-normal text-muted-foreground whitespace-nowrap">
-                              {order.project}
+                              {order.customerEmail}
                             </span>
                           </div>
-                        </TableCell>
+                        </div>
+                      </TableCell>
 
-                        {/* Item */}
-                        <TableCell className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-[30px] w-[30px] shrink-0">
-                              <AvatarImage src={order.avatar} alt={order.name} />
-                              <AvatarFallback>{getInitials(order.name)}</AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col leading-5">
-                              <span className="text-sm font-medium text-foreground whitespace-nowrap">
-                                {order.name}
-                              </span>
-                              <span className="text-sm font-normal text-muted-foreground whitespace-nowrap">
-                                {order.role}
-                              </span>
-                            </div>
-                          </div>
-                        </TableCell>
+                      {/* Status */}
+                      <TableCell className="px-4 py-3 w-[130px]">
+                        <span
+                          className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-normal whitespace-nowrap ${bg} ${text}`}
+                        >
+                          {t(`status.${order.status}`)}
+                        </span>
+                      </TableCell>
 
-                        {/* Status */}
-                        <TableCell className="px-4 py-3 w-[130px]">
-                          <span
-                            className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-normal whitespace-nowrap ${bg} ${text}`}
-                          >
-                            {t(`status.${order.status.toLowerCase() as Lowercase<StatusKey>}`)}
-                          </span>
-                        </TableCell>
+                      {/* Amount */}
+                      <TableCell className="px-4 py-3 w-[120px]">
+                        <span className="text-sm font-normal text-muted-foreground whitespace-nowrap">
+                          {money.format(order.amount)}
+                        </span>
+                      </TableCell>
 
-                        {/* Price */}
-                        <TableCell className="px-4 py-3 w-[120px]">
-                          <span className="text-sm font-normal text-muted-foreground whitespace-nowrap">
-                            {order.price}
-                          </span>
-                        </TableCell>
+                      {/* Created at */}
+                      <TableCell className="px-4 py-3 w-[150px]">
+                        <span className="text-sm font-normal text-muted-foreground whitespace-nowrap">
+                          {dateTime.format(new Date(order.createdAt))}
+                        </span>
+                      </TableCell>
 
-                        {/* Deadline */}
-                        <TableCell className="px-4 py-3 w-[130px]">
-                          <span className="text-sm font-normal text-muted-foreground whitespace-nowrap">
-                            {order.deadline}
-                          </span>
-                        </TableCell>
-
-                        {/* Actions */}
-                        <TableCell className="pr-4! px-2 py-3 w-[48px]">
-                          <Button
-                            variant="ghost"
-                            className="p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                            aria-label={t("moreOptions")}
-                          >
-                            <Ellipsis size={16} className="text-foreground" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                      {/* Actions */}
+                      <TableCell className="pr-4! px-2 py-3 w-[48px]">
+                        <Button
+                          asChild
+                          variant="ghost"
+                          className="p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                        >
+                          <Link href="/orders" aria-label={t("viewAll")}>
+                            <ArrowUpRight size={16} className="text-foreground" />
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
-        </SimpleBar>
+        </div>
       </CardContent>
     </DashboardCard>
   );

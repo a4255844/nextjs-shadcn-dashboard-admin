@@ -308,50 +308,53 @@
     },
     "banner": {
       "update": "Actualización",
-      "text": "Los ingresos por ventas aumentaron un <highlight>40%</highlight> en 1 semana",
+      "text": "Los ingresos cambiaron un <highlight>{value}</highlight> respecto al periodo anterior",
       "cta": "Ver estadísticas"
     },
     "stats": {
-      "weeklySales": "Ventas semanales",
-      "newUsers": "Nuevos usuarios",
-      "purchaseOrders": "Órdenes de compra",
+      "revenue": "Ingresos",
+      "newCustomers": "Nuevos clientes",
+      "pendingOrders": "Pedidos pendientes",
       "cta": "Ver estadísticas"
     },
     "sales": {
       "title": "Resumen de ventas",
       "totalLabel": "Ventas totales",
-      "vsLastMonth": "vs. el mes pasado",
+      "vsPrevious": "vs. periodo anterior",
       "periods": {
         "d30": "Últimos 30 días",
         "d7": "Últimos 7 días",
         "d90": "Últimos 90 días"
       },
       "series": {
-        "newUser": "Usuario nuevo",
-        "existingUser": "Usuario existente"
+        "paid": "Pagado",
+        "unpaid": "Pendiente"
       }
     },
     "assets": {
-      "title": "Activos totales",
-      "employees": "Empleados",
-      "projects": "Proyectos",
-      "clients": "Clientes",
-      "events": "Eventos"
+      "title": "Segmentos de clientes",
+      "items": {
+        "active": "Activos",
+        "vip": "VIP",
+        "atRisk": "En riesgo",
+        "inactive": "Inactivos"
+      }
     },
     "orders": {
-      "title": "Proyectos y pedidos",
-      "moreOptions": "Más opciones",
+      "title": "Pedidos recientes",
+      "viewAll": "Ver todos los pedidos",
+      "empty": "Aún no hay pedidos",
       "columns": {
-        "project": "Proyecto",
-        "item": "Elemento",
+        "order": "Pedido",
+        "customer": "Cliente",
         "status": "Estado",
-        "price": "Precio",
-        "deadline": "Fecha límite"
+        "amount": "Importe",
+        "createdAt": "Creado el"
       },
       "status": {
-        "processing": "Procesando",
-        "delayed": "Retrasado",
-        "delivered": "Entregado",
+        "pending": "Pendiente",
+        "paid": "Pagado",
+        "refunded": "Reembolsado",
         "cancelled": "Cancelado"
       }
     }

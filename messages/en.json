@@ -308,50 +308,53 @@
     },
     "banner": {
       "update": "Update",
-      "text": "Sales revenue increased <highlight>40%</highlight> in 1 week",
+      "text": "Revenue changed by <highlight>{value}</highlight> vs previous period",
       "cta": "See Statistics"
     },
     "stats": {
-      "weeklySales": "Weekly sales",
-      "newUsers": "New users",
-      "purchaseOrders": "Purchase Orders",
+      "revenue": "Revenue",
+      "newCustomers": "New customers",
+      "pendingOrders": "Pending orders",
       "cta": "See Statistics"
     },
     "sales": {
       "title": "Sales Overview",
       "totalLabel": "Total Sales",
-      "vsLastMonth": "vs last month",
+      "vsPrevious": "vs previous period",
       "periods": {
         "d30": "Last 30 Days",
         "d7": "Last 7 Days",
         "d90": "Last 90 Days"
       },
       "series": {
-        "newUser": "New User",
-        "existingUser": "Existing User"
+        "paid": "Paid",
+        "unpaid": "Pending"
       }
     },
     "assets": {
-      "title": "Total Assets",
-      "employees": "Employees",
-      "projects": "Projects",
-      "clients": "Clients",
-      "events": "Events"
+      "title": "Customer Segments",
+      "items": {
+        "active": "Active",
+        "vip": "VIP",
+        "atRisk": "At Risk",
+        "inactive": "Inactive"
+      }
     },
     "orders": {
-      "title": "Projects & Orders",
-      "moreOptions": "More options",
+      "title": "Recent Orders",
+      "viewAll": "View all orders",
+      "empty": "No orders yet",
       "columns": {
-        "project": "Project",
-        "item": "Item",
+        "order": "Order",
+        "customer": "Customer",
         "status": "Status",
-        "price": "Price",
-        "deadline": "Deadline"
+        "amount": "Amount",
+        "createdAt": "Created At"
       },
       "status": {
-        "processing": "Processing",
-        "delayed": "Delayed",
-        "delivered": "Delivered",
+        "pending": "Pending",
+        "paid": "Paid",
+        "refunded": "Refunded",
         "cancelled": "Cancelled"
       }
     }

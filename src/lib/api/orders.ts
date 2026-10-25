@@ -59,12 +59,12 @@ export async function getOrders(orgId: string): Promise<OrderRow[]> {
   return data.map(toOrderRow);
 }
 
-// PostgREST 单次 select 默认最多 1000 行，导出需要按 range 分批拉取
+// PostgREST 单次 select 默认最多 1000 行，全量读取需要按 range 分批拉取
 const EXPORT_PAGE_SIZE = 1000;
 
-// 导出专用：分页拉全量，绕过 1000 行上限。
-// ids 为 null 表示导出全部；传数组时直接按 id 过滤，避免先拉全表再内存筛选。
-export async function getOrdersForExport(
+// 全量读取（CSV 导出与仪表盘统计共用），分页拉取绕过 1000 行上限。
+// ids 为 null 表示不按 id 过滤。
+export async function getAllOrders(
   orgId: string,
   ids: string[] | null,
 ): Promise<OrderRow[]> {

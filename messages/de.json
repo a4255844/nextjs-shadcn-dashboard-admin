@@ -308,50 +308,53 @@
     },
     "banner": {
       "update": "Aktualisierung",
-      "text": "Der Umsatz ist in 1 Woche um <highlight>40%</highlight> gestiegen",
+      "text": "Der Umsatz hat sich gegenüber dem vorherigen Zeitraum um <highlight>{value}</highlight> verändert",
       "cta": "Statistiken ansehen"
     },
     "stats": {
-      "weeklySales": "Wöchentliche Verkäufe",
-      "newUsers": "Neue Nutzer",
-      "purchaseOrders": "Bestellungen",
+      "revenue": "Umsatz",
+      "newCustomers": "Neue Kunden",
+      "pendingOrders": "Offene Bestellungen",
       "cta": "Statistiken ansehen"
     },
     "sales": {
       "title": "Verkaufsübersicht",
       "totalLabel": "Gesamtumsatz",
-      "vsLastMonth": "gegenüber Vormonat",
+      "vsPrevious": "gegenüber vorherigem Zeitraum",
       "periods": {
         "d30": "Letzte 30 Tage",
         "d7": "Letzte 7 Tage",
         "d90": "Letzte 90 Tage"
       },
       "series": {
-        "newUser": "Neue Nutzer",
-        "existingUser": "Bestandsnutzer"
+        "paid": "Bezahlt",
+        "unpaid": "Ausstehend"
       }
     },
     "assets": {
-      "title": "Gesamtbestand",
-      "employees": "Mitarbeiter",
-      "projects": "Projekte",
-      "clients": "Kunden",
-      "events": "Ereignisse"
+      "title": "Kundensegmente",
+      "items": {
+        "active": "Aktiv",
+        "vip": "VIP",
+        "atRisk": "Gefährdet",
+        "inactive": "Inaktiv"
+      }
     },
     "orders": {
-      "title": "Projekte & Bestellungen",
-      "moreOptions": "Weitere Optionen",
+      "title": "Letzte Bestellungen",
+      "viewAll": "Alle Bestellungen ansehen",
+      "empty": "Noch keine Bestellungen",
       "columns": {
-        "project": "Projekt",
-        "item": "Eintrag",
+        "order": "Bestellung",
+        "customer": "Kunde",
         "status": "Status",
-        "price": "Preis",
-        "deadline": "Frist"
+        "amount": "Betrag",
+        "createdAt": "Erstellt am"
       },
       "status": {
-        "processing": "In Bearbeitung",
-        "delayed": "Verzögert",
-        "delivered": "Geliefert",
+        "pending": "Ausstehend",
+        "paid": "Bezahlt",
+        "refunded": "Erstattet",
         "cancelled": "Storniert"
       }
     }

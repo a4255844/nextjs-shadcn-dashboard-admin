@@ -308,50 +308,53 @@
     },
     "banner": {
       "update": "更新",
-      "text": "销售额在一周内增长了 <highlight>40%</highlight>",
+      "text": "本期收入较上一周期变化 <highlight>{value}</highlight>",
       "cta": "查看统计"
     },
     "stats": {
-      "weeklySales": "每周销售额",
-      "newUsers": "新用户",
-      "purchaseOrders": "采购订单",
+      "revenue": "收入",
+      "newCustomers": "新增客户",
+      "pendingOrders": "待处理订单",
       "cta": "查看统计"
     },
     "sales": {
       "title": "销售概览",
       "totalLabel": "总销售额",
-      "vsLastMonth": "较上月",
+      "vsPrevious": "较上一周期",
       "periods": {
         "d30": "近 30 天",
         "d7": "近 7 天",
         "d90": "近 90 天"
       },
       "series": {
-        "newUser": "新用户",
-        "existingUser": "老用户"
+        "paid": "已支付",
+        "unpaid": "待支付"
       }
     },
     "assets": {
-      "title": "总资产",
-      "employees": "员工",
-      "projects": "项目",
-      "clients": "客户",
-      "events": "活动"
+      "title": "客户分群",
+      "items": {
+        "active": "活跃",
+        "vip": "高价值",
+        "atRisk": "流失风险",
+        "inactive": "不活跃"
+      }
     },
     "orders": {
-      "title": "项目与订单",
-      "moreOptions": "更多操作",
+      "title": "最近订单",
+      "viewAll": "查看全部订单",
+      "empty": "暂无订单",
       "columns": {
-        "project": "项目",
-        "item": "成员",
+        "order": "订单号",
+        "customer": "客户",
         "status": "状态",
-        "price": "价格",
-        "deadline": "截止日期"
+        "amount": "金额",
+        "createdAt": "下单时间"
       },
       "status": {
-        "processing": "进行中",
-        "delayed": "已延迟",
-        "delivered": "已交付",
+        "pending": "待处理",
+        "paid": "已支付",
+        "refunded": "已退款",
         "cancelled": "已取消"
       }
     }

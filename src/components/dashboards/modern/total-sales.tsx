@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { TrendingUp } from "lucide-react";
-import { Line, LineChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
+import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -20,104 +20,39 @@ import {
 } from "@/components/ui/select";
 import type {
   AnimatedTooltipContentProps,
-  SalesDataPoint,
+  SalesPeriodKey,
+  SalesSeriesMap,
 } from "./types";
 
-// 数据 key 与展示文案解耦：周期用稳定 key，展示时再翻译
-type PeriodKey = "d30" | "d7" | "d90";
-
-const allChartData: Record<PeriodKey, SalesDataPoint[]> = {
-  d30: [
-    { date: "Mar 30", newUser: 12, existingUser: 20 },
-    { date: "Apr 1", newUser: 18, existingUser: 25 },
-    { date: "Apr 2", newUser: 14, existingUser: 22 },
-    { date: "Apr 4", newUser: 22, existingUser: 30 },
-    { date: "Apr 5", newUser: 16, existingUser: 18 },
-    { date: "Apr 7", newUser: 20, existingUser: 24 },
-    { date: "Apr 9", newUser: 18, existingUser: 32 },
-    { date: "Apr 11", newUser: 26, existingUser: 22 },
-    { date: "Apr 12", newUser: 20, existingUser: 26 },
-    { date: "Apr 14", newUser: 30, existingUser: 20 },
-    { date: "Apr 15", newUser: 22, existingUser: 28 },
-    { date: "Apr 17", newUser: 26, existingUser: 22 },
-    { date: "Apr 19", newUser: 28, existingUser: 18 },
-    { date: "Apr 20", newUser: 24, existingUser: 24 },
-    { date: "Apr 22", newUser: 38, existingUser: 18 },
-    { date: "Apr 23", newUser: 22, existingUser: 26 },
-    { date: "Apr 24", newUser: 20, existingUser: 22 },
-    { date: "Apr 26", newUser: 24, existingUser: 20 },
-    { date: "Apr 27", newUser: 18, existingUser: 24 },
-    { date: "Apr 29", newUser: 22, existingUser: 20 },
-    { date: "May 1", newUser: 20, existingUser: 18 },
-    { date: "May 4", newUser: 24, existingUser: 22 },
-  ],
-  d7: [
-    { date: "Apr 28", newUser: 18, existingUser: 22 },
-    { date: "Apr 29", newUser: 22, existingUser: 20 },
-    { date: "Apr 30", newUser: 20, existingUser: 28 },
-    { date: "May 1", newUser: 30, existingUser: 18 },
-    { date: "May 2", newUser: 24, existingUser: 26 },
-    { date: "May 3", newUser: 32, existingUser: 20 },
-    { date: "May 4", newUser: 22, existingUser: 28 },
-  ],
-  d90: [
-    { date: "Feb 1", newUser: 14, existingUser: 22 },
-    { date: "Feb 15", newUser: 20, existingUser: 28 },
-    { date: "Mar 1", newUser: 18, existingUser: 24 },
-    { date: "Mar 15", newUser: 26, existingUser: 20 },
-    { date: "Mar 30", newUser: 22, existingUser: 30 },
-    { date: "Apr 14", newUser: 32, existingUser: 22 },
-    { date: "Apr 22", newUser: 38, existingUser: 18 },
-    { date: "Apr 29", newUser: 24, existingUser: 26 },
-    { date: "May 4", newUser: 28, existingUser: 20 },
-  ],
-};
-
-const xAxisLabels: Record<PeriodKey, Set<string>> = {
-  d30: new Set(["Mar 30", "Apr 4", "Apr 9", "Apr 14", "Apr 19", "Apr 24", "Apr 29", "May 4"]),
-  d7: new Set(["Apr 28", "Apr 29", "Apr 30", "May 1", "May 2", "May 3", "May 4"]),
-  d90: new Set(["Feb 1", "Feb 15", "Mar 1", "Mar 15", "Mar 30", "Apr 14", "Apr 29", "May 4"]),
-};
-
 const chartConfig = {
-  newUser: { label: "New User", color: "var(--color-primary)" },
-  existingUser: { label: "Existing User", color: "color-mix(in srgb, var(--primary) 60%, transparent)" },
+  paid: { label: "Paid", color: "var(--color-primary)" },
+  unpaid: { label: "Pending", color: "color-mix(in srgb, var(--primary) 60%, transparent)" },
 } satisfies ChartConfig;
 
-const periodOptions: PeriodKey[] = ["d30", "d7", "d90"];
+const periodOptions: SalesPeriodKey[] = ["d30", "d7", "d90"];
 
-function useAnimatedNumber(target: number, duration = 450) {
-  const [display, setDisplay] = useState(0);
-  const currentRef = useRef(0);
-  const rafRef = useRef<number>(0);
-  useEffect(() => {
-    cancelAnimationFrame(rafRef.current);
-    const from = currentRef.current;
-    const diff = target - from;
-    if (diff === 0) return;
-    const startTime = performance.now();
-    const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const next = Math.round(from + diff * eased);
-      currentRef.current = next;
-      setDisplay(next);
-      if (progress < 1) { rafRef.current = requestAnimationFrame(tick); }
-      else { currentRef.current = target; setDisplay(target); }
-    };
-    rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [target, duration]);
-  return display;
+// 服务端按天给出 YYYY-MM-DD（服务器时区），客户端按 locale 格式化
+function parseDayKey(v: string): Date {
+  return new Date(`${v}T00:00:00`);
 }
 
-function AnimatedValue({ value }: { value: number }) {
-  const animated = useAnimatedNumber(value);
-  return <>{animated.toLocaleString()}</>;
-}
+function AnimatedTooltipContent({
+  active,
+  payload,
+  label,
+  hideLabel = false,
+  config,
+  locale,
+}: AnimatedTooltipContentProps) {
+  const money = useMemo(
+    () => new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }),
+    [locale],
+  );
 
-function AnimatedTooltipContent({ active, payload, label, hideLabel = false, config }: AnimatedTooltipContentProps) {
   if (!active || !payload?.length) return null;
   const items = payload.filter((item) => item.type !== "none" && item.value !== undefined);
   if (!items.length) return null;
@@ -130,7 +65,7 @@ function AnimatedTooltipContent({ active, payload, label, hideLabel = false, con
             <div className="h-2.5 w-2.5 shrink-0 rounded-[2px]" style={{ backgroundColor: item.color }} />
             <span className="text-muted-foreground">{config?.[item.dataKey ?? ""]?.label ?? item.name}</span>
             <span className="ml-auto font-mono font-medium tabular-nums text-foreground">
-              <AnimatedValue value={item.value as number} />
+              {money.format(item.value ?? 0)}
             </span>
           </div>
         ))}
@@ -139,18 +74,49 @@ function AnimatedTooltipContent({ active, payload, label, hideLabel = false, con
   );
 }
 
-export default function TotalSales() {
+export default function TotalSales({ series }: { series: SalesSeriesMap }) {
   const t = useTranslations("dashboard.sales");
-  const [period, setPeriod] = useState<PeriodKey>(periodOptions[0]);
+  const locale = useLocale();
+  const [period, setPeriod] = useState<SalesPeriodKey>(periodOptions[0]);
 
   // chartConfig 的 label 需要翻译，挂在组件内随 locale 重建
   const localizedConfig = {
-    newUser: { ...chartConfig.newUser, label: t("series.newUser") },
-    existingUser: { ...chartConfig.existingUser, label: t("series.existingUser") },
+    paid: { ...chartConfig.paid, label: t("series.paid") },
+    unpaid: { ...chartConfig.unpaid, label: t("series.unpaid") },
   } satisfies ChartConfig;
 
-  const chartData = allChartData[period];
-  const visibleLabels = xAxisLabels[period];
+  const money = useMemo(
+    () => new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }),
+    [locale],
+  );
+  const compactMoney = useMemo(
+    () => new Intl.NumberFormat(locale, {
+      notation: "compact",
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 1,
+    }),
+    [locale],
+  );
+  const dayLabel = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }),
+    [locale],
+  );
+
+  const active = series[period];
+  const chartData = active.points.map((p) => ({
+    ...p,
+    label: dayLabel.format(parseDayKey(p.date)),
+  }));
+  const deltaPct =
+    active.previousTotal > 0
+      ? Math.round(((active.total - active.previousTotal) / active.previousTotal) * 100)
+      : null;
+  const tickInterval = Math.max(Math.ceil(chartData.length / 7) - 1, 0);
 
   return (
     <DashboardCard className="flex flex-col gap-0!">
@@ -169,14 +135,20 @@ export default function TotalSales() {
             <span className="text-base font-normal text-foreground leading-6">{t("totalLabel")}</span>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-2xl font-semibold tracking-[-0.3px] text-foreground leading-8">
-                $12,450.00
+                {money.format(active.total)}
               </span>
-              <span className="text-sm font-medium text-chart-2">+22%</span>
-              <span className="text-sm font-normal text-muted-foreground">{t("vsLastMonth")}</span>
+              {deltaPct !== null && (
+                <>
+                  <span className={`text-sm font-medium ${deltaPct >= 0 ? "text-chart-2" : "text-destructive"}`}>
+                    {deltaPct >= 0 ? "+" : ""}{deltaPct}%
+                  </span>
+                  <span className="text-sm font-normal text-muted-foreground">{t("vsPrevious")}</span>
+                </>
+              )}
             </div>
           </div>
 
-          <Select value={period} onValueChange={(v) => v && setPeriod(v as PeriodKey)}>
+          <Select value={period} onValueChange={(v) => v && setPeriod(v as SalesPeriodKey)}>
             <SelectTrigger className="h-auto! w-fit text-sm font-medium text-foreground border-border shadow-[0px_1px_2px_rgba(0,0,0,0.05)] cursor-pointer gap-1.5 px-3">
               <SelectValue />
             </SelectTrigger>
@@ -207,22 +179,21 @@ export default function TotalSales() {
               strokeDasharray="4 4"
             />
             <XAxis
-              dataKey="date"
+              dataKey="label"
               tickLine={false}
               axisLine={false}
               tickMargin={10}
-              interval={0}
+              interval={tickInterval}
               tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-              tickFormatter={(v) => (visibleLabels.has(v) ? v : "")}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={4}
               tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-              ticks={[0, 10, 20, 30, 40]}
-              domain={[0, 40]}
-              tickFormatter={(v) => (v === 0 ? "0" : `${v}k`)}
+              domain={[0, "auto"]}
+              allowDecimals={false}
+              tickFormatter={(v: number) => (v === 0 ? "0" : compactMoney.format(v))}
             />
             <ChartTooltip
               cursor={{
@@ -230,17 +201,11 @@ export default function TotalSales() {
                 strokeWidth: 1,
                 strokeDasharray: "4 4",
               }}
-              content={<AnimatedTooltipContent config={localizedConfig} />}
+              content={<AnimatedTooltipContent config={localizedConfig} locale={locale} />}
             />
-            <ReferenceLine
-              x="Apr 22"
-              stroke="var(--border)"
-              strokeWidth={1}
-              strokeDasharray="4 4"
-            />
-            {/* New User — solid primary */}
+            {/* 已支付收入 — 实线主色 */}
             <Line
-              dataKey="newUser"
+              dataKey="paid"
               type="linear"
               stroke="var(--color-primary)"
               strokeWidth={1.5}
@@ -251,9 +216,9 @@ export default function TotalSales() {
               animationDuration={700}
               animationEasing="ease-out"
             />
-            {/* Existing User — dashed muted */}
+            {/* 待支付金额 — 虚线弱化 */}
             <Line
-              dataKey="existingUser"
+              dataKey="unpaid"
               type="linear"
               stroke="color-mix(in srgb, var(--primary) 60%, transparent)"
               strokeWidth={1.5}

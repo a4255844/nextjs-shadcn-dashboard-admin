@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOrdersForExport } from "@/lib/api/orders";
+import { getAllOrders } from "@/lib/api/orders";
 import { ORDERS_CSV_HEADERS, csvTimestamp, encodeCsv, formatCsvDate } from "@/lib/csv";
 
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       mode === "selected" && idsParam
         ? idsParam.split(",").filter((id) => id !== "")
         : null;
-    const rows = await getOrdersForExport(orgId, ids);
+    const rows = await getAllOrders(orgId, ids);
 
     const csv = encodeCsv([...ORDERS_CSV_HEADERS], rows.map((o) => [
       o.number,

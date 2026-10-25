@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCustomersForExport } from "@/lib/api/customers";
+import { getAllCustomers } from "@/lib/api/customers";
 import { parseStatus } from "@/components/dashboards/customers/types";
 import { CUSTOMERS_CSV_HEADERS, csvTimestamp, encodeCsv, formatCsvDate } from "@/lib/csv";
 
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       mode === "selected" && idsParam
         ? idsParam.split(",").filter((id) => id !== "")
         : null;
-    const rows = await getCustomersForExport(orgId, ids, status);
+    const rows = await getAllCustomers(orgId, ids, status);
 
     const csv = encodeCsv([...CUSTOMERS_CSV_HEADERS], rows.map((c) => [
       c.name,
