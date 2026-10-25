@@ -17,11 +17,18 @@ import {
 import { NavUser } from './NavUser';
 import { Button } from "@/components/ui/button";
 import { useCustomizer } from "@/components/customizer/customizer-context";
-import sidebaritems from './sidebaritems';
+import { filterSidebarItems } from './sidebaritems';
+import type { PermissionKey } from "@/lib/permissions";
 
-const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+interface SidebarLayoutProps extends React.ComponentProps<typeof Sidebar> {
+  /** 当前组织权限集合（服务端注入）；undefined = 未取到组织，不做过滤 */
+  permissions?: readonly PermissionKey[];
+}
+
+const SidebarLayout = ({ permissions, ...props }: SidebarLayoutProps) => {
   const { toggleSidebar } = useSidebar();
   const { resolvedDirection } = useCustomizer();
+  const menu = filterSidebarItems(permissions ?? undefined);
 
   return (
     <Sidebar
@@ -50,7 +57,7 @@ const SidebarLayout = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
         <SimpleBar style={{ height: "100%" }}>
           <SidebarGroup className="flex items-center justify-center group-data-[state=collapsed]:px-2 px-3 py-4">
             <div className="px-0 group-data-[state=collapsed]:px-0 w-full flex flex-col gap-4">
-              <NavCollapse menu={sidebaritems} className="text-sm" />
+              <NavCollapse menu={menu} className="text-sm" />
             </div>
           </SidebarGroup>
         </SimpleBar>

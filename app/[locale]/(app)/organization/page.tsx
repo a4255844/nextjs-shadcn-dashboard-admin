@@ -1,11 +1,15 @@
 import { getTranslations } from "next-intl/server";
 import MembersTable from "@/components/orgs/MembersTable";
 import InviteCard from "@/components/orgs/InviteCard";
+import RolesPanel from "@/components/orgs/RolesPanel";
 import LeaveOrgButton from "@/components/orgs/LeaveOrgButton";
 import NoOrgState from "@/components/orgs/NoOrgState";
 import { getActiveOrg } from "@/lib/api/organizations";
 import { getActiveInvite, listOrgMembers } from "@/lib/api/members";
+import { listOrgRoles } from "@/lib/api/roles";
 import { getCurrentUser } from "@/lib/api/auth";
+import { hasPermission } from "@/lib/permissions";
+import { requirePermission } from "@/lib/route-guard";
 
 const page = async () => {
   const t = await getTranslations("orgs.page");
@@ -16,13 +20,17 @@ const page = async () => {
     return <NoOrgState />;
   }
 
-  const isAdmin = org.role === "admin";
+  await requirePermission(org.permissions, "members.browse");
 
-  // 邀请状态仅 admin 可查（rpc 门控），非 admin 不发这次查询
-  const [user, members, invite] = await Promise.all([
+  const canManage = hasPermission(org.permissions, "members.manage");
+  const canInvite = hasPermission(org.permissions, "members.invite");
+
+  // 邀请状态仅 members.invite 持有者可查（rpc 门控），否则不发这次查询
+  const [user, roles, members, invite] = await Promise.all([
     getCurrentUser(),
+    listOrgRoles(org.id),
     listOrgMembers(org.id),
-    isAdmin ? getActiveInvite(org.id) : Promise.resolve(null),
+    canInvite ? getActiveInvite(org.id) : Promise.resolve(null),
   ]);
 
   // proxy 已保证登录，此处纯类型兜底
@@ -30,8 +38,19 @@ const page = async () => {
     return <NoOrgState />;
   }
 
-  // 退出组织的教育性提示用；真正的 last_admin 保护在 RPC 内
-  const adminCount = members.filter((m) => m.role === "admin").length;
+  // 持有 members.manage 的成员数（角色权限或额外权限）：last_admin 保护要求至少保留一名；
+  // 真正的拦截在 RPC 内，这里只做退出前的教育性提示
+  const manageRoleIds = new Set(
+    roles
+      .filter((r) => r.permissions.includes("members.manage"))
+      .map((r) => r.id),
+  );
+  const manageCount = members.filter(
+    (m) =>
+      manageRoleIds.has(m.roleId) ||
+      m.extraPermissions.includes("members.manage"),
+  ).length;
+  const isLastAdmin = canManage && manageCount === 1;
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,20 +59,25 @@ const page = async () => {
         <p className="text-sm text-muted-foreground">{t("description")}</p>
       </div>
 
+      <RolesPanel orgId={org.id} roles={roles} canManage={canManage} />
+
       <MembersTable
         rows={members}
+        roles={roles}
         orgId={org.id}
         currentUserId={user.id}
-        isAdmin={isAdmin}
+        canManage={canManage}
       />
 
-      {isAdmin && <InviteCard orgId={org.id} invite={invite} />}
+      {canInvite && (
+        <InviteCard orgId={org.id} roles={roles} invite={invite} />
+      )}
 
       <LeaveOrgButton
         orgId={org.id}
         orgName={org.name}
         currentUserId={user.id}
-        isLastAdmin={isAdmin && adminCount === 1}
+        isLastAdmin={isLastAdmin}
       />
     </div>
   );

@@ -40,8 +40,8 @@ export default function RemoveMemberDialog({
     switch (code) {
       case "last_admin":
         return tErrors("lastAdmin");
-      case "not_admin":
-        return tErrors("notAdmin");
+      case "not_allowed":
+        return tErrors("notAllowed");
       case "not_member":
         return tErrors("notMember");
       case "auth_required":

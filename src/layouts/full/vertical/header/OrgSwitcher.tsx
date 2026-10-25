@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import type { OrgSummary } from "@/lib/api/organizations";
+import type { OrgRole } from "@/lib/api/roles";
 import { setActiveOrganization } from "@/lib/actions/organizations";
 import CreateOrgDialog from "@/components/orgs/CreateOrgDialog";
 import InviteDialog from "@/components/orgs/InviteDialog";
@@ -27,6 +28,8 @@ import InviteDialog from "@/components/orgs/InviteDialog";
 interface OrgSwitcherProps {
   orgs: OrgSummary[];
   activeOrg: OrgSummary | null;
+  /** 当前组织角色列表（邀请弹窗选择加入角色；无邀请权限时为空数组） */
+  roles: OrgRole[];
 }
 
 /**
@@ -34,11 +37,16 @@ interface OrgSwitcherProps {
  * orgs/activeOrg 由 (app)/layout.tsx 服务端取数传入（Header 是 client 组件）；
  * role 由服务端算好，客户端只做展示门控。
  */
-export default function OrgSwitcher({ orgs, activeOrg }: OrgSwitcherProps) {
+export default function OrgSwitcher({
+  orgs,
+  activeOrg,
+  roles,
+}: OrgSwitcherProps) {
   const t = useTranslations("orgs");
   const [isPending, startTransition] = useTransition();
   const [createOpen, setCreateOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const canInvite = activeOrg?.permissions.includes("members.invite") ?? false;
 
   // Radix 事件纪律：菜单关闭落定后再开 Dialog，避免关闭动画与
   // Dialog 焦点管理冲突（与 LocaleSwitch 的 50ms 延迟导航同理）
@@ -90,7 +98,7 @@ export default function OrgSwitcher({ orgs, activeOrg }: OrgSwitcherProps) {
                   className="gap-2"
                 >
                   <span className="truncate">{org.name}</span>
-                  {org.role === "admin" && (
+                  {org.isAdmin && (
                     <CircleCheck className="ms-auto size-3.5 shrink-0 text-muted-foreground" />
                   )}
                 </DropdownMenuRadioItem>
@@ -104,7 +112,7 @@ export default function OrgSwitcher({ orgs, activeOrg }: OrgSwitcherProps) {
             <Plus className="size-4" />
             {t("create.title")}
           </DropdownMenuItem>
-          {activeOrg?.role === "admin" && (
+          {canInvite && (
             <DropdownMenuItem
               onSelect={() => openDialogAfterMenuClose(setInviteOpen)}
             >
@@ -116,11 +124,12 @@ export default function OrgSwitcher({ orgs, activeOrg }: OrgSwitcherProps) {
       </DropdownMenu>
 
       <CreateOrgDialog open={createOpen} onOpenChange={setCreateOpen} />
-      {activeOrg !== null && (
+      {activeOrg !== null && canInvite && (
         <InviteDialog
           open={inviteOpen}
           onOpenChange={setInviteOpen}
           orgId={activeOrg.id}
+          roles={roles}
         />
       )}
     </>

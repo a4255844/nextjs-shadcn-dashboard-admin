@@ -1,11 +1,16 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import { parseOrgRole, type OrgRole } from "@/lib/api/organizations";
+import { parsePermissionKeys, type PermissionKey } from "@/lib/permissions";
 
 export interface MemberRow {
   userId: string;
-  role: OrgRole;
+  roleId: string;
+  roleName: string;
+  /** 角色之外单独授予的额外权限（叠加在角色权限之上） */
+  extraPermissions: PermissionKey[];
+  /** 单独撤销的角色权限（仅对该成员生效） */
+  deniedPermissions: PermissionKey[];
   /** ISO 时间串 */
   joinedAt: string;
   /** profile 行缺失时为 ""（left join 返回 null，UI 用首字母兜底） */
@@ -17,7 +22,8 @@ export interface MemberRow {
 
 export interface ActiveInvite {
   token: string;
-  role: OrgRole;
+  roleId: string;
+  roleName: string;
   /** ISO 时间串 */
   expiresAt: string;
   createdAt: string;
@@ -35,21 +41,18 @@ export async function listOrgMembers(orgId: string): Promise<MemberRow[]> {
     throw new Error(`Failed to list org members: ${error.message}`);
   }
 
-  return data.flatMap((row) => {
-    const role = parseOrgRole(row.role);
-    if (role === null) return [];
-    return [
-      {
-        userId: row.user_id,
-        role,
-        joinedAt: row.joined_at,
-        email: row.email ?? "",
-        firstName: row.first_name,
-        lastName: row.last_name,
-        avatarUrl: row.avatar_url,
-      },
-    ];
-  });
+  return data.map((row) => ({
+    userId: row.user_id,
+    roleId: row.role_id,
+    roleName: row.role_name,
+    extraPermissions: parsePermissionKeys(row.extra_permissions),
+    deniedPermissions: parsePermissionKeys(row.denied_permissions),
+    joinedAt: row.joined_at,
+    email: row.email ?? "",
+    firstName: row.first_name,
+    lastName: row.last_name,
+    avatarUrl: row.avatar_url,
+  }));
 }
 
 /** 当前活跃邀请（单活跃链接语义，最多一行；无活跃邀请返回 null） */
@@ -69,27 +72,27 @@ export async function getActiveInvite(
   const row = data[0];
   if (row === undefined) return null;
 
-  // invites.role 有 check 约束，理论不会非法；校验失败按 member 兜底展示
   return {
     token: row.token,
-    role: parseOrgRole(row.role) ?? "member",
+    roleId: row.role_id,
+    roleName: row.role_name,
     expiresAt: row.expires_at,
     createdAt: row.created_at,
   };
 }
 
-/** 变更成员角色（rpc 内含 last_admin 保护；异常码以 Error message 抛出） */
+/** 变更成员角色（rpc 内含 members.manage 校验与 last_admin 保护） */
 export async function updateMemberRoleRpc(
   orgId: string,
   userId: string,
-  role: OrgRole,
+  roleId: string,
 ): Promise<void> {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("update_member_role", {
     p_org_id: orgId,
     p_user_id: userId,
-    p_role: role,
+    p_role_id: roleId,
   });
 
   if (error !== null) {
@@ -107,6 +110,27 @@ export async function removeMemberRpc(
   const { error } = await supabase.rpc("remove_member", {
     p_org_id: orgId,
     p_user_id: userId,
+  });
+
+  if (error !== null) {
+    throw new Error(error.message);
+  }
+}
+
+/** 覆盖式设置成员权限：额外授予 + 撤销角色权限（空数组 = 清空） */
+export async function setMemberPermissionOverridesRpc(
+  orgId: string,
+  userId: string,
+  granted: readonly PermissionKey[],
+  denied: readonly PermissionKey[],
+): Promise<void> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("set_member_permission_overrides", {
+    p_org_id: orgId,
+    p_user_id: userId,
+    p_granted: [...granted],
+    p_denied: [...denied],
   });
 
   if (error !== null) {

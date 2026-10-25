@@ -10,6 +10,7 @@ import {
   type CustomerWriteInput,
 } from "@/lib/api/customers";
 import { generateOrderNumbers, insertOrder, insertOrders } from "@/lib/api/orders";
+import { hasPermissionInOrg } from "@/lib/api/roles";
 import { parseCsv } from "@/lib/csv";
 import { z } from "zod";
 
@@ -87,6 +88,16 @@ export async function importCustomersCsv(
   orgId: string,
   formData: FormData,
 ): Promise<ImportResult> {
+  // 后端权限兜底：未授予 customers.import 的角色直接拒绝
+  if (!(await hasPermissionInOrg(orgId, "customers.import"))) {
+    return {
+      ok: false,
+      inserted: 0,
+      totalRows: 0,
+      errors: [{ row: 0, message: "forbidden" }],
+    };
+  }
+
   const file = formData.get("file");
   if (!(file instanceof File)) {
     return { ok: false, inserted: 0, totalRows: 0, errors: [{ row: 0, message: "no_file" }] };
@@ -247,6 +258,16 @@ export async function importOrdersCsv(
   orgId: string,
   formData: FormData,
 ): Promise<ImportResult> {
+  // 后端权限兜底：未授予 orders.import 的角色直接拒绝
+  if (!(await hasPermissionInOrg(orgId, "orders.import"))) {
+    return {
+      ok: false,
+      inserted: 0,
+      totalRows: 0,
+      errors: [{ row: 0, message: "forbidden" }],
+    };
+  }
+
   const file = formData.get("file");
   if (!(file instanceof File)) {
     return { ok: false, inserted: 0, totalRows: 0, errors: [{ row: 0, message: "no_file" }] };

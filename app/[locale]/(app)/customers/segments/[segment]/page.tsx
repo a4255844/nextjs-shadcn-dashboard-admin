@@ -9,6 +9,12 @@ import CustomersTable from "@/components/dashboards/customers/customers-table";
 import NoOrgState from "@/components/orgs/NoOrgState";
 import { getCustomers } from "@/lib/api/customers";
 import { getActiveOrg } from "@/lib/api/organizations";
+import {
+  CUSTOMER_SCOPE_KEYS,
+  toPermissionMap,
+  type CustomerScope,
+} from "@/lib/permissions";
+import { requirePermission } from "@/lib/route-guard";
 import type { StatusKey } from "@/components/dashboards/customers/types";
 
 // 分群直接复用客户状态（vip / atRisk）：与客户表的状态筛选是同一套语义，
@@ -18,6 +24,12 @@ type SegmentSlug = "high-value" | "at-risk";
 const SEGMENT_STATUS: Record<SegmentSlug, StatusKey> = {
   "high-value": "vip",
   "at-risk": "atRisk",
+};
+
+// 每个分群对应一组独立的菜单/按钮权限
+const SEGMENT_SCOPE: Record<SegmentSlug, CustomerScope> = {
+  "high-value": "high_value",
+  "at-risk": "at_risk",
 };
 
 // 信任边界：path 参数可能是任意字符串，校验通过后才允许收窄为 SegmentSlug
@@ -34,6 +46,7 @@ export default async function CustomerSegmentPage({
   const slug = parseSegmentSlug(segment);
   if (slug === null) notFound();
   const status = SEGMENT_STATUS[slug];
+  const scope = SEGMENT_SCOPE[slug];
 
   const t = await getTranslations("pages.customers.segments");
 
@@ -42,6 +55,8 @@ export default async function CustomerSegmentPage({
   if (org === null) {
     return <NoOrgState />;
   }
+
+  await requirePermission(org.permissions, CUSTOMER_SCOPE_KEYS[scope].browse);
 
   // 状态过滤下推到 DB：只取该分群的客户，聚合也只用这一份数据
   const rows = await getCustomers(org.id, status);
@@ -105,7 +120,8 @@ export default async function CustomerSegmentPage({
             key={org.id}
             rows={rows}
             orgId={org.id}
-            isAdmin={org.role === "admin"}
+            permissions={toPermissionMap(org.permissions)}
+            scope={scope}
             lockedStatus={status}
           />
         </Suspense>

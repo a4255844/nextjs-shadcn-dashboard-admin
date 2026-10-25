@@ -39,6 +39,11 @@
   },
   "pages": {
     "comingSoon": "即将上线",
+    "forbidden": {
+      "title": "无权访问该页面",
+      "description": "你当前的角色没有访问此页面的权限。如需访问，请联系组织管理员调整你的角色或权限。",
+      "back": "返回可访问页面"
+    },
     "dashboard": {
       "title": "仪表盘",
       "description": "KPI 卡片、图表与核心业务指标的快速概览。"
@@ -581,12 +586,20 @@
         "actions": "操作"
       },
       "you": "你",
-      "roles": {
-        "admin": "管理员",
-        "member": "成员"
-      },
+      "extraBadge": "+{count}",
+      "extraBadgeTitle": "{count} 项额外权限",
+      "deniedBadge": "-{count}",
+      "deniedBadgeTitle": "{count} 项已撤销权限",
       "actions": {
-        "openAria": "打开成员操作"
+        "openAria": "打开成员操作",
+        "permissions": "调整权限"
+      },
+      "permissionsDialog": {
+        "title": "成员权限",
+        "description": "调整 {name} 的权限。更改仅对该成员生效，成员更换角色后自动清除。",
+        "overrideHint": "取消勾选可撤销该成员从角色继承的权限；勾选未拥有的权限则为额外授予。",
+        "submit": "保存",
+        "cancel": "取消"
       },
       "removeDialog": {
         "title": "移除成员",
@@ -616,10 +629,12 @@
       "regenerate": "重新生成",
       "copy": "复制链接",
       "copied": "已复制",
-      "roleHint": "任何人通过此链接登录后即以成员身份加入。"
+      "roleLabel": "加入后的角色",
+      "roleHint": "任何人通过此链接登录后即以所选角色加入。"
     },
     "inviteCard": {
       "title": "邀请链接",
+      "role": "角色",
       "createdAt": "生成时间",
       "expiresAt": "过期时间"
     },
@@ -636,7 +651,107 @@
       "roleUpdated": "角色已更新",
       "memberRemoved": "成员已移除",
       "left": "已退出组织",
-      "inviteRegenerated": "邀请链接已更新"
+      "inviteRegenerated": "邀请链接已更新",
+      "roleCreated": "角色已创建",
+      "roleSaved": "角色已保存",
+      "roleDeleted": "角色已删除",
+      "memberPermissionsSaved": "额外权限已更新"
+    },
+    "roles": {
+      "title": "角色与权限",
+      "description": "创建自定义角色，并勾选其可访问的页面与可执行的操作。",
+      "systemBadge": "系统角色",
+      "builtin": {
+        "admin": "管理员",
+        "manager": "经理",
+        "sales": "销售",
+        "viewer": "访客"
+      },
+      "create": "新建角色",
+      "edit": "编辑",
+      "delete": "删除",
+      "permissionCount": "{count} 项权限",
+      "hint": "固定角色不可删除，但可以修改权限；改动对持有该角色的所有成员生效。",
+      "kind": {
+        "menu": "菜单权限",
+        "action": "按钮权限"
+      },
+      "alwaysAvailable": "个人资料与设置对所有成员开放，无需授权。",
+      "modules": {
+        "dashboard": "仪表盘",
+        "customers": "客户",
+        "orders": "订单",
+        "members": "成员",
+        "org": "组织"
+      },
+      "permissions": {
+        "dashboard": {
+          "browse": "浏览仪表盘",
+          "ecommerce": { "browse": "浏览电商看板" }
+        },
+        "customers": {
+          "browse": "浏览客户",
+          "create": "新建客户",
+          "update": "编辑客户",
+          "delete": "删除客户",
+          "export": "导出客户",
+          "import": "导入客户",
+          "high_value": {
+            "browse": "浏览高价值客户",
+            "update": "编辑高价值客户",
+            "delete": "删除高价值客户",
+            "export": "导出高价值客户"
+          },
+          "at_risk": {
+            "browse": "浏览流失风险客户",
+            "update": "编辑流失风险客户",
+            "delete": "删除流失风险客户",
+            "export": "导出流失风险客户"
+          }
+        },
+        "orders": {
+          "browse": "浏览订单",
+          "create": "新建订单",
+          "update": "编辑订单",
+          "delete": "删除订单",
+          "export": "导出订单",
+          "import": "导入订单"
+        },
+        "members": {
+          "browse": "浏览成员",
+          "invite": "邀请成员",
+          "manage": "管理成员角色"
+        },
+        "org": {
+          "update": "修改组织信息",
+          "delete": "删除组织"
+        }
+      },
+      "form": {
+        "createTitle": "新建角色",
+        "editTitle": "编辑角色",
+        "description": "角色名在组织内唯一；勾选该角色可访问的页面与操作。",
+        "nameLabel": "角色名称",
+        "namePlaceholder": "例如：销售",
+        "systemNameHint": "固定角色的名称不可修改，只能调整权限。",
+        "permissionsLabel": "权限",
+        "submitCreate": "创建",
+        "submitSave": "保存",
+        "cancel": "取消",
+        "errorName": "名称需为 1-40 个字符。",
+        "errorTaken": "角色名称已存在。",
+        "noPermission": "至少勾选一项权限。"
+      },
+      "deleteDialog": {
+        "title": "删除角色",
+        "description": "角色 {name} 将被删除。仍被成员或活跃邀请使用时无法删除。",
+        "confirm": "删除",
+        "cancel": "取消"
+      }
+    },
+    "noAccess": {
+      "title": "无访问权限",
+      "description": "当前角色未被授予该页面的访问权限，请联系组织管理员。"
     },
     "invitePage": {
       "title": "你收到了邀请",
@@ -664,9 +779,12 @@
       "generic": "出错了，请重试。",
       "authRequired": "请先登录。",
       "lastAdmin": "组织至少需要保留一名管理员。",
-      "notAdmin": "你没有执行该操作的权限。",
+      "notAllowed": "你没有执行该操作的权限。",
       "notMember": "你已不是该组织的成员。",
-      "invalidRole": "无效的角色。"
+      "invalidRole": "无效的角色。",
+      "invalidPermission": "包含未知权限。",
+      "systemRole": "系统角色不可修改或删除。",
+      "roleInUse": "该角色仍被成员或活跃邀请使用，无法删除。"
     }
   },
   "login": {

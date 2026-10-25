@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { MoreHorizontal, UserRoundMinus } from "lucide-react";
+import { KeyRound, MoreHorizontal, UserRoundMinus } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -26,15 +26,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { MemberRow } from "@/lib/api/members";
+import type { OrgRole } from "@/lib/api/roles";
 import { updateMemberRole } from "@/lib/actions/members";
+import { roleLabel } from "@/lib/role-label";
 import RemoveMemberDialog from "@/components/orgs/RemoveMemberDialog";
+import MemberPermissionsDialog from "@/components/orgs/MemberPermissionsDialog";
 
 interface MembersTableProps {
   rows: MemberRow[];
+  /** 当前组织可选角色（下拉里的角色项，按组织自定义角色渲染） */
+  roles: OrgRole[];
   /** 当前组织 id（updateMemberRole/removeMember 入参透传） */
   orgId: string;
   currentUserId: string;
-  isAdmin: boolean;
+  /** members.manage 权限（无权限时只读：不渲染操作列） */
+  canManage: boolean;
 }
 
 /** 展示名：姓名优先，缺失回落邮箱（RemoveMemberDialog 共用） */
@@ -65,17 +71,22 @@ function initialsOf(member: MemberRow): string {
 
 export default function MembersTable({
   rows,
+  roles,
   orgId,
   currentUserId,
-  isAdmin,
+  canManage,
 }: MembersTableProps) {
   const t = useTranslations("orgs.members");
+  const tRoles = useTranslations("orgs.roles");
   const tToasts = useTranslations("orgs.toasts");
   const tErrors = useTranslations("orgs.errors");
   const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [removeTarget, setRemoveTarget] = useState<MemberRow | null>(null);
+  const [permissionsTarget, setPermissionsTarget] = useState<MemberRow | null>(
+    null,
+  );
 
   const dateFmt = new Intl.DateTimeFormat(locale, {
     year: "numeric",
@@ -83,12 +94,15 @@ export default function MembersTable({
     day: "numeric",
   });
 
+  const roleById = new Map(roles.map((r) => [r.id, r]));
+  const systemRoleIds = new Set(roles.filter((r) => r.isSystem).map((r) => r.id));
+
   function errorText(code: string | undefined): string {
     switch (code) {
       case "last_admin":
         return tErrors("lastAdmin");
-      case "not_admin":
-        return tErrors("notAdmin");
+      case "not_allowed":
+        return tErrors("notAllowed");
       case "not_member":
         return tErrors("notMember");
       case "invalid_role":
@@ -100,10 +114,10 @@ export default function MembersTable({
     }
   }
 
-  function handleRoleChange(row: MemberRow, role: string) {
-    if (role === row.role) return;
+  function handleRoleChange(row: MemberRow, roleId: string) {
+    if (roleId === row.roleId) return;
     startTransition(async () => {
-      const result = await updateMemberRole(orgId, row.userId, role);
+      const result = await updateMemberRole(orgId, row.userId, roleId);
       if (result.ok) {
         toast.success(tToasts("roleUpdated"));
         router.refresh();
@@ -118,6 +132,15 @@ export default function MembersTable({
     setTimeout(() => setRemoveTarget(row), 50);
   }
 
+  function openPermissionsDialog(row: MemberRow) {
+    setTimeout(() => setPermissionsTarget(row), 50);
+  }
+
+  const permissionsTargetRole =
+    permissionsTarget === null
+      ? undefined
+      : roleById.get(permissionsTarget.roleId);
+
   return (
     <>
       <div className="overflow-hidden rounded-xl border">
@@ -127,7 +150,7 @@ export default function MembersTable({
               <TableHead className="text-start">{t("columns.member")}</TableHead>
               <TableHead className="text-start">{t("columns.role")}</TableHead>
               <TableHead className="text-start">{t("columns.joined")}</TableHead>
-              {isAdmin && (
+              {canManage && (
                 <TableHead className="w-12 text-start">
                   <span className="sr-only">{t("columns.actions")}</span>
                 </TableHead>
@@ -137,6 +160,10 @@ export default function MembersTable({
           <TableBody>
             {rows.map((row) => {
               const isSelf = row.userId === currentUserId;
+              const role = roleById.get(row.roleId);
+              const roleName =
+                role === undefined ? row.roleName : roleLabel(role, tRoles);
+              const isSystemRole = systemRoleIds.has(row.roleId);
               return (
                 <TableRow key={row.userId} aria-busy={isPending}>
                   <TableCell>
@@ -163,23 +190,49 @@ export default function MembersTable({
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={
-                        row.role === "admin"
-                          ? "border-transparent bg-primary/10 text-primary"
-                          : "border-transparent bg-muted text-muted-foreground"
-                      }
-                    >
-                      {row.role === "admin"
-                        ? t("roles.admin")
-                        : t("roles.member")}
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Badge
+                        variant="outline"
+                        className={
+                          isSystemRole
+                            ? "border-transparent bg-primary/10 text-primary"
+                            : "border-transparent bg-muted text-muted-foreground"
+                        }
+                      >
+                        {roleName}
+                      </Badge>
+                      {row.extraPermissions.length > 0 && (
+                        <Badge
+                          variant="outline"
+                          className="border-transparent bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          title={t("extraBadgeTitle", {
+                            count: row.extraPermissions.length,
+                          })}
+                        >
+                          {t("extraBadge", {
+                            count: row.extraPermissions.length,
+                          })}
+                        </Badge>
+                      )}
+                      {row.deniedPermissions.length > 0 && (
+                        <Badge
+                          variant="outline"
+                          className="border-transparent bg-destructive/10 text-destructive"
+                          title={t("deniedBadgeTitle", {
+                            count: row.deniedPermissions.length,
+                          })}
+                        >
+                          {t("deniedBadge", {
+                            count: row.deniedPermissions.length,
+                          })}
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {dateFmt.format(new Date(row.joinedAt))}
                   </TableCell>
-                  {isAdmin && (
+                  {canManage && (
                     <TableCell>
                       {/* 自己的行不提供角色变更/移除入口（DB 层 last_admin 兜底） */}
                       {isSelf ? null : (
@@ -197,16 +250,25 @@ export default function MembersTable({
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-44">
                             <DropdownMenuRadioGroup
-                              value={row.role}
-                              onValueChange={(role) => handleRoleChange(row, role)}
+                              value={row.roleId}
+                              onValueChange={(roleId) => handleRoleChange(row, roleId)}
                             >
-                              <DropdownMenuRadioItem value="admin">
-                                {t("roles.admin")}
-                              </DropdownMenuRadioItem>
-                              <DropdownMenuRadioItem value="member">
-                                {t("roles.member")}
-                              </DropdownMenuRadioItem>
+                              {roles.map((role) => (
+                                <DropdownMenuRadioItem
+                                  key={role.id}
+                                  value={role.id}
+                                >
+                                  {roleLabel(role, tRoles)}
+                                </DropdownMenuRadioItem>
+                              ))}
                             </DropdownMenuRadioGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onSelect={() => openPermissionsDialog(row)}
+                            >
+                              <KeyRound className="size-4" />
+                              {t("actions.permissions")}
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               variant="destructive"
@@ -231,6 +293,14 @@ export default function MembersTable({
         orgId={orgId}
         target={removeTarget}
         onClose={() => setRemoveTarget(null)}
+      />
+
+      <MemberPermissionsDialog
+        key={permissionsTarget?.userId ?? "closed"}
+        orgId={orgId}
+        target={permissionsTarget}
+        rolePermissions={permissionsTargetRole?.permissions ?? []}
+        onClose={() => setPermissionsTarget(null)}
       />
     </>
   );

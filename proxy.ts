@@ -14,6 +14,7 @@ const PROTECTED_PREFIXES = [
   "/organization",
   "/profile",
   "/settings",
+  "/forbidden", // 无权访问页：未登录访问时同样先登录
   "/invite", // 消费邀请链接需先登录（redirect 参数带回跳）
 ];
 

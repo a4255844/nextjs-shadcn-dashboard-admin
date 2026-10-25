@@ -39,13 +39,17 @@ const statusBadgeClass: Record<OrderStatus, string> = {
 };
 
 interface UseColumnsOptions {
-  isAdmin: boolean;
+  canUpdate: boolean;
+  canDelete: boolean;
+  canExport: boolean;
   onEdit: (order: OrderRow) => void;
   onDelete: (order: OrderRow) => void;
 }
 
 export function useColumns({
-  isAdmin,
+  canUpdate,
+  canDelete,
+  canExport,
   onEdit,
   onDelete,
 }: UseColumnsOptions): ColumnDef<typeof features, OrderRow>[] {
@@ -67,36 +71,41 @@ export function useColumns({
       });
 
       return [
-        // 勾选列：表头只作用于当前页，单元格单行切换
-        {
-          id: "select",
-          enableSorting: false,
-          header: ({ table }) => {
-            const pageRows = table.getRowModel().rows;
-            const allSelected =
-              pageRows.length > 0 && pageRows.every((r) => r.getIsSelected());
-            const someSelected = pageRows.some((r) => r.getIsSelected());
-            return (
-              <Checkbox
-                aria-label={t("select.all")}
-                checked={
-                  allSelected || (someSelected ? "indeterminate" : false)
-                }
-                onCheckedChange={(v) => {
-                  const next = v === true;
-                  for (const row of pageRows) row.toggleSelected(next);
-                }}
-              />
-            );
-          },
-          cell: ({ row }) => (
-            <Checkbox
-              aria-label={t("select.row")}
-              checked={row.getIsSelected()}
-              onCheckedChange={(v) => row.toggleSelected(v === true)}
-            />
-          ),
-        },
+        // 勾选列：仅在有导出或批量删除权限时出现
+        ...(canExport || canDelete
+          ? [
+              {
+                id: "select",
+                enableSorting: false,
+                header: ({ table }) => {
+                  const pageRows = table.getRowModel().rows;
+                  const allSelected =
+                    pageRows.length > 0 &&
+                    pageRows.every((r) => r.getIsSelected());
+                  const someSelected = pageRows.some((r) => r.getIsSelected());
+                  return (
+                    <Checkbox
+                      aria-label={t("select.all")}
+                      checked={
+                        allSelected || (someSelected ? "indeterminate" : false)
+                      }
+                      onCheckedChange={(v) => {
+                        const next = v === true;
+                        for (const row of pageRows) row.toggleSelected(next);
+                      }}
+                    />
+                  );
+                },
+                cell: ({ row }) => (
+                  <Checkbox
+                    aria-label={t("select.row")}
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(v) => row.toggleSelected(v === true)}
+                  />
+                ),
+              } satisfies ColumnDef<typeof features, OrderRow>,
+            ]
+          : []),
         {
           accessorKey: "number",
           header: ({ column }) => (
@@ -181,7 +190,7 @@ export function useColumns({
             </span>
           ),
         },
-        ...(isAdmin
+        ...(canUpdate || canDelete
           ? [
               {
                 id: "actions",
@@ -201,23 +210,27 @@ export function useColumns({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              setTimeout(() => onEdit(o), 50);
-                            }}
-                          >
-                            <Pencil className="size-4" />
-                            {t("actions.edit")}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onSelect={() => {
-                              setTimeout(() => onDelete(o), 50);
-                            }}
-                          >
-                            <Trash2 className="size-4" />
-                            {t("actions.delete")}
-                          </DropdownMenuItem>
+                          {canUpdate && (
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setTimeout(() => onEdit(o), 50);
+                              }}
+                            >
+                              <Pencil className="size-4" />
+                              {t("actions.edit")}
+                            </DropdownMenuItem>
+                          )}
+                          {canDelete && (
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onSelect={() => {
+                                setTimeout(() => onDelete(o), 50);
+                              }}
+                            >
+                              <Trash2 className="size-4" />
+                              {t("actions.delete")}
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -228,6 +241,6 @@ export function useColumns({
           : []),
       ];
     },
-    [t, locale, isAdmin, onEdit, onDelete],
+    [t, locale, canUpdate, canDelete, canExport, onEdit, onDelete],
   );
 }

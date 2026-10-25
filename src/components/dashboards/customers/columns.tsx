@@ -56,22 +56,25 @@ function initials(name: string): string {
   );
 }
 
-// 列定义 hook 入参：admin 才注入行操作回调（member 无操作列）
+// 列定义 hook 入参：按权限注入行操作（无 update / delete 时不渲染操作入口）
 interface UseColumnsOptions {
-  isAdmin: boolean;
+  canUpdate: boolean;
+  canDelete: boolean;
+  canExport: boolean;
   onEdit: (customer: CustomerRow) => void;
   onDelete: (customer: CustomerRow) => void;
 }
 
 // 列定义 hook：i18n + locale 感知，返回 memoized 的 ColumnDef 数组
 export function useColumns({
-  isAdmin,
+  canUpdate,
+  canDelete,
+  canExport,
   onEdit,
   onDelete,
 }: UseColumnsOptions): ColumnDef<typeof features, CustomerRow>[] {
   const t = useTranslations("customers.table");
   const locale = useLocale();
-
   return useMemo<ColumnDef<typeof features, CustomerRow>[]>(
     () => {
       const moneyFmt = new Intl.NumberFormat(locale, {
@@ -88,36 +91,41 @@ export function useColumns({
       });
 
       return [
-        // 勾选列：表头只作用于当前页，单元格单行切换
-        {
-          id: "select",
-          enableSorting: false,
-          header: ({ table }) => {
-            const pageRows = table.getRowModel().rows;
-            const allSelected =
-              pageRows.length > 0 && pageRows.every((r) => r.getIsSelected());
-            const someSelected = pageRows.some((r) => r.getIsSelected());
-            return (
-              <Checkbox
-                aria-label={t("select.all")}
-                checked={
-                  allSelected || (someSelected ? "indeterminate" : false)
-                }
-                onCheckedChange={(v) => {
-                  const next = v === true;
-                  for (const row of pageRows) row.toggleSelected(next);
-                }}
-              />
-            );
-          },
-          cell: ({ row }) => (
-            <Checkbox
-              aria-label={t("select.row")}
-              checked={row.getIsSelected()}
-              onCheckedChange={(v) => row.toggleSelected(v === true)}
-            />
-          ),
-        },
+        // 勾选列：仅在有导出或批量删除权限时出现（表头作用于当前页）
+        ...(canExport || canDelete
+          ? [
+              {
+                id: "select",
+                enableSorting: false,
+                header: ({ table }) => {
+                  const pageRows = table.getRowModel().rows;
+                  const allSelected =
+                    pageRows.length > 0 &&
+                    pageRows.every((r) => r.getIsSelected());
+                  const someSelected = pageRows.some((r) => r.getIsSelected());
+                  return (
+                    <Checkbox
+                      aria-label={t("select.all")}
+                      checked={
+                        allSelected || (someSelected ? "indeterminate" : false)
+                      }
+                      onCheckedChange={(v) => {
+                        const next = v === true;
+                        for (const row of pageRows) row.toggleSelected(next);
+                      }}
+                    />
+                  );
+                },
+                cell: ({ row }) => (
+                  <Checkbox
+                    aria-label={t("select.row")}
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(v) => row.toggleSelected(v === true)}
+                  />
+                ),
+              } satisfies ColumnDef<typeof features, CustomerRow>,
+            ]
+          : []),
         {
           accessorKey: "name",
           header: ({ column }) => (
@@ -222,8 +230,8 @@ export function useColumns({
             </span>
           ),
         },
-        // admin 专属：行操作列（member 不渲染，整表只读；RLS 为最终兜底）
-        ...(isAdmin
+        // 行操作列：有 update 或 delete 权限时才渲染（RLS 为最终兜底）
+        ...(canUpdate || canDelete
           ? [
               {
                 id: "actions",
@@ -245,23 +253,27 @@ export function useColumns({
                         <DropdownMenuContent align="end" className="w-36">
                           {/* Radix 纪律：菜单 onSelect 后延迟 50ms 再开 Dialog，
                               等菜单关闭落定，避免关闭后二次打开竞态 */}
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              setTimeout(() => onEdit(c), 50);
-                            }}
-                          >
-                            <Pencil className="size-4" />
-                            {t("actions.edit")}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onSelect={() => {
-                              setTimeout(() => onDelete(c), 50);
-                            }}
-                          >
-                            <Trash2 className="size-4" />
-                            {t("actions.delete")}
-                          </DropdownMenuItem>
+                          {canUpdate && (
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setTimeout(() => onEdit(c), 50);
+                              }}
+                            >
+                              <Pencil className="size-4" />
+                              {t("actions.edit")}
+                            </DropdownMenuItem>
+                          )}
+                          {canDelete && (
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onSelect={() => {
+                                setTimeout(() => onDelete(c), 50);
+                              }}
+                            >
+                              <Trash2 className="size-4" />
+                              {t("actions.delete")}
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -272,6 +284,6 @@ export function useColumns({
           : []),
       ];
     },
-    [t, locale, isAdmin, onEdit, onDelete],
+    [t, locale, canUpdate, canDelete, canExport, onEdit, onDelete],
   );
 }

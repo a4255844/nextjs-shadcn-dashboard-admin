@@ -10,6 +10,7 @@ import {
   type OrderWriteInput,
 } from "@/lib/api/orders";
 import { toErrorCode } from "@/lib/actions/rpc-errors";
+import { hasPermissionInOrg } from "@/lib/api/roles";
 import {
   orderFormSchema,
   validateOrderForm,
@@ -109,6 +110,11 @@ export async function createOrder(
   orgId: string,
   raw: OrderFormInput,
 ): Promise<OrderResult> {
+  // 后端权限兜底：绕过隐藏按钮直接调用 action 也会被拒绝
+  if (!(await hasPermissionInOrg(orgId, "orders.create"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   const parsed = await validateOrderInput(raw, orgId);
   if (!parsed.ok) return { ok: false, fieldErrors: parsed.fieldErrors };
 
@@ -127,6 +133,10 @@ export async function updateOrder(
   id: string,
   raw: OrderFormInput,
 ): Promise<OrderResult> {
+  if (!(await hasPermissionInOrg(orgId, "orders.update"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   const parsed = await validateOrderInput(raw, orgId);
   if (!parsed.ok) return { ok: false, fieldErrors: parsed.fieldErrors };
 
@@ -144,6 +154,10 @@ export async function removeOrder(
   orgId: string,
   id: string,
 ): Promise<OrderResult> {
+  if (!(await hasPermissionInOrg(orgId, "orders.delete"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   try {
     await deleteOrder(orgId, id);
   } catch (err) {
@@ -173,6 +187,10 @@ export async function removeOrders(
   orgId: string,
   ids: string[],
 ): Promise<BatchDeleteResult> {
+  if (!(await hasPermissionInOrg(orgId, "orders.delete"))) {
+    return { ok: false, errorCode: "forbidden" };
+  }
+
   try {
     const deleted = await deleteOrders(orgId, ids);
     revalidatePath("/", "layout");

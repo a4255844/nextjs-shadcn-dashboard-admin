@@ -9,6 +9,8 @@ import NoOrgState from "@/components/orgs/NoOrgState";
 import { getOrders } from "@/lib/api/orders";
 import { getCustomers } from "@/lib/api/customers";
 import { getActiveOrg } from "@/lib/api/organizations";
+import { toPermissionMap } from "@/lib/permissions";
+import { requirePermission } from "@/lib/route-guard";
 
 const page = async () => {
   const t = await getTranslations("pages.orders");
@@ -17,6 +19,8 @@ const page = async () => {
   if (org === null) {
     return <NoOrgState />;
   }
+
+  await requirePermission(org.permissions, "orders.browse");
 
   const rows = await getOrders(org.id);
   const customers = await getCustomers(org.id);
@@ -83,7 +87,7 @@ const page = async () => {
             key={org.id}
             rows={rows}
             orgId={org.id}
-            isAdmin={org.role === "admin"}
+            permissions={toPermissionMap(org.permissions)}
             customers={customers.map((c) => ({ id: c.id, name: c.name }))}
           />
         </Suspense>

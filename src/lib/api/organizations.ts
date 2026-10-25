@@ -2,16 +2,23 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-
-export type OrgRole = "admin" | "member";
+import {
+  parsePermissionKeys,
+  type PermissionKey,
+} from "@/lib/permissions";
 
 export interface OrgSummary {
   id: string;
   name: string;
-  role: OrgRole;
+  /** 当前用户在该组织持有的角色 */
+  roleId: string;
+  roleName: string;
+  /** 系统角色（Admin）= 超级管理员 */
+  isAdmin: boolean;
+  permissions: PermissionKey[];
 }
 
-/** join_organization rpc 的异常码（与 0005 迁移对齐） */
+/** join_organization rpc 的异常码（与 0005/0012 迁移对齐） */
 export type JoinErrorCode = "auth_required" | "invalid" | "used" | "expired";
 
 /** active org 持久化在 cookie，服务端 RSC 读取用于查询过滤 */
@@ -20,19 +27,22 @@ export const ACTIVE_ORG_COOKIE = "active-org";
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// role 列是 text + check 约束（非原生 enum），gen types 推导为 string，
-// 需运行时校验后收窄（与 customers status 的处理同理，DB check 属可信来源）。
-// members.ts 等同域模块复用此收窄，故导出。
-export function parseOrgRole(v: string): OrgRole | null {
-  return v === "admin" || v === "member" ? v : null;
-}
-
 /** cookie 值是信任边界（用户可伪造）：仅接受 UUID 形状的值 */
 export function parseActiveOrgId(v: string | undefined): string | null {
   return v !== undefined && UUID_PATTERN.test(v) ? v : null;
 }
 
-/** 当前用户的组织列表 */
+/** 角色 id 来自客户端（改角色/邀请/删角色）：仅接受 UUID 形状的值 */
+export function parseRoleId(v: string): string | null {
+  return UUID_PATTERN.test(v) ? v : null;
+}
+
+/**
+ * 当前用户的组织列表。
+ * 权限必须走 my_org_permissions：它按「角色权限 - 撤销 ∪ 额外授予」计算，
+ * 与 RLS / 页面守卫同一套判定。只读 role_permissions 会漏掉成员级覆盖，
+ * 导致侧边栏渲染出已被撤销的菜单。
+ */
 export async function listMyOrganizations(): Promise<OrgSummary[]> {
   const supabase = await createClient();
 
@@ -46,7 +56,7 @@ export async function listMyOrganizations(): Promise<OrgSummary[]> {
 
   const { data, error } = await supabase
     .from("members")
-    .select("org_id, role, organizations(name)")
+    .select("org_id, role_id, organizations(name), roles(name, is_system)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
@@ -54,17 +64,34 @@ export async function listMyOrganizations(): Promise<OrgSummary[]> {
     throw new Error(`Failed to fetch organizations: ${error.message}`);
   }
 
-  return data.flatMap((row) => {
-    const role = parseOrgRole(row.role);
+  const rows = data.flatMap((row) => {
+    const role = row.roles;
     if (role === null) return [];
     return [
       {
         id: row.org_id,
         name: row.organizations.name,
-        role,
+        roleId: row.role_id,
+        roleName: role.name,
+        isAdmin: role.is_system,
       },
     ];
   });
+
+  return Promise.all(
+    rows.map(async (org) => {
+      const { data: keys, error: permissionError } = await supabase.rpc(
+        "my_org_permissions",
+        { p_org_id: org.id },
+      );
+      if (permissionError !== null) {
+        throw new Error(
+          `Failed to fetch permissions: ${permissionError.message}`,
+        );
+      }
+      return { ...org, permissions: parsePermissionKeys(keys) };
+    }),
+  );
 }
 
 /**

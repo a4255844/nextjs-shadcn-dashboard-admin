@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { PermissionKey } from "@/lib/permissions";
 
 // 侧边栏叶子菜单项
 export interface ChildItem {
@@ -17,6 +18,8 @@ export interface ChildItem {
   isActive?: boolean;
   external?: boolean;
   isPro?: boolean;
+  /** 访问该路由所需权限；未设置的项对所有成员可见 */
+  permission?: PermissionKey;
 }
 
 // 侧边栏分组（含 heading 和 items）

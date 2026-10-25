@@ -7,6 +7,7 @@ import {
   ACTIVE_ORG_COOKIE,
   listMyOrganizations,
   joinOrganization,
+  parseRoleId,
   type JoinErrorCode,
 } from "@/lib/api/organizations";
 import { toErrorCode } from "./rpc-errors";
@@ -20,7 +21,7 @@ export interface CreateOrgResult {
 export interface CreateInviteResult {
   ok: boolean;
   token?: string;
-  errorCode?: "auth_required" | "not_admin" | "invalid_role" | "network";
+  errorCode?: "auth_required" | "not_allowed" | "invalid_role" | "network";
 }
 
 export interface AcceptInviteResult {
@@ -33,7 +34,7 @@ export interface AcceptInviteResult {
 const CREATE_ORG_ERRORS = ["auth_required", "invalid_name"] as const;
 const CREATE_INVITE_ERRORS = [
   "auth_required",
-  "not_admin",
+  "not_allowed",
   "invalid_role",
 ] as const;
 const JOIN_ERRORS = ["auth_required", "invalid", "used", "expired"] as const;
@@ -71,13 +72,22 @@ export async function createOrganization(
   return { ok: true, orgId: data };
 }
 
-/** 为指定组织生成一次性邀请链接（仅 admin；旧活跃链接自动失效） */
-export async function createInvite(orgId: string): Promise<CreateInviteResult> {
+/** 为指定组织生成一次性邀请链接（需 members.invite；旧活跃链接自动失效） */
+export async function createInvite(
+  orgId: string,
+  roleId: string,
+): Promise<CreateInviteResult> {
+  // roleId 来自客户端，属信任边界：先运行时校验收窄，非法直接拒绝
+  const parsed = parseRoleId(roleId);
+  if (parsed === null) {
+    return { ok: false, errorCode: "invalid_role" };
+  }
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("create_invite", {
     p_org_id: orgId,
-    p_role: "member",
+    p_role_id: parsed,
   });
 
   if (error !== null) {

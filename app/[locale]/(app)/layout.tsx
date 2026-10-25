@@ -8,6 +8,7 @@ import {
   listMyOrganizations,
   type OrgSummary,
 } from "@/lib/api/organizations";
+import { listOrgRoles, type OrgRole } from "@/lib/api/roles";
 
 export default async function AppLayout({
   children,
@@ -28,11 +29,24 @@ export default async function AppLayout({
     // 组织数据获取失败不阻塞整个布局渲染，切换器显示"无组织"态
   }
 
+  // 邀请弹窗的角色选项：仅 members.invite 权限持有者才查（RPC 亦有门控）
+  let roles: OrgRole[] = [];
+  if (
+    activeOrg !== null &&
+    activeOrg.permissions.includes("members.invite")
+  ) {
+    try {
+      roles = await listOrgRoles(activeOrg.id);
+    } catch {
+      // 角色查询失败不影响布局；邀请弹窗将无角色可选（按钮禁用）
+    }
+  }
+
   return (
     <SidebarProvider>
-      <SidebarLayout />
+      <SidebarLayout permissions={activeOrg?.permissions} />
       <SidebarInset className="bg-muted/30">
-        <Header user={user} orgs={orgs} activeOrg={activeOrg} />
+        <Header user={user} orgs={orgs} activeOrg={activeOrg} roles={roles} />
         <div className="flex flex-1 flex-col p-4 md:p-6">{children}</div>
       </SidebarInset>
     </SidebarProvider>

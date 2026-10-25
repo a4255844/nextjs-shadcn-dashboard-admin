@@ -39,6 +39,11 @@
   },
   "pages": {
     "comingSoon": "In Kürze",
+    "forbidden": {
+      "title": "Kein Zugriff auf diese Seite",
+      "description": "Deine aktuelle Rolle hat keine Berechtigung für diese Seite. Bitte einen Administrator der Organisation, deine Rolle oder Berechtigungen anzupassen.",
+      "back": "Zu einer zugänglichen Seite"
+    },
     "dashboard": {
       "title": "Dashboard",
       "description": "KPI-Karten, Diagramme und ein schneller Überblick über die wichtigsten Geschäftskennzahlen."
@@ -581,12 +586,20 @@
         "actions": "Aktionen"
       },
       "you": "Du",
-      "roles": {
-        "admin": "Administrator",
-        "member": "Mitglied"
-      },
+      "extraBadge": "+{count}",
+      "extraBadgeTitle": "{count} zusätzliche Berechtigungen",
+      "deniedBadge": "-{count}",
+      "deniedBadgeTitle": "{count} entzogene Berechtigungen",
       "actions": {
-        "openAria": "Mitgliederaktionen öffnen"
+        "openAria": "Mitgliederaktionen öffnen",
+        "permissions": "Berechtigungen anpassen"
+      },
+      "permissionsDialog": {
+        "title": "Mitgliedsberechtigungen",
+        "description": "Passe die Berechtigungen von {name} an. Änderungen gelten nur für dieses Mitglied und werden beim Rollenwechsel zurückgesetzt.",
+        "overrideHint": "Abwählen entzieht eine von der Rolle geerbte Berechtigung; Anwählen einer fehlenden Berechtigung erteilt sie zusätzlich.",
+        "submit": "Speichern",
+        "cancel": "Abbrechen"
       },
       "removeDialog": {
         "title": "Mitglied entfernen",
@@ -616,10 +629,12 @@
       "regenerate": "Neu erstellen",
       "copy": "Link kopieren",
       "copied": "Kopiert",
-      "roleHint": "Jeder mit diesem Link tritt nach der Anmeldung als Mitglied bei."
+      "roleLabel": "Rolle nach dem Beitritt",
+      "roleHint": "Jeder mit diesem Link tritt nach der Anmeldung mit der ausgewählten Rolle bei."
     },
     "inviteCard": {
       "title": "Einladungslink",
+      "role": "Rolle",
       "createdAt": "Erstellt",
       "expiresAt": "Läuft ab"
     },
@@ -636,7 +651,107 @@
       "roleUpdated": "Rolle aktualisiert",
       "memberRemoved": "Mitglied entfernt",
       "left": "Du hast die Organisation verlassen",
-      "inviteRegenerated": "Einladungslink aktualisiert"
+      "inviteRegenerated": "Einladungslink aktualisiert",
+      "roleCreated": "Rolle erstellt",
+      "roleSaved": "Rolle gespeichert",
+      "roleDeleted": "Rolle gelöscht",
+      "memberPermissionsSaved": "Zusätzliche Berechtigungen aktualisiert"
+    },
+    "roles": {
+      "title": "Rollen & Berechtigungen",
+      "description": "Erstelle eigene Rollen und lege fest, auf welche Seiten und Aktionen sie zugreifen dürfen.",
+      "systemBadge": "System",
+      "builtin": {
+        "admin": "Administrator",
+        "manager": "Manager",
+        "sales": "Vertrieb",
+        "viewer": "Betrachter"
+      },
+      "create": "Neue Rolle",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "permissionCount": "{count} Berechtigungen",
+      "hint": "Feste Rollen können nicht gelöscht werden, ihre Berechtigungen sind aber bearbeitbar. Änderungen gelten für alle Mitglieder mit dieser Rolle.",
+      "kind": {
+        "menu": "Menüberechtigung",
+        "action": "Button-Berechtigung"
+      },
+      "alwaysAvailable": "Profil und Einstellungen sind für alle Mitglieder verfügbar und benötigen keine Berechtigung.",
+      "modules": {
+        "dashboard": "Dashboard",
+        "customers": "Kunden",
+        "orders": "Bestellungen",
+        "members": "Mitglieder",
+        "org": "Organisation"
+      },
+      "permissions": {
+        "dashboard": {
+          "browse": "Dashboard durchsuchen",
+          "ecommerce": { "browse": "E-Commerce durchsuchen" }
+        },
+        "customers": {
+          "browse": "Kunden durchsuchen",
+          "create": "Kunden anlegen",
+          "update": "Kunden bearbeiten",
+          "delete": "Kunden löschen",
+          "export": "Kunden exportieren",
+          "import": "Kunden importieren",
+          "high_value": {
+            "browse": "Hochwertige Kunden ansehen",
+            "update": "Hochwertige Kunden bearbeiten",
+            "delete": "Hochwertige Kunden löschen",
+            "export": "Hochwertige Kunden exportieren"
+          },
+          "at_risk": {
+            "browse": "Abwanderungsgefährdete Kunden ansehen",
+            "update": "Abwanderungsgefährdete Kunden bearbeiten",
+            "delete": "Abwanderungsgefährdete Kunden löschen",
+            "export": "Abwanderungsgefährdete Kunden exportieren"
+          }
+        },
+        "orders": {
+          "browse": "Bestellungen durchsuchen",
+          "create": "Bestellungen anlegen",
+          "update": "Bestellungen bearbeiten",
+          "delete": "Bestellungen löschen",
+          "export": "Bestellungen exportieren",
+          "import": "Bestellungen importieren"
+        },
+        "members": {
+          "browse": "Mitglieder durchsuchen",
+          "invite": "Mitglieder einladen",
+          "manage": "Mitgliederrollen verwalten"
+        },
+        "org": {
+          "update": "Organisation bearbeiten",
+          "delete": "Organisation löschen"
+        }
+      },
+      "form": {
+        "createTitle": "Neue Rolle",
+        "editTitle": "Rolle bearbeiten",
+        "description": "Rollennamen sind innerhalb der Organisation eindeutig. Wähle die Seiten und Aktionen für diese Rolle.",
+        "nameLabel": "Rollenname",
+        "namePlaceholder": "z. B. Vertrieb",
+        "systemNameHint": "Namen fester Rollen sind gesperrt; nur Berechtigungen lassen sich ändern.",
+        "permissionsLabel": "Berechtigungen",
+        "submitCreate": "Erstellen",
+        "submitSave": "Speichern",
+        "cancel": "Abbrechen",
+        "errorName": "Der Name muss 1-40 Zeichen haben.",
+        "errorTaken": "Dieser Rollenname ist bereits vergeben.",
+        "noPermission": "Wähle mindestens eine Berechtigung."
+      },
+      "deleteDialog": {
+        "title": "Rolle löschen",
+        "description": "Die Rolle {name} wird gelöscht. Sie kann nicht gelöscht werden, solange Mitglieder oder eine aktive Einladung sie verwenden.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
+      }
+    },
+    "noAccess": {
+      "title": "Kein Zugriff",
+      "description": "Deine aktuelle Rolle hat keinen Zugriff auf diese Seite. Frage einen Organisations-Administrator."
     },
     "invitePage": {
       "title": "Du wurdest eingeladen",
@@ -664,9 +779,12 @@
       "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
       "authRequired": "Bitte melde dich zuerst an.",
       "lastAdmin": "Die Organisation muss mindestens einen Administrator behalten.",
-      "notAdmin": "Du hast keine Berechtigung für diese Aktion.",
+      "notAllowed": "Du hast keine Berechtigung für diese Aktion.",
       "notMember": "Du bist nicht mehr Mitglied dieser Organisation.",
-      "invalidRole": "Ungültige Rolle."
+      "invalidRole": "Ungültige Rolle.",
+      "invalidPermission": "Unbekannte Berechtigung enthalten.",
+      "systemRole": "Systemrollen können nicht geändert oder gelöscht werden.",
+      "roleInUse": "Diese Rolle wird noch von Mitgliedern oder einer aktiven Einladung verwendet."
     }
   },
   "login": {

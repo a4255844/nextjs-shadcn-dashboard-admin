@@ -51,6 +51,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { features, useColumns } from "./columns";
+import { can, type PermissionMap } from "@/lib/permissions";
 import {
   ORDER_STATUS_KEYS,
   PAGE_SIZE_OPTIONS,
@@ -80,7 +81,8 @@ const STATUS_FILTER_OPTIONS: readonly StatusFilter[] = [
 interface OrdersTableProps {
   rows: OrderRow[];
   orgId: string;
-  isAdmin: boolean;
+  /** 当前用户在该组织的权限集合（按钮/操作列按权限渲染；RLS 为最终兜底） */
+  permissions: PermissionMap;
   /** 当前组织的客户列表（供弹窗 Select 使用） */
   customers: { id: string; name: string }[];
 }
@@ -88,9 +90,14 @@ interface OrdersTableProps {
 export default function OrdersTable({
   rows,
   orgId,
-  isAdmin,
+  permissions,
   customers,
 }: OrdersTableProps) {
+  const canCreate = can(permissions, "orders.create");
+  const canUpdate = can(permissions, "orders.update");
+  const canDelete = can(permissions, "orders.delete");
+  const canExport = can(permissions, "orders.export");
+  const canImport = can(permissions, "orders.import");
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -157,7 +164,13 @@ export default function OrdersTable({
     [orgId, rows.length, rowSelection, tp],
   );
 
-  const columns = useColumns({ isAdmin, onEdit: handleEdit, onDelete: handleDelete });
+  const columns = useColumns({
+    canUpdate,
+    canDelete,
+    canExport,
+    onEdit: handleEdit,
+    onDelete: handleDelete,
+  });
   const sortCol = parseSortableColumn(searchParams.get("sort"));
   const sortDir = parseSortDir(searchParams.get("order"));
   const pageStr = searchParams.get("page");
@@ -303,13 +316,13 @@ export default function OrdersTable({
             />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {isAdmin && (
+            {canCreate && (
               <Button size="sm" onClick={handleAdd}>
                 <Plus className="size-4" />
                 {t("actions.add")}
               </Button>
             )}
-            {isAdmin && selectedCount > 0 && (
+            {canDelete && selectedCount > 0 && (
               <Button
                 size="sm"
                 variant="destructive"
@@ -320,36 +333,38 @@ export default function OrdersTable({
                 {t("actions.deleteSelected", { count: selectedCount })}
               </Button>
             )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 cursor-pointer"
-                  aria-label={t("export.label")}
-                >
-                  <Download className="size-3.5" />
-                  {t("export.label")}
-                  <ChevronDown className="size-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-40">
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  disabled={selectedCount === 0}
-                  onClick={() => doExport(false)}
-                >
-                  {t("export.selected", { count: selectedCount })}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => doExport(true)}
-                >
-                  {t("export.all")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {isAdmin && (
+            {canExport && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 cursor-pointer"
+                    aria-label={t("export.label")}
+                  >
+                    <Download className="size-3.5" />
+                    {t("export.label")}
+                    <ChevronDown className="size-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-40">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    disabled={selectedCount === 0}
+                    onClick={() => doExport(false)}
+                  >
+                    {t("export.selected", { count: selectedCount })}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => doExport(true)}
+                  >
+                    {t("export.all")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {canImport && (
               <Button
                 size="sm"
                 variant="outline"
@@ -552,39 +567,43 @@ export default function OrdersTable({
         </div>
       </DashboardCard>
 
-      {isAdmin && (
-        <>
-          <OrderFormDialog
-            open={formOpen}
-            onOpenChange={setFormOpen}
-            orgId={orgId}
-            order={editingOrder}
-            customers={customers}
-          />
-          <OrderDeleteDialog
-            orgId={orgId}
-            target={deleteTarget}
-            onClose={() => setDeleteTarget(null)}
-          />
-          <ImportDialog
-            open={importOpen}
-            onOpenChange={setImportOpen}
-            orgId={orgId}
-            columnLabels={["Order Number", "Customer", "Email", "Status", "Amount", "Payment Method", "Notes"]}
-            actionFn={importOrdersCsv}
-            tNamespace="pages.orders.import"
-          />
-          <BatchDeleteDialog
-            open={batchDeleteOpen}
-            onOpenChange={setBatchDeleteOpen}
-            count={selectedCount}
-            ids={Object.keys(rowSelection)}
-            orgId={orgId}
-            actionFn={removeOrders}
-            tNamespace="pages.orders"
-            onDeleted={() => setRowSelection({})}
-          />
-        </>
+      {(canCreate || canUpdate) && (
+        <OrderFormDialog
+          open={formOpen}
+          onOpenChange={setFormOpen}
+          orgId={orgId}
+          order={editingOrder}
+          customers={customers}
+        />
+      )}
+      {canDelete && (
+        <OrderDeleteDialog
+          orgId={orgId}
+          target={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+        />
+      )}
+      {canImport && (
+        <ImportDialog
+          open={importOpen}
+          onOpenChange={setImportOpen}
+          orgId={orgId}
+          columnLabels={["Order Number", "Customer", "Email", "Status", "Amount", "Payment Method", "Notes"]}
+          actionFn={importOrdersCsv}
+          tNamespace="pages.orders.import"
+        />
+      )}
+      {canDelete && (
+        <BatchDeleteDialog
+          open={batchDeleteOpen}
+          onOpenChange={setBatchDeleteOpen}
+          count={selectedCount}
+          ids={Object.keys(rowSelection)}
+          orgId={orgId}
+          actionFn={removeOrders}
+          tNamespace="pages.orders"
+          onDeleted={() => setRowSelection({})}
+        />
       )}
     </>
   );
