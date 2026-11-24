@@ -8,6 +8,7 @@ import Notifications from "./Notifications";
 import LocaleSwitch from "./LocaleSwitch";
 import OrgSwitcher from "./OrgSwitcher";
 import Customizer from "@/components/customizer/customizer-panel";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { CurrentUser } from "@/lib/api/auth";
 import type { OrgSummary } from "@/lib/api/organizations";
 import type { OrgRole } from "@/lib/api/roles";
@@ -28,9 +29,8 @@ const Header = ({ user, orgs, activeOrg, roles }: HeaderProps) => {
         <nav>
           <div className="flex h-14 items-center justify-between gap-2 px-4 md:px-6">
             <div className="flex min-w-0 items-center gap-1">
-              <div className="block lg:hidden">
-                <FullLogo />
-              </div>
+              {/* 移动端菜单触发按钮（lg 以下才显示） */}
+              <SidebarTrigger className="lg:hidden" />
 
               <div className="hidden sm:block">
                 <Search />

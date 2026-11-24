@@ -106,7 +106,7 @@ export default function MemberPermissionsDialog({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
@@ -114,14 +114,18 @@ export default function MemberPermissionsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-3">
-          <PermissionTree selected={selected} onChange={setSelected} />
+        <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-hidden">
+          <PermissionTree
+            selected={selected}
+            onChange={setSelected}
+            className="flex-1 min-h-0 overflow-y-auto"
+          />
           <p className="text-xs text-muted-foreground">{t("overrideHint")}</p>
         </div>
 
         {error !== null && <p className="text-sm text-destructive">{error}</p>}
 
-        <DialogFooter>
+        <DialogFooter className="mt-auto mx-0 mb-0 rounded-b-none border-t bg-muted/50">
           <Button variant="outline" onClick={onClose} disabled={isPending}>
             {t("cancel")}
           </Button>

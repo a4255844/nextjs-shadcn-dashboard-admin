@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { LayoutPanelLeft, MousePointerClick } from "lucide-react";
+import { cn } from "cn";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   PERMISSION_GROUPS,
@@ -13,6 +14,8 @@ interface PermissionTreeProps {
   /** 当前勾选的权限集合 */
   selected: readonly PermissionKey[];
   onChange: (next: PermissionKey[]) => void;
+  /** 外部容器样式（常用于 flex 布局内撑开 + 独立滚动） */
+  className?: string;
 }
 
 /**
@@ -24,6 +27,7 @@ interface PermissionTreeProps {
 export default function PermissionTree({
   selected,
   onChange,
+  className,
 }: PermissionTreeProps) {
   const t = useTranslations("orgs.roles");
   const tSidebar = useTranslations("sidebar");
@@ -45,7 +49,7 @@ export default function PermissionTree({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border p-3">
+    <div className={cn("flex flex-col gap-4 rounded-lg border p-3", className)}>
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <LayoutPanelLeft className="size-3.5 text-primary" />

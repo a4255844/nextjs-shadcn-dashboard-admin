@@ -116,7 +116,7 @@ export default function RoleFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>
             {role === null ? t("createTitle") : t("editTitle")}
@@ -124,7 +124,7 @@ export default function RoleFormDialog({
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 flex-1 min-h-0">
           <div className="flex flex-col gap-2">
             <Label htmlFor="role-name">{t("nameLabel")}</Label>
             <Input
@@ -143,14 +143,18 @@ export default function RoleFormDialog({
             )}
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             <Label>{t("permissionsLabel")}</Label>
-            <PermissionTree selected={selected} onChange={setSelected} />
+            <PermissionTree
+              selected={selected}
+              onChange={setSelected}
+              className="flex-1 min-h-0 overflow-y-auto"
+            />
           </div>
 
           {error !== null && <p className="text-sm text-destructive">{error}</p>}
 
-          <DialogFooter>
+          <DialogFooter className="mt-auto mx-0 mb-0 rounded-b-none border-t bg-muted/50">
             <Button
               type="button"
               variant="outline"
