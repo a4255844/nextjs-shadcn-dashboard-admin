@@ -15,7 +15,10 @@ export interface NotificationType {
 export interface ProfileType {
   avatar: LucideIcon;
   titleKey: string;
-  href: string;
+  /** 路由地址；与 actionType 互斥 */
+  href?: string;
+  /** 非路由型动作标记：渲染为 button 而非 Link，由消费方按类型处理 */
+  actionType?: "customizer";
 }
 
 // 全局搜索结果项

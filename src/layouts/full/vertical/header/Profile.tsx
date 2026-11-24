@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "cn";
 import { profileDD } from "./data";
 import { Link } from "@/i18n/navigation";
+import { useCustomizer } from "@/components/customizer/customizer-context";
 import type { CurrentUser } from "@/lib/api/auth";
 
 /** 取用于头像/展示的名字：优先 first + last，其次 email @ 前段 */
@@ -40,6 +41,7 @@ function getInitials(user: CurrentUser): string {
 export default function ProfileSheet({ user }: { user: CurrentUser | null }) {
   const t = useTranslations("header.profile");
   const router = useRouter();
+  const { openCustomizer } = useCustomizer();
 
   async function handleSignOut() {
     const supabase = createClient();
@@ -104,21 +106,42 @@ export default function ProfileSheet({ user }: { user: CurrentUser | null }) {
           <ul className="flex flex-col gap-2 p-6">
             {profileDD.map((item) => (
               <li key={item.titleKey} className="group">
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "flex gap-3 py-2 px-3 rounded-md group-hover:bg-primary/5 text-muted-foreground"
-                  )}
-                >
-                  <item.avatar
-                    width={20}
-                    height={20}
-                    className="group-hover:text-primary"
-                  />
-                  <h6 className="text-sm group-hover:text-primary">
-                    {t(item.titleKey)}
-                  </h6>
-                </Link>
+                {item.actionType === "customizer" ? (
+                  <SheetClose asChild>
+                    <button
+                      type="button"
+                      onClick={openCustomizer}
+                      className={cn(
+                        "flex gap-3 py-2 px-3 rounded-md group-hover:bg-primary/5 text-muted-foreground w-full text-start cursor-pointer bg-transparent border-0",
+                      )}
+                    >
+                      <item.avatar
+                        width={20}
+                        height={20}
+                        className="group-hover:text-primary"
+                      />
+                      <h6 className="text-sm group-hover:text-primary">
+                        {t(item.titleKey)}
+                      </h6>
+                    </button>
+                  </SheetClose>
+                ) : (
+                  <Link
+                    href={item.href!}
+                    className={cn(
+                      "flex gap-3 py-2 px-3 rounded-md group-hover:bg-primary/5 text-muted-foreground"
+                    )}
+                  >
+                    <item.avatar
+                      width={20}
+                      height={20}
+                      className="group-hover:text-primary"
+                    />
+                    <h6 className="text-sm group-hover:text-primary">
+                      {t(item.titleKey)}
+                    </h6>
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

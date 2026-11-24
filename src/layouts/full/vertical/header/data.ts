@@ -79,7 +79,7 @@ const profileDD: ProfileType[] = [
   {
     avatar: SettingsIcon,
     titleKey: 'settings',
-    href: '/settings',
+    actionType: 'customizer',
   },
 ];
 

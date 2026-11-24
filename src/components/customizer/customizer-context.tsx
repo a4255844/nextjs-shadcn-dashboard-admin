@@ -33,6 +33,11 @@ interface CustomizerContextValue {
   mounted: boolean;
   /** 实际生效的文本方向：显式设置优先，否则回退当前 locale 推导 */
   resolvedDirection: ThemeDirection;
+  /** Customizer 侧边栏开合状态（供外部菜单项/头像下拉打开） */
+  customizerOpen: boolean;
+  openCustomizer: () => void;
+  closeCustomizer: () => void;
+  setCustomizerOpen: (open: boolean) => void;
   setStyle: (style: ThemeStyle) => void;
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
@@ -100,9 +105,14 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
   // 始终以默认值启动，保证 SSR 与首帧一致，避免 hydration mismatch
   const [settings, setSettings] = useState<CustomizerSettings>(DEFAULT_SETTINGS);
   const [mounted, setMounted] = useState(false);
+  // Customizer 侧边栏开合状态
+  const [customizerOpen, setCustomizerOpen] = useState(false);
   // 最新设置的同步引用，供 update 在事件中同步读取/落盘
   const settingsRef = useRef(settings);
   const locale = useLocale();
+
+  const openCustomizer = useCallback(() => setCustomizerOpen(true), []);
+  const closeCustomizer = useCallback(() => setCustomizerOpen(false), []);
 
   // 显式方向优先；为 null 时回退 locale 推导。首帧默认值即 locale 方向，与 SSR 一致
   const resolvedDirection: ThemeDirection =
@@ -187,6 +197,10 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
       settings,
       mounted,
       resolvedDirection,
+      customizerOpen,
+      openCustomizer,
+      closeCustomizer,
+      setCustomizerOpen,
       setStyle,
       setMode,
       toggleMode,
@@ -198,6 +212,10 @@ export function CustomizerProvider({ children }: { children: ReactNode }) {
       settings,
       mounted,
       resolvedDirection,
+      customizerOpen,
+      openCustomizer,
+      closeCustomizer,
+      setCustomizerOpen,
       setStyle,
       setMode,
       toggleMode,

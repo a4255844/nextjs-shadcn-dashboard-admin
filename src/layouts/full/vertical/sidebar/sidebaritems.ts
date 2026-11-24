@@ -95,7 +95,7 @@ const SidebarContent: MenuItem[] = [
         id: uniqueId(),
         name: "settings",
         icon: Settings,
-        url: "/settings",
+        actionType: "customizer",
       },
     ],
   },

@@ -20,6 +20,8 @@ export interface ChildItem {
   isPro?: boolean;
   /** 访问该路由所需权限；未设置的项对所有成员可见 */
   permission?: PermissionKey;
+  /** 非路由型动作标记：渲染为 button 而非 Link，由消费方按类型处理 */
+  actionType?: "customizer";
 }
 
 // 侧边栏分组（含 heading 和 items）

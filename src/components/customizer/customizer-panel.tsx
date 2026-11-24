@@ -21,15 +21,17 @@ import {
 } from "./types";
 import { useCustomizer } from "./customizer-context";
 
-// Customizer 抽屉：Header 齿轮触发，右侧滑出。
-// 后续模块（布局/容器）在各 section 之后继续追加。
+// Customizer 抽屉：Header 齿轮触发（SheetTrigger），右侧滑出。
+// 也支持外部通过 openCustomizer() 主动打开（侧边栏菜单/头像下拉等）。
 export default function Customizer() {
   // 国际化文案（messages/*.json 的 customizer 命名空间）
   const t = useTranslations("customizer");
-  // 全局设置状态：settings 为当前值，resolvedDirection 为语言回退后的实际方向
+  // 全局设置状态 + 抽屉开合状态
   const {
     settings,
     resolvedDirection,
+    customizerOpen,
+    setCustomizerOpen,
     setStyle,
     setMode,
     setDirection,
@@ -37,8 +39,8 @@ export default function Customizer() {
   } = useCustomizer();
 
   return (
-    // Sheet 根组件：管理抽屉开合状态（Radix Dialog 封装）
-    <Sheet>
+    // Sheet 根组件：受控模式，开合由 context 统一管理
+    <Sheet open={customizerOpen} onOpenChange={setCustomizerOpen}>
       {/* 触发器：Header 中的齿轮按钮，asChild 让 Button 直接作为触发节点 */}
       <SheetTrigger asChild>
         <Button

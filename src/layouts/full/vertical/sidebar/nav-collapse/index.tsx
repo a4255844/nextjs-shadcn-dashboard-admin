@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import NavItem from "../nav-items/index";
 import { cn } from "cn";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useCustomizer } from "@/components/customizer/customizer-context";
 import type { MenuItem, ChildItem } from "../types";
 
 interface NavCollapseProps {
@@ -17,6 +18,11 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
   const { state } = useSidebar();
   const isCollapse = state === "collapsed";
   const t = useTranslations("sidebar");
+  const { openCustomizer } = useCustomizer();
+
+  const handleAction = (item: ChildItem) => {
+    if (item.actionType === "customizer") openCustomizer();
+  };
 
   const isActiveRoute = (item: ChildItem): boolean => {
     if (item.url && pathname === item.url) return true;
@@ -56,8 +62,29 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
               Array.isArray(item.items) && item.items.length > 0;
             const active = isActiveRoute(item);
 
-            // No children → direct link
-            if (!hasChildren)
+            // No children → direct link or action button
+            if (!hasChildren) {
+              // 非路由型动作（如打开 Customizer 侧边栏）
+              if (item.actionType) {
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => handleAction(item)}
+                    className={cn(
+                      "flex items-center gap-3 rounded-md transition-all duration-200 ease-in-out w-full text-start cursor-pointer bg-transparent border-0 p-0",
+                      className,
+                    )}
+                  >
+                    <NavItem
+                      item={item}
+                      hasChildren={false}
+                      isActive={active}
+                      label={getMenuText(item.name || "")}
+                    />
+                  </button>
+                );
+              }
               return (
                 <Link
                   key={index}
@@ -76,6 +103,7 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
                   />
                 </Link>
               );
+            }
 
             // With children → collapsible
             return (
@@ -106,6 +134,24 @@ export default function NavCollapse({ menu, className }: NavCollapseProps) {
                         menu={[{ items: [sub] }]}
                         className={className}
                       />
+                    ) : sub.actionType ? (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleAction(sub)}
+                        className={cn(
+                          "block rounded-md transition-all duration-200 ease-in-out w-full text-start cursor-pointer bg-transparent border-0 p-0",
+                          className,
+                        )}
+                      >
+                        <NavItem
+                          item={sub}
+                          hasChildren={false}
+                          className={cn("px-2! py-1! my-1!")}
+                          isActive={false}
+                          label={getMenuText(sub.name || "")}
+                        />
+                      </button>
                     ) : (
                       <Link
                         key={index}
